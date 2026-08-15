@@ -49,13 +49,15 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       transition: 0.2s;
     }
     .btn-primary { background: var(--primary-dark); color: white; }
     .btn-primary:hover { background: #4338ca; }
     .btn-outline { background: white; border: 1px solid #cbd5e1; color: var(--text); }
+    .btn-outline:hover { background: #f8fafc; }
     .btn-danger { background: #fee2e2; color: var(--danger); }
+    
     .select-st {
       width: 100%;
       padding: 10px 14px;
@@ -66,12 +68,11 @@
       background: #fff;
     }
 
-    /* สไตล์ลิสต์บทเรียนแบบดั้งเดิม */
     .topic-card-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 0;
+      padding: 16px 0;
       border-bottom: 1px solid #f1f5f9;
       gap: 16px;
     }
@@ -84,14 +85,14 @@
       flex: 1;
     }
     .badge-num {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       flex-shrink: 0;
       margin-top: 2px;
     }
@@ -99,25 +100,46 @@
     .num-in_progress { background: #fef08a; color: #854d0e; }
     .num-pending { background: #f1f5f9; color: #64748b; }
 
-    .status-tag {
-      font-size: 0.82rem;
-      padding: 3px 10px;
+    /* ป้ายสถานะทรงมนแบบคลิกเลือกเปลี่ยนได้ทันที */
+    .status-select-pill {
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      padding: 4px 28px 4px 12px;
       border-radius: 20px;
-      font-weight: 500;
-      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 10px;
       margin-left: 8px;
+      transition: all 0.2s;
     }
-    .tag-completed { background: #dcfce7; color: #166534; }
-    .tag-in_progress { background: #fef3c7; color: #92400e; }
-    .tag-pending { background: #f1f5f9; color: #64748b; }
+    .status-select-pill.completed {
+      background-color: #dcfce7;
+      color: #166534;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23166534'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    }
+    .status-select-pill.in_progress {
+      background-color: #fef08a;
+      color: #854d0e;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23854d0e'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    }
+    .status-select-pill.pending {
+      background-color: #f1f5f9;
+      color: #64748b;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    }
 
     .action-link {
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       margin-left: 8px;
-      color: #64748b;
+      color: #94a3b8;
       display: inline-flex;
       align-items: center;
       gap: 2px;
@@ -129,19 +151,35 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #f1f5f9;
+      background: #f8fafc;
       border: 1px solid #e2e8f0;
       padding: 4px 12px;
       border-radius: 20px;
       font-size: 0.78rem;
       text-decoration: none;
       color: #334155;
-      margin: 6px 6px 0 0;
-      transition: 0.2s;
+      margin: 4px 4px 0 0;
     }
-    .attachment-capsule:hover { background: #e2e8f0; }
 
-    /* กล่องสนทนา */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
     .chat-box { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-right: 6px; }
     .chat-msg { padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; max-width: 80%; }
     .chat-msg.tutor { align-self: flex-end; background: #e0e7ff; color: #312e81; }
@@ -173,21 +211,16 @@
       </div>
     </div>
 
-    <!-- ส่วนเนื้อหาบทเรียนและสนทนา -->
+    <!-- แผนการสอน -->
     <div id="contentSection" style="display: none;">
-      
-      <!-- แผนการสอน -->
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
           <div>
-            <h3 style="font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-              <span>📚</span> แผนการสอนและบทเรียน
-            </h3>
-            <p id="courseSub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">เรียนผ่านแล้ว 0 จาก 0 บท</p>
+            <h3 style="font-size: 1.2rem; font-weight: 600;">📚 แผนการสอนและบทเรียน</h3>
+            <p id="courseSub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">เรียนผ่านแล้ว 0 จาก 0 บท</p>
           </div>
           <button class="btn btn-primary" onclick="addTopicPrompt()">+ เพิ่มเนื้อหาบทเรียน</button>
         </div>
-        
         <div id="topicList"></div>
       </div>
 
@@ -200,14 +233,33 @@
           <button class="btn btn-primary" onclick="sendTutorComment()">ส่งข้อความ</button>
         </div>
       </div>
-
     </div>
 
+  </div>
+
+  <!-- Modal สำหรับอัปโหลดไฟล์และโน้ตคุณครู -->
+  <div id="updateModal" class="modal-backdrop">
+    <div class="modal-content">
+      <h3 style="font-size: 1.1rem; margin-bottom: 12px;">✏️ บันทึกโน้ตและแนบไฟล์</h3>
+      <input type="hidden" id="modalTopicId">
+      
+      <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">บันทึกผลการสอน / การบ้าน:</label>
+      <textarea id="modalTutorNotes" class="select-st" style="height: 90px; margin-top: 6px; resize: none;" placeholder="ระบุสิ่งที่เด็กทำได้ หรือการบ้าน..."></textarea>
+      
+      <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; display: block; margin-top: 12px;">แนบรูปภาพ / คลิปวิดีโอ / PDF:</label>
+      <input type="file" id="modalFiles" multiple class="select-st" style="margin-top: 6px;">
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <button class="btn btn-outline" onclick="closeUpdateModal()">ยกเลิก</button>
+        <button class="btn btn-primary" id="saveModalBtn" onclick="saveTopicDetails()">💾 บันทึกข้อมูล</button>
+      </div>
+    </div>
   </div>
 
   <script>
     let currentStudentId = null;
     let allStudents = [];
+    let currentTopics = [];
 
     async function loadStudents() {
       const res = await fetch('/api/students');
@@ -247,23 +299,22 @@
       const res = await fetch(`/api/students/${currentStudentId}/progress`);
       const data = await res.json();
       if (data.success) {
-        const topics = data.topics || [];
-        const completed = topics.filter(t => t.status === 'completed').length;
-        document.getElementById('courseSub').innerText = `เรียนผ่านแล้ว ${completed} จาก ${topics.length} บท`;
+        currentTopics = data.topics || [];
+        const completed = currentTopics.filter(t => t.status === 'completed').length;
+        document.getElementById('courseSub').innerText = `เรียนผ่านแล้ว ${completed} จาก ${currentTopics.length} บท`;
 
         const list = document.getElementById('topicList');
-        if (topics.length === 0) {
+        if (currentTopics.length === 0) {
           list.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; padding: 14px 0;">ยังไม่มีบทเรียน คลิกปุ่ม "+ เพิ่มเนื้อหาบทเรียน" เพื่อเริ่มต้น</p>';
           return;
         }
 
-        list.innerHTML = topics.map(t => {
-          let statusThai = t.status === 'completed' ? 'เรียนเสร็จแล้ว' : (t.status === 'in_progress' ? 'กำลังเรียนอยู่' : 'ยังไม่เริ่ม');
-          let numClass = `num-${t.status || 'pending'}`;
-          let tagClass = `tag-${t.status || 'pending'}`;
+        list.innerHTML = currentTopics.map(t => {
+          const status = t.status || 'pending';
+          let numClass = `num-${status}`;
 
           let filesHtml = (t.attachments && t.attachments.length > 0) 
-            ? '<div style="margin-top: 4px;">' + t.attachments.map(a => `<a href="${a.file_url}" target="_blank" class="attachment-capsule">📎 ${a.file_name}</a>`).join('') + '</div>'
+            ? '<div style="margin-top: 6px;">' + t.attachments.map(a => `<a href="${a.file_url}" target="_blank" class="attachment-capsule">📎 ${a.file_name}</a>`).join('') + '</div>'
             : '';
           let noteHtml = t.tutor_notes ? `<div style="font-size: 0.82rem; color: #475569; margin-top: 6px; background: #f8fafc; padding: 6px 10px; border-radius: 8px;">📝 <b>บันทึก:</b> ${t.tutor_notes}</div>` : '';
 
@@ -274,7 +325,14 @@
                 <div style="flex: 1;">
                   <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
                     <b style="font-size: 1rem;">${t.title}</b>
-                    <span class="status-tag ${tagClass}">${statusThai}</span>
+                    
+                    <!-- ป้ายสถานะแบบเลือกเปลี่ยนได้ทันที -->
+                    <select class="status-select-pill ${status}" onchange="changeTopicStatus('${t.topic_id}', this.value)">
+                      <option value="pending" ${status === 'pending' ? 'selected' : ''}>ยังไม่เริ่ม</option>
+                      <option value="in_progress" ${status === 'in_progress' ? 'selected' : ''}>กำลังเรียนอยู่</option>
+                      <option value="completed" ${status === 'completed' ? 'selected' : ''}>เรียนเสร็จแล้ว</option>
+                    </select>
+
                     <button class="action-link" onclick="editTopicName('${t.topic_id}', '${t.title}')">✏️ แก้ไข</button>
                     <button class="action-link delete" onclick="deleteTopic('${t.topic_id}')">🗑️ ลบ</button>
                   </div>
@@ -283,12 +341,66 @@
                 </div>
               </div>
               <div>
-                <button class="btn btn-outline" style="font-size: 0.82rem; white-space: nowrap;" onclick="updateProgressModal('${t.topic_id}')">✏️ อัปเดตผล / แนบไฟล์</button>
+                <button class="btn btn-outline" style="font-size: 0.82rem; white-space: nowrap;" onclick="openUpdateModal('${t.topic_id}')">✏️ อัปเดตผล / แนบไฟล์</button>
               </div>
             </div>
           `;
         }).join('');
       }
+    }
+
+    // ฟังก์ชันเปลี่ยนสถานะทันทีเมื่อผู้ใช้เลือกจากดรอปดาวน์
+    async function changeTopicStatus(topicId, newStatus) {
+      const fd = new FormData();
+      fd.append('status', newStatus);
+      await fetch(`/api/progress/${currentStudentId}/${topicId}`, {
+        method: 'PATCH',
+        body: fd
+      });
+      loadProgress();
+    }
+
+    function openUpdateModal(topicId) {
+      const t = currentTopics.find(x => x.topic_id === topicId);
+      document.getElementById('modalTopicId').value = topicId;
+      document.getElementById('modalTutorNotes').value = t ? (t.tutor_notes || '') : '';
+      document.getElementById('modalFiles').value = '';
+      document.getElementById('updateModal').style.display = 'flex';
+    }
+
+    function closeUpdateModal() {
+      document.getElementById('updateModal').style.display = 'none';
+    }
+
+    async function saveTopicDetails() {
+      const topicId = document.getElementById('modalTopicId').value;
+      const notes = document.getElementById('modalTutorNotes').value;
+      const filesInput = document.getElementById('modalFiles');
+      const btn = document.getElementById('saveModalBtn');
+
+      const t = currentTopics.find(x => x.topic_id === topicId);
+      const currentStatus = t ? (t.status || 'pending') : 'pending';
+
+      const fd = new FormData();
+      fd.append('status', currentStatus);
+      if (notes) fd.append('tutorNotes', notes);
+
+      for (let i = 0; i < filesInput.files.length; i++) {
+        fd.append('files', filesInput.files[i]);
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'กำลังบันทึก...';
+      
+      await fetch(`/api/progress/${currentStudentId}/${topicId}`, {
+        method: 'PATCH',
+        body: fd
+      });
+
+      btn.disabled = false;
+      btn.innerText = '💾 บันทึกข้อมูล';
+      closeUpdateModal();
+      loadProgress();
     }
 
     async function addTopicPrompt() {
@@ -316,40 +428,6 @@
     async function deleteTopic(topicId) {
       if (!confirm('ต้องการลบบทเรียนนี้ใช่หรือไม่?')) return;
       await fetch(`/api/topics/${topicId}`, { method: 'DELETE' });
-      loadProgress();
-    }
-
-    async function updateProgressModal(topicId) {
-      const status = prompt('ระบุสถานะ:\ncompleted = เรียนเสร็จแล้ว\nin_progress = กำลังเรียนอยู่\npending = ยังไม่เริ่ม', 'completed');
-      if (!status) return;
-      const tutorNotes = prompt('บันทึกความเข้าใจ / การบ้าน:');
-
-      const fd = new FormData();
-      fd.append('status', status);
-      if (tutorNotes) fd.append('tutorNotes', tutorNotes);
-
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.multiple = true;
-      fileInput.onchange = async () => {
-        for (let i = 0; i < fileInput.files.length; i++) {
-          fd.append('files', fileInput.files[i]);
-        }
-        await submitProgressUpdate(topicId, fd);
-      };
-
-      if (confirm('ต้องการแนบรูปภาพ/วิดีโอ/ไฟล์ หรือไม่? (กด OK เพื่อเลือกไฟล์ หรือกด Cancel เพื่อบันทึกทันที)')) {
-        fileInput.click();
-      } else {
-        await submitProgressUpdate(topicId, fd);
-      }
-    }
-
-    async function submitProgressUpdate(topicId, fd) {
-      await fetch(`/api/progress/${currentStudentId}/${topicId}`, {
-        method: 'PATCH',
-        body: fd
-      });
       loadProgress();
     }
 
