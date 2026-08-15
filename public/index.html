@@ -12,6 +12,7 @@
       --bg: #f8fafc;
       --surface: #ffffff;
       --text: #1e293b;
+      --text-muted: #64748b;
       --border: #e2e8f0;
       --success: #10b981;
       --warning: #f59e0b;
@@ -19,27 +20,29 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
     body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+    
     .header {
-      background: var(--primary);
+      background: var(--primary-dark);
       color: white;
-      padding: 16px 24px;
+      padding: 16px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
     }
-    .container { max-width: 920px; margin: 24px auto; padding: 0 16px; }
+    .container { max-width: 900px; margin: 28px auto; padding: 0 16px; }
     .card {
       background: var(--surface);
-      border-radius: 16px;
-      padding: 22px;
-      margin-bottom: 20px;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
       border: 1px solid var(--border);
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 15px -2px rgba(0,0,0,0.04);
     }
+
     .btn {
-      padding: 8px 16px;
-      border-radius: 10px;
+      padding: 8px 18px;
+      border-radius: 12px;
       border: none;
       cursor: pointer;
       font-weight: 500;
@@ -49,62 +52,108 @@
       font-size: 0.9rem;
       transition: 0.2s;
     }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+    .btn-primary { background: var(--primary-dark); color: white; }
+    .btn-primary:hover { background: #4338ca; }
+    .btn-outline { background: white; border: 1px solid #cbd5e1; color: var(--text); }
     .btn-danger { background: #fee2e2; color: var(--danger); }
     .select-st {
       width: 100%;
       padding: 10px 14px;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid var(--border);
       font-size: 0.95rem;
       outline: none;
+      background: #fff;
     }
-    .topic-row {
+
+    /* สไตล์ลิสต์บทเรียนแบบดั้งเดิม */
+    .topic-card-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 14px;
+      padding: 18px 0;
       border-bottom: 1px solid #f1f5f9;
-      gap: 12px;
+      gap: 16px;
     }
-    .topic-row:last-child { border-bottom: none; }
-    .badge {
-      padding: 4px 10px;
+    .topic-card-item:last-child { border-bottom: none; }
+
+    .topic-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1;
+    }
+    .badge-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .num-completed { background: #dcfce7; color: #15803d; }
+    .num-in_progress { background: #fef08a; color: #854d0e; }
+    .num-pending { background: #f1f5f9; color: #64748b; }
+
+    .status-tag {
+      font-size: 0.82rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      display: inline-block;
+      margin-left: 8px;
+    }
+    .tag-completed { background: #dcfce7; color: #166534; }
+    .tag-in_progress { background: #fef3c7; color: #92400e; }
+    .tag-pending { background: #f1f5f9; color: #64748b; }
+
+    .action-link {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.82rem;
+      margin-left: 8px;
+      color: #64748b;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .action-link:hover { color: var(--primary-dark); }
+    .action-link.delete:hover { color: var(--danger); }
+
+    .attachment-capsule {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 4px 12px;
       border-radius: 20px;
       font-size: 0.78rem;
-      font-weight: 600;
+      text-decoration: none;
+      color: #334155;
+      margin: 6px 6px 0 0;
+      transition: 0.2s;
     }
-    .badge.completed { background: #dcfce7; color: #166534; }
-    .badge.in_progress { background: #fef3c7; color: #92400e; }
-    .badge.pending { background: #f1f5f9; color: #64748b; }
+    .attachment-capsule:hover { background: #e2e8f0; }
 
+    /* กล่องสนทนา */
     .chat-box { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-right: 6px; }
     .chat-msg { padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; max-width: 80%; }
     .chat-msg.tutor { align-self: flex-end; background: #e0e7ff; color: #312e81; }
     .chat-msg.parent { align-self: flex-start; background: #f1f5f9; color: #1e293b; }
-    .attachment-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      padding: 4px 10px;
-      border-radius: 16px;
-      font-size: 0.78rem;
-      text-decoration: none;
-      color: #475569;
-      margin: 4px 4px 0 0;
-    }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h2 style="font-size: 1.25rem;">📝 Tutor Portal (ระบบติดตามรายบุคคล)</h2>
+    <h2 style="font-size: 1.25rem; font-weight: 600;">📝 Tutor Portal (ระบบติดตามรายบุคคล)</h2>
     <div>
-      <a href="/parent.html" target="_blank" style="color: white; margin-right: 14px; text-decoration: underline; font-size: 0.9rem;">🔗 ลิงก์รวมผู้ปกครอง</a>
+      <a href="/parent.html" target="_blank" style="color: white; margin-right: 16px; text-decoration: underline; font-size: 0.9rem;">🔗 ลิงก์รวมผู้ปกครอง</a>
       <button class="btn" style="background: white; color: var(--primary-dark);" onclick="openAddStudent()">+ เพิ่มนักเรียนใหม่</button>
     </div>
   </div>
@@ -113,14 +162,14 @@
     
     <!-- กล่องเลือกนักเรียน -->
     <div class="card">
-      <label style="font-weight: 600; color: #64748b; font-size: 0.88rem;">เลือกนักเรียนที่ต้องการจัดการ:</label>
+      <label style="font-weight: 600; color: var(--text-muted); font-size: 0.88rem;">เลือกนักเรียนที่ต้องการจัดการ:</label>
       <div style="display: flex; gap: 10px; margin-top: 8px; align-items: center;">
         <select id="studentSelect" class="select-st" onchange="onStudentChange(this.value)">
           <option value="">กำลังโหลดรายชื่อนักเรียน...</option>
         </select>
         <button class="btn btn-outline" onclick="editCurrentStudent()" title="แก้ไขข้อมูลนักเรียน">✏️</button>
         <button class="btn btn-danger" onclick="deleteCurrentStudent()" title="ลบนักเรียน">🗑️</button>
-        <button class="btn btn-primary" onclick="copyParentLink()">📋 คัดลอกลิงก์รวมส่ง LINE</button>
+        <button class="btn btn-primary" onclick="copyParentLink()">📋 คัดลอกลิงก์ส่ง LINE</button>
       </div>
     </div>
 
@@ -129,19 +178,22 @@
       
       <!-- แผนการสอน -->
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
           <div>
-            <h3 id="courseTitleHeader" style="font-size: 1.15rem; font-weight: 600;">📚 แผนการสอนและบทเรียน</h3>
-            <p id="courseSub" style="font-size: 0.85rem; color: #64748b;"></p>
+            <h3 style="font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+              <span>📚</span> แผนการสอนและบทเรียน
+            </h3>
+            <p id="courseSub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">เรียนผ่านแล้ว 0 จาก 0 บท</p>
           </div>
           <button class="btn btn-primary" onclick="addTopicPrompt()">+ เพิ่มเนื้อหาบทเรียน</button>
         </div>
+        
         <div id="topicList"></div>
       </div>
 
       <!-- กล่องข้อความและฟีดแบ็ก -->
       <div class="card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 12px;">💬 สนทนา / ตอบคำถามผู้ปกครอง (น้อง <span id="chatStName" style="color: var(--primary);"></span>)</h3>
+        <h3 style="font-size: 1.1rem; margin-bottom: 12px;">💬 สนทนา / ฟีดแบ็กกับผู้ปกครอง (น้อง <span id="chatStName" style="color: var(--primary-dark);"></span>)</h3>
         <div id="tutorChatBox" class="chat-box"></div>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="tutorMsgInput" class="select-st" placeholder="พิมพ์ข้อความตอบกลับผู้ปกครอง..." onkeypress="if(event.key==='Enter') sendTutorComment()">
@@ -201,31 +253,37 @@
 
         const list = document.getElementById('topicList');
         if (topics.length === 0) {
-          list.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; padding: 10px 0;">ยังไม่มีบทเรียน คลิกปุ่ม "+ เพิ่มเนื้อหาบทเรียน" เพื่อเริ่มต้น</p>';
+          list.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; padding: 14px 0;">ยังไม่มีบทเรียน คลิกปุ่ม "+ เพิ่มเนื้อหาบทเรียน" เพื่อเริ่มต้น</p>';
           return;
         }
 
         list.innerHTML = topics.map(t => {
           let statusThai = t.status === 'completed' ? 'เรียนเสร็จแล้ว' : (t.status === 'in_progress' ? 'กำลังเรียนอยู่' : 'ยังไม่เริ่ม');
+          let numClass = `num-${t.status || 'pending'}`;
+          let tagClass = `tag-${t.status || 'pending'}`;
+
           let filesHtml = (t.attachments && t.attachments.length > 0) 
-            ? '<div>' + t.attachments.map(a => `<a href="${a.file_url}" target="_blank" class="attachment-pill">📎 ${a.file_name}</a>`).join('') + '</div>'
+            ? '<div style="margin-top: 4px;">' + t.attachments.map(a => `<a href="${a.file_url}" target="_blank" class="attachment-capsule">📎 ${a.file_name}</a>`).join('') + '</div>'
             : '';
-          let noteHtml = t.tutor_notes ? `<div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">📝 ${t.tutor_notes}</div>` : '';
+          let noteHtml = t.tutor_notes ? `<div style="font-size: 0.82rem; color: #475569; margin-top: 6px; background: #f8fafc; padding: 6px 10px; border-radius: 8px;">📝 <b>บันทึก:</b> ${t.tutor_notes}</div>` : '';
 
           return `
-            <div class="topic-row">
-              <div style="flex: 1;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <b>${t.sequence_order}. ${t.title}</b>
-                  <span class="badge ${t.status}">${statusThai}</span>
-                  <button style="border:none; background:none; cursor:pointer; font-size:0.8rem; color:#6366f1;" onclick="editTopicName('${t.topic_id}', '${t.title}')">✏️ แก้ไข</button>
-                  <button style="border:none; background:none; cursor:pointer; font-size:0.8rem; color:#ef4444;" onclick="deleteTopic('${t.topic_id}')">🗑️ ลบ</button>
+            <div class="topic-card-item">
+              <div class="topic-left">
+                <div class="badge-num ${numClass}">${t.sequence_order}</div>
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+                    <b style="font-size: 1rem;">${t.title}</b>
+                    <span class="status-tag ${tagClass}">${statusThai}</span>
+                    <button class="action-link" onclick="editTopicName('${t.topic_id}', '${t.title}')">✏️ แก้ไข</button>
+                    <button class="action-link delete" onclick="deleteTopic('${t.topic_id}')">🗑️ ลบ</button>
+                  </div>
+                  ${noteHtml}
+                  ${filesHtml}
                 </div>
-                ${noteHtml}
-                ${filesHtml}
               </div>
               <div>
-                <button class="btn btn-outline" style="font-size: 0.82rem;" onclick="updateProgressModal('${t.topic_id}')">✏️ อัปเดตผล / แนบไฟล์</button>
+                <button class="btn btn-outline" style="font-size: 0.82rem; white-space: nowrap;" onclick="updateProgressModal('${t.topic_id}')">✏️ อัปเดตผล / แนบไฟล์</button>
               </div>
             </div>
           `;
@@ -262,7 +320,7 @@
     }
 
     async function updateProgressModal(topicId) {
-      const status = prompt('ระบุสถานะ:\ncompleted = เรียนเสร็จแล้ว\nin_progress = กำลังเรียน\npending = ยังไม่เริ่ม', 'completed');
+      const status = prompt('ระบุสถานะ:\ncompleted = เรียนเสร็จแล้ว\nin_progress = กำลังเรียนอยู่\npending = ยังไม่เริ่ม', 'completed');
       if (!status) return;
       const tutorNotes = prompt('บันทึกความเข้าใจ / การบ้าน:');
 
@@ -270,7 +328,6 @@
       fd.append('status', status);
       if (tutorNotes) fd.append('tutorNotes', tutorNotes);
 
-      // สร้าง input file ชั่วคราวเพื่อให้เลือกไฟล์ได้ง่ายๆ
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
       fileInput.multiple = true;
@@ -357,7 +414,7 @@
         `).join('');
         box.scrollTop = box.scrollHeight;
       } else {
-        box.innerHTML = '<p style="color: #64748b; font-size: 0.85rem; text-align: center;">ยังไม่มีข้อความสนทนา</p>';
+        box.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center;">ยังไม่มีข้อความสนทนา</p>';
       }
     }
 
