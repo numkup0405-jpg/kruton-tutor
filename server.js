@@ -21,20 +21,28 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// อัปเกรดตารางให้รองรับ student_id ใน topics และ course_title ใน students อัตโนมัติ
+// ตรวจสอบและสร้างตาราง comments และฟิลด์ที่จำเป็นอัตโนมัติ
 (async () => {
   try {
     await pool.query(`
       ALTER TABLE topics ADD COLUMN IF NOT EXISTS student_id UUID;
       ALTER TABLE topics ALTER COLUMN course_id DROP NOT NULL;
       ALTER TABLE students ADD COLUMN IF NOT EXISTS course_title VARCHAR(255);
+
+      CREATE TABLE IF NOT EXISTS comments (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+        sender_role VARCHAR(20) NOT NULL,
+        sender_name VARCHAR(100) NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      );
     `);
   } catch (e) {
-    console.error('Setup column check:', e.message);
+    console.error('Setup DB check:', e.message);
   }
 })();
 
-// ตั้งค่าที่เก็บไฟล์
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => {
@@ -44,9 +52,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ==================== API สำหรับจัดการนักเรียน ====================
+// ==================== API นักเรียน ====================
 
-// 1. ดึงรายชื่อนักเรียนทั้งหมด
 app.get('/api/students', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM students ORDER BY created_at DESC');
@@ -56,7 +63,6 @@ app.get('/api/students', async (req, res) => {
   }
 });
 
-// 2. เพิ่มนักเรียนใหม่
 app.post('/api/students', async (req, res) => {
   try {
     const { fullName, nickname, gradeLevel, courseTitle } = req.body;
@@ -66,19 +72,16 @@ app.post('/api/students', async (req, res) => {
       'INSERT INTO students (full_name, nickname, grade_level, course_title, parent_access_code) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [fullName, nickname, gradeLevel, courseTitle || 'วิชาเรียนทั่วไป', accessCode]
     );
-
     res.json({ success: true, student: studentRes.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// 3. แก้ไขข้อมูลนักเรียน / ชื่อวิชา
 app.put('/api/students/:studentId', async (req, res) => {
   try {
     const { studentId } = req.params;
     const { fullName, nickname, gradeLevel, courseTitle } = req.body;
-
     const result = await pool.query(
       'UPDATE students SET full_name = $1, nickname = $2, grade_level = $3, course_title = $4 WHERE id = $5 RETURNING *',
       [fullName, nickname, gradeLevel, courseTitle, studentId]
@@ -89,12 +92,12 @@ app.put('/api/students/:studentId', async (req, res) => {
   }
 });
 
-// 4. ลบนักเรียน
 app.delete('/api/students/:studentId', async (req, res) => {
   try {
     const { studentId } = req.params;
     await pool.query('DELETE FROM topics WHERE student_id = $1', [studentId]);
     await pool.query('DELETE FROM student_progress WHERE student_id = $1', [studentId]);
+    await pool.query('DELETE FROM comments WHERE student_id = $1', [studentId]);
     await pool.query('DELETE FROM students WHERE id = $1', [studentId]);
     res.json({ success: true, message: 'ลบนักเรียนเรียบร้อย' });
   } catch (err) {
@@ -102,9 +105,8 @@ app.delete('/api/students/:studentId', async (req, res) => {
   }
 });
 
-// ==================== API สำหรับจัดการบทเรียน ====================
+// ==================== API บทเรียนและความคืบหน้า ====================
 
-// 5. ดึงบทเรียนเฉพาะของนักเรียนคนนั้น
 app.get('/api/students/:studentId/progress', async (req, res) => {
   try {
     const { studentId } = req.params;
@@ -139,25 +141,21 @@ app.get('/api/students/:studentId/progress', async (req, res) => {
   }
 });
 
-// 6. เพิ่มบทเรียนให้นักเรียนคนนี้โดยเฉพาะ
 app.post('/api/topics', async (req, res) => {
   try {
     const { title, studentId } = req.body;
     const countRes = await pool.query('SELECT COUNT(*) FROM topics WHERE student_id = $1', [studentId]);
     const nextOrder = parseInt(countRes.rows[0].count) + 1;
-
     const result = await pool.query(
       'INSERT INTO topics (title, sequence_order, student_id) VALUES ($1, $2, $3) RETURNING *',
       [title, nextOrder, studentId]
     );
-
     res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// 7. แก้ไขชื่อบทเรียน
 app.put('/api/topics/:topicId', async (req, res) => {
   try {
     const { topicId } = req.params;
@@ -169,7 +167,6 @@ app.put('/api/topics/:topicId', async (req, res) => {
   }
 });
 
-// 8. ลบบทเรียน
 app.delete('/api/topics/:topicId', async (req, res) => {
   try {
     const { topicId } = req.params;
@@ -181,7 +178,6 @@ app.delete('/api/topics/:topicId', async (req, res) => {
   }
 });
 
-// 9. บันทึกผลการสอน + รูป/วิดีโอ/ไฟล์
 app.patch('/api/progress/:studentId/:topicId', upload.array('files', 5), async (req, res) => {
   const client = await pool.connect();
   try {
@@ -228,12 +224,52 @@ app.patch('/api/progress/:studentId/:topicId', upload.array('files', 5), async (
   }
 });
 
-// ==================== API สำหรับผู้ปกครอง ====================
+// ==================== API ข้อความสนทนา / Feedback ====================
+
+app.get('/api/comments/:studentId', async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const result = await pool.query(
+      'SELECT * FROM comments WHERE student_id = $1 ORDER BY created_at ASC',
+      [studentId]
+    );
+    res.json({ success: true, comments: result.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/comments', async (req, res) => {
+  try {
+    const { studentId, senderRole, senderName, message } = req.body;
+    if (!message || !message.trim()) return res.status(400).json({ success: false, error: 'กรุณาใส่ข้อความ' });
+
+    const result = await pool.query(
+      'INSERT INTO comments (student_id, sender_role, sender_name, message) VALUES ($1, $2, $3, $4) RETURNING *',
+      [studentId, senderRole, senderName || 'ผู้ปกครอง', message.trim()]
+    );
+    res.json({ success: true, comment: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==================== API สำหรับฝั่งผู้ปกครอง ====================
+
+app.get('/api/parent/students', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, full_name, nickname, grade_level, course_title, parent_access_code FROM students ORDER BY nickname ASC');
+    res.json({ success: true, students: result.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.get('/api/parent/view/:accessCode', async (req, res) => {
   try {
     const { accessCode } = req.params;
     const sRes = await pool.query('SELECT * FROM students WHERE parent_access_code = $1', [accessCode]);
-    if (!sRes.rows.length) return res.status(404).json({ success: false, error: 'รหัสติดตามไม่ถูกต้อง' });
+    if (!sRes.rows.length) return res.status(404).json({ success: false, error: 'ไม่พบนักเรียน' });
 
     const student = sRes.rows[0];
     const topics = await pool.query(`

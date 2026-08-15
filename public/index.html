@@ -3,430 +3,384 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบจัดการการเรียนรู้ติวเตอร์</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Tutor Portal (ระบบติดตามรายบุคคล)</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style> body { font-family: 'Prompt', sans-serif; } </style>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .container { max-width: 920px; margin: 24px auto; padding: 0 16px; }
+    .card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+    .btn-danger { background: #fee2e2; color: var(--danger); }
+    .select-st {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .topic-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px;
+      border-bottom: 1px solid #f1f5f9;
+      gap: 12px;
+    }
+    .topic-row:last-child { border-bottom: none; }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .badge.completed { background: #dcfce7; color: #166534; }
+    .badge.in_progress { background: #fef3c7; color: #92400e; }
+    .badge.pending { background: #f1f5f9; color: #64748b; }
+
+    .chat-box { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-right: 6px; }
+    .chat-msg { padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; max-width: 80%; }
+    .chat-msg.tutor { align-self: flex-end; background: #e0e7ff; color: #312e81; }
+    .chat-msg.parent { align-self: flex-start; background: #f1f5f9; color: #1e293b; }
+    .attachment-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 0.78rem;
+      text-decoration: none;
+      color: #475569;
+      margin: 4px 4px 0 0;
+    }
+  </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 pb-12">
+<body>
 
-  <!-- Navbar -->
-  <nav class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-30">
-    <div class="max-w-5xl mx-auto flex justify-between items-center">
-      <div class="flex items-center gap-2">
-        <span class="text-2xl">📝</span>
-        <h1 class="text-lg font-bold">Tutor Portal (ระบบติดตามรายบุคคล)</h1>
-      </div>
-      <button onclick="openStudentModal()" class="bg-white text-indigo-600 px-3.5 py-1.5 rounded-xl font-medium text-sm hover:bg-indigo-50 shadow-sm transition">
-        ➕ เพิ่มนักเรียนใหม่
-      </button>
-    </div>
-  </nav>
-
-  <main class="max-w-5xl mx-auto px-4 mt-6">
-    <!-- กล่องข้อมูลนักเรียนที่เลือก -->
-    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6">
-      <div class="flex flex-wrap justify-between items-center gap-4">
-        <div class="flex-1 min-w-[260px]">
-          <label class="block text-xs font-semibold text-slate-500 mb-1">เลือกนักเรียนที่ต้องการจัดการ</label>
-          <div class="flex items-center gap-2">
-            <select id="student-select" onchange="loadStudentData()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full">
-              <option value="">กำลังโหลดรายชื่อนักเรียน...</option>
-            </select>
-            <button onclick="openEditStudentModal()" title="แก้ไขข้อมูลนักเรียน" class="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600">✏️</button>
-            <button onclick="deleteStudent()" title="ลบนักเรียนนี้" class="p-2 border border-red-200 rounded-xl hover:bg-red-50 text-red-600">🗑️</button>
-          </div>
-        </div>
-
-        <div id="parent-link-box" class="hidden flex items-center gap-2 bg-indigo-50 p-2.5 rounded-xl border border-indigo-100">
-          <div class="text-left mr-2">
-            <span class="block text-[11px] text-indigo-500 font-semibold uppercase">รหัสผู้ปกครอง: <span id="display-access-code" class="text-indigo-800 font-bold"></span></span>
-            <span class="text-xs text-indigo-900 font-medium">วิชา: <b id="display-course-title">-</b></span>
-          </div>
-          <button onclick="copyParentLink()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl font-medium transition shadow-sm">
-            📋 คัดลอกลิงก์ส่ง LINE
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- รายการเนื้อหาและแผนการเรียนเฉพาะคนนั้น -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
-      <div class="p-5 border-b border-slate-100 flex justify-between items-center flex-wrap gap-2">
-        <div>
-          <h2 class="font-bold text-slate-900 text-lg">📚 แผนการสอนและบทเรียน</h2>
-          <p class="text-xs text-slate-500" id="topic-summary">จัดการเนื้อหาเฉพาะของนักเรียนคนนี้</p>
-        </div>
-        <button onclick="openTopicModal()" class="bg-slate-900 text-white px-3.5 py-1.5 rounded-xl text-xs font-medium hover:bg-slate-800 transition">
-          ➕ เพิ่มเนื้อหาบทเรียน
-        </button>
-      </div>
-
-      <div id="topics-list" class="divide-y divide-slate-100">
-        <div class="p-8 text-center text-slate-400 text-sm">กรุณาเลือกนักเรียนเพื่อดูและจัดการแผนการเรียน</div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Modal เพิ่ม/แก้ไข นักเรียน -->
-  <div id="student-modal" class="fixed inset-0 bg-slate-900/50 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
-      <h3 class="text-lg font-bold text-slate-900 mb-4" id="student-modal-title">เพิ่มข้อมูลนักเรียนใหม่</h3>
-      <form onsubmit="handleSaveStudent(event)">
-        <input type="hidden" id="edit-student-id">
-        <div class="mb-3">
-          <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อ-นามสกุล</label>
-          <input type="text" id="new-name" required placeholder="ด.ช. เก่งกาจ ใจดี" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-        <div class="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อเล่น</label>
-            <input type="text" id="new-nickname" placeholder="น้องเก่ง" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">ระดับชั้น</label>
-            <input type="text" id="new-grade" placeholder="ม.2" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-          </div>
-        </div>
-        <div class="mb-5">
-          <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อวิชา / คอร์สที่เรียน</label>
-          <input type="text" id="new-course" placeholder="คณิตศาสตร์ ม.2 พื้นฐาน" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-        <div class="flex justify-end gap-2">
-          <button type="button" onclick="closeModal('student-modal')" class="px-4 py-2 text-sm text-slate-600">ยกเลิก</button>
-          <button type="submit" id="save-student-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700">บันทึกข้อมูล</button>
-        </div>
-      </form>
+  <div class="header">
+    <h2 style="font-size: 1.25rem;">📝 Tutor Portal (ระบบติดตามรายบุคคล)</h2>
+    <div>
+      <a href="/parent.html" target="_blank" style="color: white; margin-right: 14px; text-decoration: underline; font-size: 0.9rem;">🔗 ลิงก์รวมผู้ปกครอง</a>
+      <button class="btn" style="background: white; color: var(--primary-dark);" onclick="openAddStudent()">+ เพิ่มนักเรียนใหม่</button>
     </div>
   </div>
 
-  <!-- Modal เพิ่ม/แก้ไข หัวข้อบทเรียน -->
-  <div id="topic-modal" class="fixed inset-0 bg-slate-900/50 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
-      <h3 class="text-lg font-bold text-slate-900 mb-4" id="topic-modal-title">เพิ่มเนื้อหาบทเรียน</h3>
-      <form onsubmit="handleSaveTopic(event)">
-        <input type="hidden" id="edit-topic-id">
-        <div class="mb-4">
-          <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อบทเรียน / หัวข้อที่ต้องเรียน</label>
-          <input type="text" id="topic-title" required placeholder="เช่น การแก้สมการเชิงเส้น" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-        <div class="flex justify-end gap-2">
-          <button type="button" onclick="closeModal('topic-modal')" class="px-4 py-2 text-sm text-slate-600">ยกเลิก</button>
-          <button type="submit" id="save-topic-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700">บันทึกเนื้อหา</button>
-        </div>
-      </form>
+  <div class="container">
+    
+    <!-- กล่องเลือกนักเรียน -->
+    <div class="card">
+      <label style="font-weight: 600; color: #64748b; font-size: 0.88rem;">เลือกนักเรียนที่ต้องการจัดการ:</label>
+      <div style="display: flex; gap: 10px; margin-top: 8px; align-items: center;">
+        <select id="studentSelect" class="select-st" onchange="onStudentChange(this.value)">
+          <option value="">กำลังโหลดรายชื่อนักเรียน...</option>
+        </select>
+        <button class="btn btn-outline" onclick="editCurrentStudent()" title="แก้ไขข้อมูลนักเรียน">✏️</button>
+        <button class="btn btn-danger" onclick="deleteCurrentStudent()" title="ลบนักเรียน">🗑️</button>
+        <button class="btn btn-primary" onclick="copyParentLink()">📋 คัดลอกลิงก์รวมส่ง LINE</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Modal บันทึกผลการสอน + ไฟล์ -->
-  <div id="progress-modal" class="fixed inset-0 bg-slate-900/50 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl">
-      <h3 class="text-lg font-bold text-slate-900 mb-1" id="prog-topic-title">อัปเดตผลการสอน</h3>
-      <p class="text-xs text-slate-500 mb-4">ติ๊กถูกผลการเรียน ใส่คอมเมนต์ และแนบรูป/วิดีโอ</p>
+    <!-- ส่วนเนื้อหาบทเรียนและสนทนา -->
+    <div id="contentSection" style="display: none;">
       
-      <form onsubmit="saveProgress(event)">
-        <input type="hidden" id="prog-topic-id">
-        
-        <div class="mb-3">
-          <label class="block text-xs font-medium text-slate-700 mb-1">สถานะ</label>
-          <select id="prog-status" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-            <option value="pending">⏳ ยังไม่เริ่มเรียน</option>
-            <option value="in_progress">📖 กำลังเรียนอยู่</option>
-            <option value="completed">✅ เรียนเสร็จแล้ว (ผ่านการทดสอบ)</option>
-          </select>
+      <!-- แผนการสอน -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div>
+            <h3 id="courseTitleHeader" style="font-size: 1.15rem; font-weight: 600;">📚 แผนการสอนและบทเรียน</h3>
+            <p id="courseSub" style="font-size: 0.85rem; color: #64748b;"></p>
+          </div>
+          <button class="btn btn-primary" onclick="addTopicPrompt()">+ เพิ่มเนื้อหาบทเรียน</button>
         </div>
+        <div id="topicList"></div>
+      </div>
 
-        <div class="mb-3">
-          <label class="block text-xs font-medium text-slate-700 mb-1">บันทึกของติวเตอร์ / คอมเมนต์สรุปผล</label>
-          <textarea id="prog-notes" rows="3" placeholder="พิมพ์บันทึก ผลการทำแบบฝึกหัด หรือสิ่งที่ต้องปรับปรุง..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+      <!-- กล่องข้อความและฟีดแบ็ก -->
+      <div class="card">
+        <h3 style="font-size: 1.1rem; margin-bottom: 12px;">💬 สนทนา / ตอบคำถามผู้ปกครอง (น้อง <span id="chatStName" style="color: var(--primary);"></span>)</h3>
+        <div id="tutorChatBox" class="chat-box"></div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="tutorMsgInput" class="select-st" placeholder="พิมพ์ข้อความตอบกลับผู้ปกครอง..." onkeypress="if(event.key==='Enter') sendTutorComment()">
+          <button class="btn btn-primary" onclick="sendTutorComment()">ส่งข้อความ</button>
         </div>
+      </div>
 
-        <div class="mb-5">
-          <label class="block text-xs font-medium text-slate-700 mb-1">แนบรูปภาพ / วิดีโอ / เอกสาร PDF</label>
-          <input type="file" id="prog-files" multiple accept="image/*,video/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-        </div>
-
-        <div class="flex justify-end gap-2">
-          <button type="button" onclick="closeModal('progress-modal')" class="px-4 py-2 text-sm text-slate-600">ยกเลิก</button>
-          <button type="submit" id="prog-submit-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700">บันทึกข้อมูล</button>
-        </div>
-      </form>
     </div>
+
   </div>
 
   <script>
-    let currentStudent = null;
+    let currentStudentId = null;
+    let allStudents = [];
 
     async function loadStudents() {
-      try {
-        const res = await fetch('/api/students');
-        const data = await res.json();
-        const select = document.getElementById('student-select');
-        if (data.success && data.data.length > 0) {
-          select.innerHTML = data.data.map(s => `<option value="${s.id}">${s.nickname ? s.nickname + ' - ' : ''}${s.full_name} (${s.grade_level || 'ไม่ระบุชั้น'})</option>`).join('');
-          loadStudentData();
-        } else {
-          select.innerHTML = '<option value="">ยังไม่มีข้อมูลนักเรียน (กดปุ่มเพิ่มด้านบน)</option>';
-          document.getElementById('topics-list').innerHTML = '<div class="p-8 text-center text-slate-400 text-sm">ยังไม่มีนักเรียน กรุณากดปุ่ม "+ เพิ่มนักเรียนใหม่"</div>';
-          document.getElementById('parent-link-box').classList.add('hidden');
+      const res = await fetch('/api/students');
+      const data = await res.json();
+      if (data.success) {
+        allStudents = data.data;
+        const select = document.getElementById('studentSelect');
+        if (allStudents.length === 0) {
+          select.innerHTML = '<option value="">-- ยังไม่มีนักเรียนในระบบ --</option>';
+          document.getElementById('contentSection').style.display = 'none';
+          return;
         }
-      } catch (err) {
-        console.error('Error loading students:', err);
+        select.innerHTML = '';
+        allStudents.forEach(st => {
+          select.innerHTML += `<option value="${st.id}">น้อง${st.nickname} - ${st.full_name} (${st.grade_level}) [วิชา: ${st.course_title || 'ทั่วไป'}]</option>`;
+        });
+
+        if (!currentStudentId || !allStudents.find(s => s.id === currentStudentId)) {
+          currentStudentId = allStudents[0].id;
+        }
+        select.value = currentStudentId;
+        onStudentChange(currentStudentId);
       }
     }
 
-    async function loadStudentData() {
-      const studentId = document.getElementById('student-select').value;
-      if (!studentId) return;
-
-      try {
-        const res = await fetch(`/api/students/${studentId}/progress`);
-        const data = await res.json();
-
-        if (data.success) {
-          currentStudent = data.student;
-          document.getElementById('parent-link-box').classList.remove('hidden');
-          document.getElementById('display-access-code').innerText = currentStudent.parent_access_code;
-          document.getElementById('display-course-title').innerText = currentStudent.course_title || 'ทั่วไป';
-          renderTopics(data.topics);
-        }
-      } catch (err) {
-        console.error('Error loading progress:', err);
-      }
+    async function onStudentChange(id) {
+      if (!id) return;
+      currentStudentId = id;
+      document.getElementById('contentSection').style.display = 'block';
+      const st = allStudents.find(s => s.id === id);
+      document.getElementById('chatStName').innerText = st.nickname;
+      loadProgress();
+      loadTutorChat();
     }
 
-    function renderTopics(topics) {
-      const list = document.getElementById('topics-list');
-      if (!topics || topics.length === 0) {
-        list.innerHTML = '<div class="p-8 text-center text-slate-400 text-sm">ยังไม่มีบทเรียนของนักเรียนคนนี้<br><button onclick="openTopicModal()" class="mt-2 text-indigo-600 font-semibold hover:underline">+ กดเพิ่มบทเรียนแรก</button></div>';
-        document.getElementById('topic-summary').innerText = '0 บทเรียน';
-        return;
-      }
+    async function loadProgress() {
+      const res = await fetch(`/api/students/${currentStudentId}/progress`);
+      const data = await res.json();
+      if (data.success) {
+        const topics = data.topics || [];
+        const completed = topics.filter(t => t.status === 'completed').length;
+        document.getElementById('courseSub').innerText = `เรียนผ่านแล้ว ${completed} จาก ${topics.length} บท`;
 
-      const completed = topics.filter(t => t.status === 'completed').length;
-      document.getElementById('topic-summary').innerText = `เรียนผ่านแล้ว ${completed} จาก ${topics.length} บท`;
+        const list = document.getElementById('topicList');
+        if (topics.length === 0) {
+          list.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; padding: 10px 0;">ยังไม่มีบทเรียน คลิกปุ่ม "+ เพิ่มเนื้อหาบทเรียน" เพื่อเริ่มต้น</p>';
+          return;
+        }
 
-      list.innerHTML = topics.map(t => {
-        const isDone = t.status === 'completed';
-        const isProgress = t.status === 'in_progress';
+        list.innerHTML = topics.map(t => {
+          let statusThai = t.status === 'completed' ? 'เรียนเสร็จแล้ว' : (t.status === 'in_progress' ? 'กำลังเรียนอยู่' : 'ยังไม่เริ่ม');
+          let filesHtml = (t.attachments && t.attachments.length > 0) 
+            ? '<div>' + t.attachments.map(a => `<a href="${a.file_url}" target="_blank" class="attachment-pill">📎 ${a.file_name}</a>`).join('') + '</div>'
+            : '';
+          let noteHtml = t.tutor_notes ? `<div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">📝 ${t.tutor_notes}</div>` : '';
 
-        return `
-          <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50 transition">
-            <div class="flex items-start gap-3 flex-1">
-              <div class="mt-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${isDone ? 'bg-emerald-500 text-white' : isProgress ? 'bg-amber-400 text-white' : 'bg-slate-200 text-slate-600'}">
-                ${isDone ? '✓' : t.sequence_order}
+          return `
+            <div class="topic-row">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <b>${t.sequence_order}. ${t.title}</b>
+                  <span class="badge ${t.status}">${statusThai}</span>
+                  <button style="border:none; background:none; cursor:pointer; font-size:0.8rem; color:#6366f1;" onclick="editTopicName('${t.topic_id}', '${t.title}')">✏️ แก้ไข</button>
+                  <button style="border:none; background:none; cursor:pointer; font-size:0.8rem; color:#ef4444;" onclick="deleteTopic('${t.topic_id}')">🗑️ ลบ</button>
+                </div>
+                ${noteHtml}
+                ${filesHtml}
               </div>
-              <div class="flex-1">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <h4 class="font-semibold text-slate-900 text-base ${isDone ? 'line-through text-slate-400' : ''}">${t.title}</h4>
-                  <button onclick="openEditTopicModal('${t.topic_id}', '${t.title}')" class="text-xs text-slate-400 hover:text-indigo-600 font-medium">✏️ แก้ไข</button>
-                  <button onclick="deleteTopic('${t.topic_id}')" class="text-xs text-slate-400 hover:text-red-600 font-medium">🗑️ ลบ</button>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2 mt-1">
-                  <span class="text-xs px-2.5 py-0.5 rounded-full font-medium ${isDone ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isProgress ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-600'}">
-                    ${isDone ? '✅ เรียนเสร็จแล้ว' : isProgress ? '📖 กำลังเรียนอยู่' : '⏳ ยังไม่เริ่มเรียน'}
-                  </span>
-                  ${t.completed_at ? `<span class="text-xs text-slate-400">เรียนเมื่อ: ${new Date(t.completed_at).toLocaleDateString('th-TH')}</span>` : ''}
-                </div>
-
-                ${t.tutor_notes ? `<div class="mt-2 text-xs bg-slate-50 p-2 rounded-lg text-slate-700 border border-slate-100">📌 <b>โน้ตติวเตอร์:</b> ${t.tutor_notes}</div>` : ''}
-
-                ${t.attachments && t.attachments.length > 0 ? `
-                  <div class="flex flex-wrap gap-2 mt-2">
-                    ${t.attachments.map(a => `
-                      <a href="${a.file_url}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md border border-indigo-100 hover:bg-indigo-100">
-                        📎 ${a.file_name || 'ดูไฟล์แนบ'}
-                      </a>
-                    `).join('')}
-                  </div>
-                ` : ''}
+              <div>
+                <button class="btn btn-outline" style="font-size: 0.82rem;" onclick="updateProgressModal('${t.topic_id}')">✏️ อัปเดตผล / แนบไฟล์</button>
               </div>
             </div>
-
-            <button onclick="openProgressModal('${t.topic_id}', '${t.title}', '${t.status}', '${t.tutor_notes || ''}')" class="self-start md:self-center px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-xs font-semibold transition">
-              ✏️ อัปเดตผล / แนบไฟล์
-            </button>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
     }
 
-    function openStudentModal() {
-      document.getElementById('student-modal-title').innerText = 'เพิ่มข้อมูลนักเรียนใหม่';
-      document.getElementById('edit-student-id').value = '';
-      document.getElementById('new-name').value = '';
-      document.getElementById('new-nickname').value = '';
-      document.getElementById('new-grade').value = '';
-      document.getElementById('new-course').value = '';
-      document.getElementById('student-modal').classList.remove('hidden');
-    }
-
-    function openEditStudentModal() {
-      if (!currentStudent) return;
-      document.getElementById('student-modal-title').innerText = 'แก้ไขข้อมูลนักเรียน / วิชา';
-      document.getElementById('edit-student-id').value = currentStudent.id;
-      document.getElementById('new-name').value = currentStudent.full_name;
-      document.getElementById('new-nickname').value = currentStudent.nickname || '';
-      document.getElementById('new-grade').value = currentStudent.grade_level || '';
-      document.getElementById('new-course').value = currentStudent.course_title || '';
-      document.getElementById('student-modal').classList.remove('hidden');
-    }
-
-    function openTopicModal() {
-      if (!currentStudent) return alert('กรุณาเลือกนักเรียนก่อนครับ');
-      document.getElementById('topic-modal-title').innerText = 'เพิ่มเนื้อหาบทเรียนใหม่';
-      document.getElementById('edit-topic-id').value = '';
-      document.getElementById('topic-title').value = '';
-      document.getElementById('topic-modal').classList.remove('hidden');
-    }
-
-    function openEditTopicModal(topicId, title) {
-      document.getElementById('topic-modal-title').innerText = 'แก้ไขชื่อบทเรียน';
-      document.getElementById('edit-topic-id').value = topicId;
-      document.getElementById('topic-title').value = title;
-      document.getElementById('topic-modal').classList.remove('hidden');
-    }
-
-    function openProgressModal(topicId, title, status, notes) {
-      document.getElementById('prog-topic-id').value = topicId;
-      document.getElementById('prog-topic-title').innerText = title;
-      document.getElementById('prog-status').value = status;
-      document.getElementById('prog-notes').value = notes;
-      document.getElementById('prog-files').value = '';
-      document.getElementById('progress-modal').classList.remove('hidden');
-    }
-
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-    async function handleSaveStudent(e) {
-      e.preventDefault();
-      const editId = document.getElementById('edit-student-id').value;
-      const body = {
-        fullName: document.getElementById('new-name').value,
-        nickname: document.getElementById('new-nickname').value,
-        gradeLevel: document.getElementById('new-grade').value,
-        courseTitle: document.getElementById('new-course').value
-      };
-
-      const url = editId ? `/api/students/${editId}` : '/api/students';
-      const method = editId ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
+    async function addTopicPrompt() {
+      const title = prompt('กรุณาระบุชื่อบทเรียน / หัวข้อใหม่:');
+      if (!title) return;
+      await fetch('/api/topics', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ title, studentId: currentStudentId })
       });
-      const data = await res.json();
-      if (data.success) {
-        closeModal('student-modal');
-        loadStudents();
-      } else {
-        alert(data.error);
-      }
+      loadProgress();
     }
 
-    async function deleteStudent() {
-      if (!currentStudent) return;
-      if (!confirm(`คุณต้องการลบนักเรียน "${currentStudent.full_name}" พร้อมข้อมูลทั้งหมดใช่หรือไม่?`)) return;
-
-      const res = await fetch(`/api/students/${currentStudent.id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        alert('ลบนักเรียนเรียบร้อย');
-        loadStudents();
-      }
-    }
-
-    async function handleSaveTopic(e) {
-      e.preventDefault();
-      if (!currentStudent) {
-        alert('กรุณาเลือกนักเรียนก่อนครับ');
-        return;
-      }
-
-      const saveBtn = document.getElementById('save-topic-btn');
-      saveBtn.innerText = 'กำลังบันทึก...';
-      saveBtn.disabled = true;
-
-      try {
-        const editId = document.getElementById('edit-topic-id').value;
-        const title = document.getElementById('topic-title').value;
-
-        const url = editId ? `/api/topics/${editId}` : '/api/topics';
-        const method = editId ? 'PUT' : 'POST';
-        const body = editId ? { title } : { title, studentId: currentStudent.id };
-
-        const res = await fetch(url, {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          document.getElementById('topic-title').value = '';
-          closeModal('topic-modal');
-          loadStudentData();
-        } else {
-          alert('เกิดข้อผิดพลาด: ' + (data.error || 'ไม่สามารถบันทึกได้'));
-        }
-      } catch (err) {
-        alert('เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ');
-      } finally {
-        saveBtn.innerText = 'บันทึกเนื้อหา';
-        saveBtn.disabled = false;
-      }
+    async function editTopicName(topicId, oldTitle) {
+      const title = prompt('แก้ไขชื่อบทเรียน:', oldTitle);
+      if (!title || title === oldTitle) return;
+      await fetch(`/api/topics/${topicId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title })
+      });
+      loadProgress();
     }
 
     async function deleteTopic(topicId) {
       if (!confirm('ต้องการลบบทเรียนนี้ใช่หรือไม่?')) return;
-      const res = await fetch(`/api/topics/${topicId}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        loadStudentData();
+      await fetch(`/api/topics/${topicId}`, { method: 'DELETE' });
+      loadProgress();
+    }
+
+    async function updateProgressModal(topicId) {
+      const status = prompt('ระบุสถานะ:\ncompleted = เรียนเสร็จแล้ว\nin_progress = กำลังเรียน\npending = ยังไม่เริ่ม', 'completed');
+      if (!status) return;
+      const tutorNotes = prompt('บันทึกความเข้าใจ / การบ้าน:');
+
+      const fd = new FormData();
+      fd.append('status', status);
+      if (tutorNotes) fd.append('tutorNotes', tutorNotes);
+
+      // สร้าง input file ชั่วคราวเพื่อให้เลือกไฟล์ได้ง่ายๆ
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.multiple = true;
+      fileInput.onchange = async () => {
+        for (let i = 0; i < fileInput.files.length; i++) {
+          fd.append('files', fileInput.files[i]);
+        }
+        await submitProgressUpdate(topicId, fd);
+      };
+
+      if (confirm('ต้องการแนบรูปภาพ/วิดีโอ/ไฟล์ หรือไม่? (กด OK เพื่อเลือกไฟล์ หรือกด Cancel เพื่อบันทึกทันที)')) {
+        fileInput.click();
+      } else {
+        await submitProgressUpdate(topicId, fd);
       }
     }
 
-    async function saveProgress(e) {
-      e.preventDefault();
-      const topicId = document.getElementById('prog-topic-id').value;
-      const status = document.getElementById('prog-status').value;
-      const tutorNotes = document.getElementById('prog-notes').value;
-      const files = document.getElementById('prog-files').files;
-
-      const formData = new FormData();
-      formData.append('status', status);
-      formData.append('tutorNotes', tutorNotes);
-      for (let i = 0; i < files.length; i++) {
-        formData.append('files', files[i]);
-      }
-
-      const btn = document.getElementById('prog-submit-btn');
-      btn.innerText = 'กำลังบันทึก...';
-      btn.disabled = true;
-
-      const res = await fetch(`/api/progress/${currentStudent.id}/${topicId}`, {
+    async function submitProgressUpdate(topicId, fd) {
+      await fetch(`/api/progress/${currentStudentId}/${topicId}`, {
         method: 'PATCH',
-        body: formData
+        body: fd
+      });
+      loadProgress();
+    }
+
+    async function openAddStudent() {
+      const nickname = prompt('ชื่อเล่น:');
+      if (!nickname) return;
+      const fullName = prompt('ชื่อ-นามสกุลจริง:');
+      const gradeLevel = prompt('ระดับชั้น (เช่น ป.3, ม.1):');
+      const courseTitle = prompt('ชื่อวิชาที่เรียน (เช่น คณิตศาสตร์พื้นฐาน):');
+      
+      const res = await fetch('/api/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname, fullName: fullName || nickname, gradeLevel: gradeLevel || 'ทั่วไป', courseTitle: courseTitle || 'วิชาเรียนทั่วไป' })
       });
       const data = await res.json();
       if (data.success) {
-        alert('บันทึกผลการสอนสำเร็จ!');
-        closeModal('progress-modal');
-        loadStudentData();
+        currentStudentId = data.student.id;
+        loadStudents();
       }
-      btn.innerText = 'บันทึกข้อมูล';
-      btn.disabled = false;
+    }
+
+    async function editCurrentStudent() {
+      const st = allStudents.find(s => s.id === currentStudentId);
+      if (!st) return;
+      const nickname = prompt('แก้ไขชื่อเล่น:', st.nickname);
+      const fullName = prompt('แก้ไขชื่อ-นามสกุล:', st.full_name);
+      const gradeLevel = prompt('แก้ไขระดับชั้น:', st.grade_level);
+      const courseTitle = prompt('แก้ไขชื่อวิชา:', st.course_title);
+
+      await fetch(`/api/students/${currentStudentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname, fullName, gradeLevel, courseTitle })
+      });
+      loadStudents();
+    }
+
+    async function deleteCurrentStudent() {
+      if (!confirm('ยืนยันลบนักเรียนคนนี้พร้อมประวัติและบทเรียนทั้งหมดหรือไม่?')) return;
+      await fetch(`/api/students/${currentStudentId}`, { method: 'DELETE' });
+      currentStudentId = null;
+      loadStudents();
     }
 
     function copyParentLink() {
-      if (!currentStudent) return;
-      const url = `${window.location.origin}/parent.html?code=${currentStudent.parent_access_code}`;
-      navigator.clipboard.writeText(url);
-      alert(`คัดลอกลิงก์สำหรับผู้ปกครองแล้ว:\n${url}`);
+      const link = `${window.location.origin}/parent.html`;
+      navigator.clipboard.writeText(link);
+      alert(`คัดลอกลิงก์รวมสำหรับส่งให้ผู้ปกครองเรียบร้อยแล้ว:\n${link}`);
     }
 
+    async function loadTutorChat() {
+      if (!currentStudentId) return;
+      const res = await fetch(`/api/comments/${currentStudentId}`);
+      const data = await res.json();
+      const box = document.getElementById('tutorChatBox');
+      if (data.success && data.comments.length > 0) {
+        box.innerHTML = data.comments.map(c => `
+          <div class="chat-msg ${c.sender_role}">
+            <b>${c.sender_name}:</b> ${c.message}
+          </div>
+        `).join('');
+        box.scrollTop = box.scrollHeight;
+      } else {
+        box.innerHTML = '<p style="color: #64748b; font-size: 0.85rem; text-align: center;">ยังไม่มีข้อความสนทนา</p>';
+      }
+    }
+
+    async function sendTutorComment() {
+      const input = document.getElementById('tutorMsgInput');
+      const msg = input.value.trim();
+      if (!msg || !currentStudentId) return;
+
+      await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: currentStudentId,
+          senderRole: 'tutor',
+          senderName: 'คุณครู',
+          message: msg
+        })
+      });
+      input.value = '';
+      loadTutorChat();
+    }
+
+    setInterval(() => { if (currentStudentId) loadTutorChat(); }, 8000);
     loadStudents();
   </script>
 </body>

@@ -3,116 +3,377 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>รายงานผลการเรียนสำหรับผู้ปกครอง</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>ติดตามผลการเรียน - Tutor Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style> body { font-family: 'Prompt', sans-serif; } </style>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 60px; }
+    .hero {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
+      padding: 35px 20px 65px;
+      text-align: center;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+    }
+    .container { max-width: 760px; margin: -40px auto 0; padding: 0 16px; }
+    .card {
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    .select-box {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 2px solid var(--primary);
+      font-size: 1rem;
+      font-weight: 500;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+      margin-top: 8px;
+    }
+    .progress-bar-bg {
+      background: #e2e8f0;
+      border-radius: 10px;
+      height: 12px;
+      overflow: hidden;
+      margin: 12px 0 6px;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #10b981, #059669);
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+    .topic-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .topic-item:last-child { border-bottom: none; }
+    .badge-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .badge-completed { background: #dcfce7; color: #15803d; }
+    .badge-in-progress { background: #fef3c7; color: #b45309; }
+    .badge-pending { background: #f1f5f9; color: #64748b; }
+
+    .status-tag {
+      font-size: 0.78rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    .status-tag.completed { background: #dcfce7; color: #166534; }
+    .status-tag.in-progress { background: #fef3c7; color: #92400e; }
+    .status-tag.pending { background: #f1f5f9; color: #64748b; }
+
+    .attachment-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      text-decoration: none;
+      color: #334155;
+      margin: 6px 4px 0 0;
+      transition: 0.2s;
+    }
+    .attachment-pill:hover { background: #e2e8f0; }
+
+    /* Chat / Comment */
+    .chat-box {
+      max-height: 350px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-right: 6px;
+    }
+    .chat-msg {
+      padding: 12px 16px;
+      border-radius: 16px;
+      max-width: 85%;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .chat-msg.tutor {
+      align-self: flex-start;
+      background: #f1f5f9;
+      border-bottom-left-radius: 4px;
+    }
+    .chat-msg.parent {
+      align-self: flex-end;
+      background: #e0e7ff;
+      color: #312e81;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-author {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+      color: var(--primary-dark);
+    }
+    .chat-input-area {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      outline: none;
+      font-size: 0.9rem;
+    }
+    .chat-btn {
+      padding: 10px 20px;
+      background: var(--primary-dark);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 pb-16">
+<body>
 
-  <div class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white p-6 shadow-md">
-    <div class="max-w-2xl mx-auto">
-      <div class="inline-block bg-white/20 text-xs px-3 py-1 rounded-full mb-2">📊 รายงานความคืบหน้าการเรียน</div>
-      <h1 class="text-2xl font-bold" id="student-name">กำลังโหลดข้อมูล...</h1>
-      <p class="text-indigo-100 text-sm mt-1" id="student-detail"></p>
-
-      <!-- แถบ Progress Bar สรุป % การเรียน -->
-      <div class="mt-5 bg-black/20 p-4 rounded-2xl backdrop-blur-sm">
-        <div class="flex justify-between text-xs font-semibold mb-1">
-          <span>ความคืบหน้าหลักสูตร</span>
-          <span id="progress-percent">0%</span>
-        </div>
-        <div class="w-full bg-white/30 h-2.5 rounded-full overflow-hidden">
-          <div id="progress-bar" class="bg-emerald-400 h-full w-0 transition-all duration-500"></div>
-        </div>
-      </div>
-    </div>
+  <div class="hero">
+    <h2 style="font-size: 1.5rem; margin-bottom: 4px;">📊 รายงานความคืบหน้าการเรียน</h2>
+    <p style="opacity: 0.9; font-size: 0.9rem;">ดูบันทึกการสอน และสนทนาสอบถามกับคุณครู</p>
   </div>
 
-  <main class="max-w-2xl mx-auto px-4 mt-6">
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="p-4 border-b border-slate-100 font-bold text-slate-800 text-base flex justify-between items-center">
-        <span>รายการบทเรียนที่วางแผนไว้</span>
-        <span id="topic-count" class="text-xs text-slate-500"></span>
+  <div class="container">
+    
+    <!-- เลือกรักเรียน -->
+    <div class="card">
+      <label style="font-weight: 600; font-size: 0.95rem; color: var(--text-muted);">👤 เลือกรายชื่อนักเรียนที่ต้องการดูผลการเรียน:</label>
+      <select id="studentSelect" class="select-box" onchange="onStudentChange(this.value)">
+        <option value="">กำลังโหลดรายชื่อนักเรียน...</option>
+      </select>
+    </div>
+
+    <!-- ข้อมูลนักเรียนและความคืบหน้า -->
+    <div id="studentDetailCard" class="card" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h2 id="stName" style="font-size: 1.3rem; color: var(--primary-dark);">น้อง...</h2>
+          <p id="stInfo" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 2px;">วิชา: -</p>
+        </div>
+        <span id="progressPercent" style="font-weight: 700; color: #059669; font-size: 1.2rem;">0%</span>
       </div>
-      <div id="parent-topics" class="divide-y divide-slate-100">
-        <!-- รายการบทเรียนจะถูกแสดงตรงนี้ -->
+      <div class="progress-bar-bg">
+        <div id="progressBarFill" class="progress-bar-fill" style="width: 0%;"></div>
+      </div>
+      <p id="progressCount" style="font-size: 0.8rem; color: var(--text-muted); text-align: right;">ผ่านแล้ว 0 จาก 0 บท</p>
+    </div>
+
+    <!-- รายการบทเรียน -->
+    <div id="topicCard" class="card" style="display: none;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 12px; font-weight: 600;">📑 รายการบทเรียนที่วางแผนไว้</h3>
+      <div id="topicList"></div>
+    </div>
+
+    <!-- กล่องพูดคุย / ฟีดแบ็กสอบถามหลังเลิกเรียน -->
+    <div id="commentCard" class="card" style="display: none;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 12px; font-weight: 600;">💬 กล่องข้อความและฟีดแบ็ก (ผู้ปกครอง & คุณครู)</h3>
+      <div id="chatBox" class="chat-box">
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">ยังไม่มีข้อความสนทนา</p>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="commentInput" class="chat-input" placeholder="พิมพ์ข้อความหรือคำถามถึงคุณครู..." onkeypress="if(event.key==='Enter') sendComment()">
+        <button class="chat-btn" onclick="sendComment()">ส่ง</button>
       </div>
     </div>
-  </main>
+
+  </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
+    let currentStudentId = null;
+    let allStudents = [];
 
-    async function loadData() {
-      if (!code) {
-        document.body.innerHTML = '<div class="p-8 text-center text-red-500">ไม่พบรหัสติดตาม กรุณาตรวจสอบลิงก์อีกครั้ง</div>';
-        return;
+    async function init() {
+      try {
+        const res = await fetch('/api/parent/students');
+        const data = await res.json();
+        if (data.success) {
+          allStudents = data.students;
+          const select = document.getElementById('studentSelect');
+          select.innerHTML = '<option value="">-- กรุณาเลือกนักเรียน --</option>';
+          allStudents.forEach(st => {
+            select.innerHTML += `<option value="${st.parent_access_code}">น้อง${st.nickname} (${st.full_name}) - ${st.grade_level}</option>`;
+          });
+
+          const urlParams = new URLSearchParams(window.location.search);
+          const code = urlParams.get('code');
+          if (code) {
+            select.value = code;
+            loadStudentData(code);
+          }
+        }
+      } catch (err) {
+        console.error(err);
       }
-
-      const res = await fetch(`/api/parent/view/${code}`);
-      const data = await res.json();
-
-      if (!data.success) {
-        document.body.innerHTML = `<div class="p-8 text-center text-red-500">${data.error}</div>`;
-        return;
-      }
-
-      const { student, topics } = data;
-      document.getElementById('student-name').innerText = `น้อง${student.nickname || ''} (${student.full_name})`;
-      document.getElementById('student-detail').innerText = `ระดับชั้น: ${student.grade_level || 'ไม่ระบุ'} • รหัส: ${student.parent_access_code}`;
-
-      const completedCount = topics.filter(t => t.status === 'completed').length;
-      const percent = topics.length > 0 ? Math.round((completedCount / topics.length) * 100) : 0;
-
-      document.getElementById('progress-percent').innerText = `${percent}% (${completedCount}/${topics.length} บท)`;
-      document.getElementById('progress-bar').style.width = `${percent}%`;
-      document.getElementById('topic-count').innerText = `ผ่านแล้ว ${completedCount} จาก ${topics.length} บท`;
-
-      const list = document.getElementById('parent-topics');
-      if (topics.length === 0) {
-        list.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">ยังไม่มีรายการบทเรียน</div>';
-        return;
-      }
-
-      list.innerHTML = topics.map(t => {
-        const isDone = t.status === 'completed';
-        const isProg = t.status === 'in_progress';
-
-        return `
-          <div class="p-4 flex items-start gap-3">
-            <div class="mt-0.5 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isDone ? 'bg-emerald-500 text-white' : isProg ? 'bg-amber-400 text-white' : 'bg-slate-200 text-slate-600'}">
-              ${isDone ? '✓' : t.sequence_order}
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center justify-between">
-                <h4 class="font-medium text-slate-800 text-sm">${t.title}</h4>
-                <span class="text-xs px-2 py-0.5 rounded-md ${isDone ? 'bg-emerald-50 text-emerald-700' : isProg ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-500'}">
-                  ${isDone ? 'เรียนแล้ว' : isProg ? 'กำลังเรียน' : 'ยังไม่เริ่ม'}
-                </span>
-              </div>
-
-              ${t.completed_at ? `<p class="text-[11px] text-slate-400 mt-0.5">เรียนเสร็จเมื่อ: ${new Date(t.completed_at).toLocaleDateString('th-TH')}</p>` : ''}
-              
-              ${t.tutor_notes ? `<div class="mt-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-slate-700">💬 <b>บันทึกจากติวเตอร์:</b> ${t.tutor_notes}</div>` : ''}
-
-              ${t.attachments && t.attachments.length > 0 ? `
-                <div class="flex flex-wrap gap-2 mt-2">
-                  ${t.attachments.map(a => `
-                    <a href="${a.url}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg border border-indigo-100 hover:bg-indigo-100">
-                      📷 ดูรูปภาพ/เอกสาร (${a.name || 'ไฟล์แนบ'})
-                    </a>
-                  `).join('')}
-                </div>
-              ` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
     }
 
-    loadData();
+    function onStudentChange(code) {
+      if (!code) {
+        document.getElementById('studentDetailCard').style.display = 'none';
+        document.getElementById('topicCard').style.display = 'none';
+        document.getElementById('commentCard').style.display = 'none';
+        return;
+      }
+      window.history.pushState({}, '', `?code=${code}`);
+      loadStudentData(code);
+    }
+
+    async function loadStudentData(code) {
+      try {
+        const res = await fetch(`/api/parent/view/${code}`);
+        const data = await res.json();
+        if (data.success) {
+          const st = data.student;
+          currentStudentId = st.id;
+
+          document.getElementById('stName').innerText = `น้อง${st.nickname} (${st.full_name})`;
+          document.getElementById('stInfo').innerText = `ระดับชั้น: ${st.grade_level} | วิชา: ${st.course_title || 'วิชาเรียนทั่วไป'}`;
+
+          const topics = data.topics || [];
+          const completedCount = topics.filter(t => t.status === 'completed').length;
+          const percent = topics.length > 0 ? Math.round((completedCount / topics.length) * 100) : 0;
+
+          document.getElementById('progressPercent').innerText = `${percent}%`;
+          document.getElementById('progressBarFill').style.width = `${percent}%`;
+          document.getElementById('progressCount').innerText = `ผ่านแล้ว ${completedCount} จาก ${topics.length} บท`;
+
+          const list = document.getElementById('topicList');
+          if (topics.length === 0) {
+            list.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">ยังไม่มีบทเรียนในขณะนี้</p>';
+          } else {
+            list.innerHTML = topics.map(t => {
+              let badgeClass = t.status === 'completed' ? 'badge-completed' : (t.status === 'in_progress' ? 'badge-in-progress' : 'badge-pending');
+              let statusText = t.status === 'completed' ? 'เรียนเสร็จแล้ว' : (t.status === 'in_progress' ? 'กำลังเรียน' : 'ยังไม่เริ่ม');
+              let tagClass = t.status === 'completed' ? 'completed' : (t.status === 'in_progress' ? 'in-progress' : 'pending');
+
+              let filesHtml = '';
+              if (t.attachments && t.attachments.length > 0) {
+                filesHtml = `<div style="margin-top: 8px;">` + t.attachments.map(f => `
+                  <a href="${f.url}" target="_blank" class="attachment-pill">📎 ${f.name}</a>
+                `).join('') + `</div>`;
+              }
+
+              let notesHtml = t.tutor_notes ? `<p style="font-size: 0.88rem; color: #475569; margin-top: 6px; background: #f8fafc; padding: 8px 12px; border-radius: 8px;">📝 <b>บันทึกคุณครู:</b> ${t.tutor_notes}</p>` : '';
+
+              return `
+                <div class="topic-item">
+                  <div class="badge-num ${badgeClass}">${t.sequence_order}</div>
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <b style="font-size: 0.95rem;">${t.title}</b>
+                      <span class="status-tag ${tagClass}">${statusText}</span>
+                    </div>
+                    ${notesHtml}
+                    ${filesHtml}
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+
+          document.getElementById('studentDetailCard').style.display = 'block';
+          document.getElementById('topicCard').style.display = 'block';
+          document.getElementById('commentCard').style.display = 'block';
+
+          loadComments();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadComments() {
+      if (!currentStudentId) return;
+      try {
+        const res = await fetch(`/api/comments/${currentStudentId}`);
+        const data = await res.json();
+        const box = document.getElementById('chatBox');
+        if (data.success && data.comments.length > 0) {
+          box.innerHTML = data.comments.map(c => `
+            <div class="chat-msg ${c.sender_role}">
+              <div class="chat-author">${c.sender_name} (${c.sender_role === 'tutor' ? 'คุณครู' : 'ผู้ปกครอง'})</div>
+              <div>${c.message}</div>
+              <div style="font-size: 0.68rem; opacity: 0.6; text-align: right; margin-top: 3px;">
+                ${new Date(c.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
+              </div>
+            </div>
+          `).join('');
+          box.scrollTop = box.scrollHeight;
+        } else {
+          box.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">ยังไม่มีข้อความสนทนา พิมพ์ทักทายคุณครูได้เลยครับ</p>';
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    async function sendComment() {
+      const input = document.getElementById('commentInput');
+      const msg = input.value.trim();
+      if (!msg || !currentStudentId) return;
+
+      try {
+        const res = await fetch('/api/comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            studentId: currentStudentId,
+            senderRole: 'parent',
+            senderName: 'ผู้ปกครอง',
+            message: msg
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          input.value = '';
+          loadComments();
+        }
+      } catch (e) { alert('ส่งข้อความไม่สำเร็จ'); }
+    }
+
+    setInterval(() => {
+      if (currentStudentId) loadComments();
+    }, 8000);
+
+    init();
   </script>
 </body>
 </html>
