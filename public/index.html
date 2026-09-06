@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tutor Portal (ระบบติดตามรายบุคคล)</title>
+  <title>Kruton Tutor - Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --bg: #f8fafc;
+      --primary: #2563eb;       /* สีน้ำเงินหลักสไตล์ Dashboard */
+      --primary-light: #eff6ff;
+      --secondary: #4f46e5;
+      --bg-color: #eef2f6;      /* สีพื้นหลังฟ้าอ่อน */
       --surface: #ffffff;
       --text: #1e293b;
       --text-muted: #64748b;
@@ -19,218 +21,311 @@
       --danger: #ef4444;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+    body { 
+      background: linear-gradient(135deg, #e8f0fe 0%, #f8fafc 100%);
+      color: var(--text); 
+      padding-bottom: 80px; 
+      min-height: 100vh;
+    }
     
-    .header {
-      background: var(--primary-dark);
-      color: white;
-      padding: 16px 28px;
+    /* ---------------- Navbar สไตล์ NRRU ---------------- */
+    .navbar {
+      background: var(--surface);
+      padding: 12px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+      box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .container { max-width: 900px; margin: 28px auto; padding: 0 16px; }
-    .card {
-      background: var(--surface);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 15px -2px rgba(0,0,0,0.04);
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .navbar-logo {
+      height: 45px;
+      border-radius: 8px;
+    }
+    .navbar-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+    .navbar-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .navbar-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
     }
 
+    .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+
+    /* ---------------- Card Design ---------------- */
+    .card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+
+    /* ---------------- Profile Header (คล้ายภาพที่ 3) ---------------- */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, var(--primary-light), #dbeafe);
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      border: 2px solid white;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+    }
+    .profile-info h2 { font-size: 1.4rem; color: var(--primary); margin-bottom: 4px; }
+    .profile-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .tag {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ---------------- Buttons & Inputs ---------------- */
     .btn {
       padding: 8px 18px;
-      border-radius: 12px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
       font-weight: 500;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.88rem;
-      transition: 0.2s;
+      font-size: 0.9rem;
+      transition: all 0.2s;
     }
-    .btn-primary { background: var(--primary-dark); color: white; }
-    .btn-primary:hover { background: #4338ca; }
-    .btn-outline { background: white; border: 1px solid #cbd5e1; color: var(--text); }
-    .btn-outline:hover { background: #f8fafc; }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+    .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: var(--primary-light); color: var(--primary); border-color: #bfdbfe; }
     .btn-danger { background: #fee2e2; color: var(--danger); }
     
     .select-st {
       width: 100%;
       padding: 10px 14px;
-      border-radius: 12px;
+      border-radius: 8px;
       border: 1px solid var(--border);
       font-size: 0.95rem;
       outline: none;
-      background: #fff;
+      background: #f8fafc;
+      transition: 0.2s;
     }
+    .select-st:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
 
+    /* ---------------- Navigation Tabs ---------------- */
+    .nav-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+    .nav-tab.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .nav-tab:hover:not(.active) { background: #f1f5f9; }
+
+    /* ---------------- Topic List ---------------- */
     .topic-card-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 16px 0;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px dashed var(--border);
       gap: 16px;
     }
     .topic-card-item:last-child { border-bottom: none; }
-
-    .topic-left {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      flex: 1;
-    }
+    .topic-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
+    
     .badge-num {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       flex-shrink: 0;
-      margin-top: 2px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
-    .num-completed { background: #dcfce7; color: #15803d; }
-    .num-in_progress { background: #fef08a; color: #854d0e; }
-    .num-pending { background: #f1f5f9; color: #64748b; }
+    .num-completed { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .num-in_progress { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
+    .num-pending { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
 
-    /* ป้ายสถานะทรงมนแบบคลิกเลือกเปลี่ยนได้ทันที */
     .status-select-pill {
       appearance: none;
       -webkit-appearance: none;
-      border: none;
-      padding: 4px 28px 4px 12px;
-      border-radius: 20px;
-      font-size: 0.82rem;
+      border: 1px solid transparent;
+      padding: 4px 26px 4px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       outline: none;
       background-repeat: no-repeat;
-      background-position: right 10px center;
+      background-position: right 8px center;
       background-size: 10px;
       margin-left: 8px;
-      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
-    .status-select-pill.completed {
-      background-color: #dcfce7;
-      color: #166534;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23166534'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
-    }
-    .status-select-pill.in_progress {
-      background-color: #fef08a;
-      color: #854d0e;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23854d0e'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
-    }
-    .status-select-pill.pending {
-      background-color: #f1f5f9;
-      color: #64748b;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
-    }
+    .status-select-pill.completed { background-color: #dcfce7; color: #166534; border-color: #bbf7d0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23166534'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E"); }
+    .status-select-pill.in_progress { background-color: #fef08a; color: #854d0e; border-color: #fde047; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23854d0e'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E"); }
+    .status-select-pill.pending { background-color: #f8fafc; color: #64748b; border-color: #cbd5e1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E"); }
 
-    .action-link {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 0.8rem;
-      margin-left: 8px;
-      color: #94a3b8;
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-    }
-    .action-link:hover { color: var(--primary-dark); }
+    .action-link { background: none; border: none; cursor: pointer; font-size: 0.8rem; margin-left: 8px; color: #94a3b8; }
+    .action-link:hover { color: var(--primary); }
     .action-link.delete:hover { color: var(--danger); }
 
     .attachment-capsule {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.78rem;
-      text-decoration: none;
-      color: #334155;
-      margin: 4px 4px 0 0;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 0.78rem; text-decoration: none; color: #334155; margin: 4px 4px 0 0;
     }
+    
+    /* ---------------- Chat Box ---------------- */
+    .chat-box { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; padding-right: 6px; }
+    .chat-msg { padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; max-width: 80%; line-height: 1.4; }
+    .chat-msg.tutor { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+    .chat-msg.parent { align-self: flex-start; background: #f1f5f9; color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
 
+    /* ---------------- Modal ---------------- */
     .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+      display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px); z-index: 999; align-items: center; justify-content: center; padding: 16px;
     }
     .modal-content {
-      background: white;
-      border-radius: 18px;
-      padding: 24px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 500px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
     }
-
-    .chat-box { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-right: 6px; }
-    .chat-msg { padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; max-width: 80%; }
-    .chat-msg.tutor { align-self: flex-end; background: #e0e7ff; color: #312e81; }
-    .chat-msg.parent { align-self: flex-start; background: #f1f5f9; color: #1e293b; }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h2 style="font-size: 1.25rem; font-weight: 600;">📝 Tutor Portal (ระบบติดตามรายบุคคล)</h2>
-    <div>
-      <a href="/parent.html" target="_blank" style="color: white; margin-right: 16px; text-decoration: underline; font-size: 0.9rem;">🔗 ลิงก์รวมผู้ปกครอง</a>
-      <button class="btn" style="background: white; color: var(--primary-dark);" onclick="openAddStudent()">+ เพิ่มนักเรียนใหม่</button>
+  <!-- แถบเมนูด้านบน (Navbar) -->
+  <div class="navbar">
+    <div class="navbar-brand">
+      <img src="/logo.png" alt="Logo" class="navbar-logo" onerror="this.src='https://via.placeholder.com/45/2563eb/ffffff?text=K'">
+      <div>
+        <div class="navbar-title">Kruton Tutor Profile</div>
+        <div class="navbar-subtitle">Digital Competency & Progress Transcript</div>
+      </div>
+    </div>
+    <div class="navbar-actions">
+      <a href="/parent.html" target="_blank" class="btn btn-outline" style="font-size: 0.8rem;">🔗 มุมมองผู้ปกครอง</a>
+      <button class="btn btn-primary" onclick="openAddStudent()">+ เพิ่มนักเรียน</button>
     </div>
   </div>
 
   <div class="container">
     
-    <!-- กล่องเลือกนักเรียน -->
-    <div class="card">
-      <label style="font-weight: 600; color: var(--text-muted); font-size: 0.88rem;">เลือกนักเรียนที่ต้องการจัดการ:</label>
-      <div style="display: flex; gap: 10px; margin-top: 8px; align-items: center;">
+    <!-- ส่วนเลือกนักเรียน -->
+    <div class="card" style="padding: 16px 24px;">
+      <label style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">🔍 ค้นหาและเลือกนักเรียน</label>
+      <div style="display: flex; gap: 12px; margin-top: 10px; align-items: center;">
         <select id="studentSelect" class="select-st" onchange="onStudentChange(this.value)">
           <option value="">กำลังโหลดรายชื่อนักเรียน...</option>
         </select>
-        <button class="btn btn-outline" onclick="editCurrentStudent()" title="แก้ไขข้อมูลนักเรียน">✏️</button>
-        <button class="btn btn-danger" onclick="deleteCurrentStudent()" title="ลบนักเรียน">🗑️</button>
-        <button class="btn btn-primary" onclick="copyParentLink()">📋 คัดลอกลิงก์ส่ง LINE</button>
+        <button class="btn btn-outline" onclick="copyParentLink()" title="คัดลอกลิงก์ส่งให้ผู้ปกครอง">📋 คัดลอกลิงก์</button>
       </div>
     </div>
 
-    <!-- แผนการสอน -->
     <div id="contentSection" style="display: none;">
+      
+      <!-- Profile Header Card -->
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-          <div>
-            <h3 style="font-size: 1.2rem; font-weight: 600;">📚 แผนการสอนและบทเรียน</h3>
-            <p id="courseSub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">เรียนผ่านแล้ว 0 จาก 0 บท</p>
+        <div class="profile-header">
+          <div id="stAvatar" class="profile-avatar">น</div>
+          <div class="profile-info" style="flex: 1;">
+            <h2 id="stFullName">น้อง...</h2>
+            <div class="profile-tags">
+              <span class="tag">🎓 ชั้น: <span id="stGrade"></span></span>
+              <span class="tag">📚 วิชา: <span id="stCourse"></span></span>
+              <span class="tag" style="background: #fef08a; color: #854d0e;">🏆 รหัส: <span id="stCode"></span></span>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="addTopicPrompt()">+ เพิ่มเนื้อหาบทเรียน</button>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">ความคืบหน้า</div>
+            <div id="progressScore" style="font-size: 2.2rem; font-weight: 700; color: var(--primary); line-height: 1;">0%</div>
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="nav-tabs" style="margin: 0; border: none; padding: 0;">
+            <div class="nav-tab active">Dashboard</div>
+            <div class="nav-tab" onclick="document.getElementById('chatSection').scrollIntoView({behavior: 'smooth'})">ข้อความฟีดแบ็ก</div>
+          </div>
+          <div>
+            <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="editCurrentStudent()">✏️ แก้ไขข้อมูล</button>
+            <button class="btn btn-danger" style="font-size: 0.8rem; padding: 8px 12px;" onclick="deleteCurrentStudent()">🗑️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- แผนการสอน (Roadmap) -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 600; color: var(--primary);">📍 แผนการเรียนรู้ (Roadmap)</h3>
+            <p id="courseSub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">เรียนผ่านแล้ว 0 จาก 0 บท</p>
+          </div>
+          <button class="btn btn-primary" onclick="addTopicPrompt()" style="font-size: 0.85rem;">+ เพิ่มเนื้อหา</button>
         </div>
         <div id="topicList"></div>
       </div>
 
       <!-- กล่องข้อความและฟีดแบ็ก -->
-      <div class="card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 12px;">💬 สนทนา / ฟีดแบ็กกับผู้ปกครอง (น้อง <span id="chatStName" style="color: var(--primary-dark);"></span>)</h3>
+      <div class="card" id="chatSection">
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--primary);">💬 ช่องทางติดต่อผู้ปกครอง</h3>
         <div id="tutorChatBox" class="chat-box"></div>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="tutorMsgInput" class="select-st" placeholder="พิมพ์ข้อความตอบกลับผู้ปกครอง..." onkeypress="if(event.key==='Enter') sendTutorComment()">
-          <button class="btn btn-primary" onclick="sendTutorComment()">ส่งข้อความ</button>
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <input type="text" id="tutorMsgInput" class="select-st" placeholder="พิมพ์ข้อความฟีดแบ็กหรือแจ้งเตือน..." onkeypress="if(event.key==='Enter') sendTutorComment()">
+          <button class="btn btn-primary" onclick="sendTutorComment()">ส่ง</button>
         </div>
       </div>
     </div>
@@ -240,18 +335,18 @@
   <!-- Modal สำหรับอัปโหลดไฟล์และโน้ตคุณครู -->
   <div id="updateModal" class="modal-backdrop">
     <div class="modal-content">
-      <h3 style="font-size: 1.1rem; margin-bottom: 12px;">✏️ บันทึกโน้ตและแนบไฟล์</h3>
+      <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">อัปเดตผลการเรียน</h3>
       <input type="hidden" id="modalTopicId">
       
-      <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">บันทึกผลการสอน / การบ้าน:</label>
-      <textarea id="modalTutorNotes" class="select-st" style="height: 90px; margin-top: 6px; resize: none;" placeholder="ระบุสิ่งที่เด็กทำได้ หรือการบ้าน..."></textarea>
+      <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">บันทึกย่อ / ข้อเสนอแนะ:</label>
+      <textarea id="modalTutorNotes" class="select-st" style="height: 100px; margin-top: 6px; resize: none;" placeholder="พิมพ์ผลประเมิน หรือสิ่งที่ต้องพัฒนาเพิ่ม..."></textarea>
       
-      <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; display: block; margin-top: 12px;">แนบรูปภาพ / คลิปวิดีโอ / PDF:</label>
-      <input type="file" id="modalFiles" multiple class="select-st" style="margin-top: 6px;">
+      <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; display: block; margin-top: 16px;">แนบหลักฐาน (รูปภาพ/วิดีโอ/เอกสาร):</label>
+      <input type="file" id="modalFiles" multiple class="select-st" style="margin-top: 6px; padding: 8px;">
 
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
         <button class="btn btn-outline" onclick="closeUpdateModal()">ยกเลิก</button>
-        <button class="btn btn-primary" id="saveModalBtn" onclick="saveTopicDetails()">💾 บันทึกข้อมูล</button>
+        <button class="btn btn-primary" id="saveModalBtn" onclick="saveTopicDetails()">บันทึกข้อมูล</button>
       </div>
     </div>
   </div>
@@ -274,7 +369,7 @@
         }
         select.innerHTML = '';
         allStudents.forEach(st => {
-          select.innerHTML += `<option value="${st.id}">น้อง${st.nickname} - ${st.full_name} (${st.grade_level}) [วิชา: ${st.course_title || 'ทั่วไป'}]</option>`;
+          select.innerHTML += `<option value="${st.id}">${st.nickname} (${st.full_name}) - ${st.course_title || 'ทั่วไป'}</option>`;
         });
 
         if (!currentStudentId || !allStudents.find(s => s.id === currentStudentId)) {
@@ -290,7 +385,14 @@
       currentStudentId = id;
       document.getElementById('contentSection').style.display = 'block';
       const st = allStudents.find(s => s.id === id);
-      document.getElementById('chatStName').innerText = st.nickname;
+      
+      // อัปเดต Profile Header
+      document.getElementById('stAvatar').innerText = st.nickname.charAt(0);
+      document.getElementById('stFullName').innerText = `${st.full_name} (น้อง${st.nickname})`;
+      document.getElementById('stGrade').innerText = st.grade_level || '-';
+      document.getElementById('stCourse').innerText = st.course_title || 'ทั่วไป';
+      document.getElementById('stCode').innerText = st.parent_access_code;
+      
       loadProgress();
       loadTutorChat();
     }
@@ -301,11 +403,14 @@
       if (data.success) {
         currentTopics = data.topics || [];
         const completed = currentTopics.filter(t => t.status === 'completed').length;
-        document.getElementById('courseSub').innerText = `เรียนผ่านแล้ว ${completed} จาก ${currentTopics.length} บท`;
+        const percent = currentTopics.length > 0 ? Math.round((completed / currentTopics.length) * 100) : 0;
+        
+        document.getElementById('progressScore').innerText = `${percent}%`;
+        document.getElementById('courseSub').innerText = `ความคืบหน้า: ผ่านแล้ว ${completed} จาก ${currentTopics.length} บทเรียน`;
 
         const list = document.getElementById('topicList');
         if (currentTopics.length === 0) {
-          list.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; padding: 14px 0;">ยังไม่มีบทเรียน คลิกปุ่ม "+ เพิ่มเนื้อหาบทเรียน" เพื่อเริ่มต้น</p>';
+          list.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted); background: #f8fafc; border-radius: 12px; border: 1px dashed var(--border);">ยังไม่มีแผนการเรียนรู้ คลิกปุ่มเพิ่มเนื้อหาเพื่อเริ่มต้น</div>';
           return;
         }
 
@@ -314,34 +419,33 @@
           let numClass = `num-${status}`;
 
           let filesHtml = (t.attachments && t.attachments.length > 0) 
-            ? '<div style="margin-top: 6px;">' + t.attachments.map(a => `<a href="${a.file_url}" target="_blank" class="attachment-capsule">📎 ${a.file_name}</a>`).join('') + '</div>'
+            ? '<div style="margin-top: 8px;">' + t.attachments.map(a => `<a href="${a.file_url}" target="_blank" class="attachment-capsule">📎 ${a.file_name}</a>`).join('') + '</div>'
             : '';
-          let noteHtml = t.tutor_notes ? `<div style="font-size: 0.82rem; color: #475569; margin-top: 6px; background: #f8fafc; padding: 6px 10px; border-radius: 8px;">📝 <b>บันทึก:</b> ${t.tutor_notes}</div>` : '';
+          let noteHtml = t.tutor_notes ? `<div style="font-size: 0.85rem; color: #334155; margin-top: 8px; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--primary-light);"><b>บันทึก:</b> ${t.tutor_notes}</div>` : '';
 
           return `
             <div class="topic-card-item">
               <div class="topic-left">
                 <div class="badge-num ${numClass}">${t.sequence_order}</div>
                 <div style="flex: 1;">
-                  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
-                    <b style="font-size: 1rem;">${t.title}</b>
+                  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                    <b style="font-size: 1.05rem;">${t.title}</b>
                     
-                    <!-- ป้ายสถานะแบบเลือกเปลี่ยนได้ทันที -->
                     <select class="status-select-pill ${status}" onchange="changeTopicStatus('${t.topic_id}', this.value)">
-                      <option value="pending" ${status === 'pending' ? 'selected' : ''}>ยังไม่เริ่ม</option>
-                      <option value="in_progress" ${status === 'in_progress' ? 'selected' : ''}>กำลังเรียนอยู่</option>
-                      <option value="completed" ${status === 'completed' ? 'selected' : ''}>เรียนเสร็จแล้ว</option>
+                      <option value="pending" ${status === 'pending' ? 'selected' : ''}>รอดำเนินการ</option>
+                      <option value="in_progress" ${status === 'in_progress' ? 'selected' : ''}>กำลังเรียน</option>
+                      <option value="completed" ${status === 'completed' ? 'selected' : ''}>ผ่านเกณฑ์</option>
                     </select>
 
-                    <button class="action-link" onclick="editTopicName('${t.topic_id}', '${t.title}')">✏️ แก้ไข</button>
-                    <button class="action-link delete" onclick="deleteTopic('${t.topic_id}')">🗑️ ลบ</button>
+                    <button class="action-link" onclick="editTopicName('${t.topic_id}', '${t.title}')" title="แก้ไขชื่อ">✏️</button>
+                    <button class="action-link delete" onclick="deleteTopic('${t.topic_id}')" title="ลบเนื้อหา">🗑️</button>
                   </div>
                   ${noteHtml}
                   ${filesHtml}
                 </div>
               </div>
               <div>
-                <button class="btn btn-outline" style="font-size: 0.82rem; white-space: nowrap;" onclick="openUpdateModal('${t.topic_id}')">✏️ อัปเดตผล / แนบไฟล์</button>
+                <button class="btn btn-outline" style="font-size: 0.8rem; white-space: nowrap; padding: 6px 12px;" onclick="openUpdateModal('${t.topic_id}')">📝 อัปเดตผล</button>
               </div>
             </div>
           `;
@@ -349,7 +453,6 @@
       }
     }
 
-    // ฟังก์ชันเปลี่ยนสถานะทันทีเมื่อผู้ใช้เลือกจากดรอปดาวน์
     async function changeTopicStatus(topicId, newStatus) {
       const fd = new FormData();
       fd.append('status', newStatus);
@@ -398,13 +501,13 @@
       });
 
       btn.disabled = false;
-      btn.innerText = '💾 บันทึกข้อมูล';
+      btn.innerText = 'บันทึกข้อมูล';
       closeUpdateModal();
       loadProgress();
     }
 
     async function addTopicPrompt() {
-      const title = prompt('กรุณาระบุชื่อบทเรียน / หัวข้อใหม่:');
+      const title = prompt('กำหนดหัวข้อการเรียนรู้ใหม่:');
       if (!title) return;
       await fetch('/api/topics', {
         method: 'POST',
@@ -415,7 +518,7 @@
     }
 
     async function editTopicName(topicId, oldTitle) {
-      const title = prompt('แก้ไขชื่อบทเรียน:', oldTitle);
+      const title = prompt('แก้ไขชื่อหัวข้อ:', oldTitle);
       if (!title || title === oldTitle) return;
       await fetch(`/api/topics/${topicId}`, {
         method: 'PUT',
@@ -426,7 +529,7 @@
     }
 
     async function deleteTopic(topicId) {
-      if (!confirm('ต้องการลบบทเรียนนี้ใช่หรือไม่?')) return;
+      if (!confirm('ยืนยันลบหัวข้อการเรียนรู้นี้?')) return;
       await fetch(`/api/topics/${topicId}`, { method: 'DELETE' });
       loadProgress();
     }
@@ -435,8 +538,8 @@
       const nickname = prompt('ชื่อเล่น:');
       if (!nickname) return;
       const fullName = prompt('ชื่อ-นามสกุลจริง:');
-      const gradeLevel = prompt('ระดับชั้น (เช่น ป.3, ม.1):');
-      const courseTitle = prompt('ชื่อวิชาที่เรียน (เช่น คณิตศาสตร์พื้นฐาน):');
+      const gradeLevel = prompt('ระดับชั้น:');
+      const courseTitle = prompt('วิชาที่ลงทะเบียน:');
       
       const res = await fetch('/api/students', {
         method: 'POST',
@@ -456,7 +559,7 @@
       const nickname = prompt('แก้ไขชื่อเล่น:', st.nickname);
       const fullName = prompt('แก้ไขชื่อ-นามสกุล:', st.full_name);
       const gradeLevel = prompt('แก้ไขระดับชั้น:', st.grade_level);
-      const courseTitle = prompt('แก้ไขชื่อวิชา:', st.course_title);
+      const courseTitle = prompt('แก้ไขวิชา:', st.course_title);
 
       await fetch(`/api/students/${currentStudentId}`, {
         method: 'PUT',
@@ -467,7 +570,7 @@
     }
 
     async function deleteCurrentStudent() {
-      if (!confirm('ยืนยันลบนักเรียนคนนี้พร้อมประวัติและบทเรียนทั้งหมดหรือไม่?')) return;
+      if (!confirm('โปรดระวัง: ยืนยันการลบนักเรียนคนนี้พร้อมข้อมูลทั้งหมดหรือไม่?')) return;
       await fetch(`/api/students/${currentStudentId}`, { method: 'DELETE' });
       currentStudentId = null;
       loadStudents();
@@ -476,7 +579,7 @@
     function copyParentLink() {
       const link = `${window.location.origin}/parent.html`;
       navigator.clipboard.writeText(link);
-      alert(`คัดลอกลิงก์รวมสำหรับส่งให้ผู้ปกครองเรียบร้อยแล้ว:\n${link}`);
+      alert(`คัดลอกลิงก์ส่วนของผู้ปกครองสำเร็จ:\n${link}`);
     }
 
     async function loadTutorChat() {
@@ -487,12 +590,13 @@
       if (data.success && data.comments.length > 0) {
         box.innerHTML = data.comments.map(c => `
           <div class="chat-msg ${c.sender_role}">
-            <b>${c.sender_name}:</b> ${c.message}
+            <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 2px; opacity: 0.8;">${c.sender_name}</div>
+            <div>${c.message}</div>
           </div>
         `).join('');
         box.scrollTop = box.scrollHeight;
       } else {
-        box.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center;">ยังไม่มีข้อความสนทนา</p>';
+        box.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">ยังไม่มีการสนทนา</p>';
       }
     }
 
@@ -507,7 +611,7 @@
         body: JSON.stringify({
           studentId: currentStudentId,
           senderRole: 'tutor',
-          senderName: 'คุณครู',
+          senderName: 'ผู้สอน',
           message: msg
         })
       });
