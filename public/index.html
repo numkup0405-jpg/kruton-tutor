@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kruton Tutor - Dashboard</title>
-  <link rel="icon" type="image/png" href="/logo.png">
+  <!-- ดึงโลโก้มาเป็นไอคอนแท็บเบราว์เซอร์ -->
+  <link rel="icon" type="image/png" href="/logo.png.png">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -30,6 +31,7 @@
     .sidebar-brand {
       padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border);
     }
+    .sidebar-brand img { width: 45px; height: 45px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); object-fit: cover; }
     .brand-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
     
     .sidebar-menu { padding: 20px 16px; flex: 1; overflow-y: auto; }
@@ -42,7 +44,6 @@
     .menu-item:hover { background: var(--bg-color); color: var(--primary); }
     .menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; border-left: 4px solid var(--primary); }
     
-    /* Submenu (Dropdown) */
     .caret { transition: transform 0.3s; font-size: 0.8rem; }
     .menu-item.open .caret { transform: rotate(180deg); }
     .submenu { display: none; padding-left: 36px; margin-bottom: 8px; }
@@ -50,7 +51,7 @@
       padding: 8px 12px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;
       border-radius: 8px; transition: 0.2s;
     }
-    .submenu-item:hover { color: var(--primary); background: #f1f5f9; }
+    .submenu-item:hover { color: var(--primary); background: #f1f5f9; font-weight: 500; }
 
     .sidebar-bottom { padding: 20px 16px; border-top: 1px solid var(--border); }
     .btn-add-topic {
@@ -64,7 +65,6 @@
       flex: 1; margin-left: 260px; padding: 30px 40px; display: flex; flex-direction: column; gap: 30px;
     }
 
-    /* --- Banner Carousel --- */
     .banner-container {
       background: linear-gradient(135deg, #1e3a8a, var(--primary));
       border-radius: 20px; height: 180px; display: flex; flex-direction: column;
@@ -79,7 +79,6 @@
     .dot.active { background: white; width: 20px; border-radius: 10px; }
     .banner-decor { position: absolute; right: -20px; top: -30px; opacity: 0.1; font-size: 200px; z-index: 1;}
 
-    /* --- Sections --- */
     .view-section { display: none; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .view-section.active { display: block; }
@@ -96,7 +95,6 @@
     .add-course-btn-group:hover .fab-button { background: var(--primary-light); transform: scale(1.05); }
     .add-course-label { font-size: 0.8rem; font-weight: 600; color: var(--primary); }
 
-    /* --- Course Grid --- */
     .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
     .course-card {
       background: var(--surface); border-radius: 16px; padding: 24px; border: 1px solid var(--border);
@@ -106,14 +104,12 @@
     .course-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 5px; background: var(--primary); }
     .course-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
     
-    /* --- History Table --- */
-    .history-card { background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-    .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    .history-table th, .history-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .history-card { background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); overflow-x: auto; }
+    .history-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    .history-table th, .history-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
     .history-table th { background: #f8fafc; font-weight: 600; color: var(--text-muted); font-size: 0.9rem; }
     .history-table tr:hover td { background: #f1f5f9; cursor: pointer; }
 
-    /* --- Detail View Components (From previous setup) --- */
     .back-btn { background: white; border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; margin-bottom: 20px; }
     .back-btn:hover { background: #f1f5f9; }
     .card { background: var(--surface); border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--border); }
@@ -136,7 +132,6 @@
     .chat-msg.parent { align-self: flex-start; background: #f1f5f9; border: 1px solid var(--border); }
     .select-st { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.95rem; }
     
-    /* Modal */
     .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 999; align-items: center; justify-content: center; }
     .modal-content { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; }
   </style>
@@ -146,11 +141,13 @@
   <!-- ================= 1. Sidebar ================= -->
   <aside class="sidebar">
     <div class="sidebar-brand">
+      <!-- รูปโลโก้: ดักจับทั้งชื่อ logo.png และ logo.png.png เผื่อไฟล์ซ้อนกัน -->
+      <img src="/logo.png" alt="Logo" onerror="this.onerror=null; this.src='/logo.png.png';">
       <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Dashboard System</span></div>
     </div>
     
     <div class="sidebar-menu">
-      <div class="menu-item active" id="menu-dashboard" onclick="switchView('dashboardView', this)">
+      <div class="menu-item active" id="menu-dashboard" onclick="switchView('dashboardView', this); currentFilterGrade = 'ทั้งหมด'; renderCourseCards('ทั้งหมด'); document.getElementById('courseListTitle').innerText = 'คอร์สที่ปรากฏ (ทั้งหมด)';">
         <div class="menu-label"><span>📚</span> คอร์สที่ปรากฏ</div>
       </div>
       
@@ -158,7 +155,6 @@
         <div class="menu-label"><span>👤</span> ประวัตินักเรียน</div>
       </div>
       
-      <!-- เมนูจัดการระดับชั้น (Dropdown) -->
       <div class="menu-item" onclick="toggleSubmenu(this)">
         <div class="menu-label"><span>📊</span> จัดการระดับชั้น</div>
         <span class="caret">▼</span>
@@ -188,7 +184,7 @@
   <!-- ================= 2. Main Content ================= -->
   <main class="main-wrapper">
     
-    <!-- Banner ประกาศ (แสดงทุกหน้ายกเว้นหน้ารายละเอียด) -->
+    <!-- Banner ประกาศ -->
     <div class="banner-container" id="mainBanner">
       <div class="banner-decor">⭐</div>
       <div class="banner-content">
@@ -202,7 +198,7 @@
       </div>
     </div>
 
-    <!-- VIEW 1: Dashboard (หน้าหลัก) -->
+    <!-- VIEW 1: Dashboard -->
     <div id="dashboardView" class="view-section active">
       <div class="section-header">
         <h3 class="section-title" id="courseListTitle">คอร์สที่ปรากฏ (ทั้งหมด)</h3>
@@ -211,12 +207,10 @@
           <span class="add-course-label">เพิ่มเมนู / เพิ่มคอร์ส</span>
         </div>
       </div>
-      <div id="courseGrid" class="course-grid">
-        <!-- การ์ดคอร์สจะถูกสร้างที่นี่ -->
-      </div>
+      <div id="courseGrid" class="course-grid"></div>
     </div>
 
-    <!-- VIEW 2: History (หน้าประวัตินักเรียน) -->
+    <!-- VIEW 2: History -->
     <div id="historyView" class="view-section">
       <div class="section-header">
         <h3 class="section-title">ประวัตินักเรียนทั้งหมด</h3>
@@ -233,14 +227,12 @@
               <th>จัดการ</th>
             </tr>
           </thead>
-          <tbody id="historyTableBody">
-            <!-- ข้อมูลนักเรียน -->
-          </tbody>
+          <tbody id="historyTableBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- VIEW 3: Detail View (หน้าแผนการเรียนรายบุคคล) -->
+    <!-- VIEW 3: Detail View -->
     <div id="detailView" class="view-section">
       <button class="back-btn" onclick="switchView('dashboardView', document.getElementById('menu-dashboard'))">⬅️ ย้อนกลับไปหน้าคอร์ส</button>
       
@@ -304,27 +296,18 @@
     let currentTopics = [];
     let currentFilterGrade = 'ทั้งหมด';
 
-    // ================= ระบบเชื่อมโยงหน้า (Navigation) =================
+    // การเชื่อมโยงหน้า (Navigation)
     function switchView(viewId, menuElement = null) {
-      // ซ่อนทุกหน้า
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      // ล้างแถบ active เมนูซ้าย
       if (menuElement) {
         document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
         menuElement.classList.add('active');
       }
-      
-      // จัดการแสดงผล Banner
       const banner = document.getElementById('mainBanner');
-      if(viewId === 'detailView') {
-        banner.style.display = 'none';
-      } else {
-        banner.style.display = 'flex';
+      if (banner) {
+        banner.style.display = (viewId === 'detailView') ? 'none' : 'flex';
       }
-
-      // แสดงหน้าที่ต้องการ
       document.getElementById(viewId).classList.add('active');
-      currentStudentId = null; // รีเซ็ตการเลือก
     }
 
     function toggleSubmenu(element) {
@@ -333,62 +316,53 @@
       submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
     }
 
-    // ================= ระบบแบนเนอร์สไลด์ (Carousel) =================
+    // แบนเนอร์ (Carousel)
     const banners = [
       { title: "ยินดีต้อนรับสู่ระบบ Kruton Tutor", desc: "จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครอง" },
       { title: "ฟีเจอร์ใหม่! จัดการระดับชั้น", desc: "เลือกแถบเมนูด้านซ้ายเพื่อกรองคอร์สเรียนตามระดับชั้นได้แล้ว" },
       { title: "ตารางประวัตินักเรียน", desc: "ตรวจสอบข้อมูลและรหัสเข้าใช้งานของผู้ปกครองได้ที่หน้าประวัตินักเรียน" }
     ];
     let bannerIndex = 0;
-    
     function setBanner(index) {
       bannerIndex = index;
       document.getElementById('bannerTitle').innerText = banners[index].title;
       document.getElementById('bannerDesc').innerText = banners[index].desc;
-      const dots = document.querySelectorAll('.dot');
-      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      document.querySelectorAll('.dot').forEach((dot, i) => dot.classList.toggle('active', i === index));
     }
-    
-    setInterval(() => {
-      let nextIndex = (bannerIndex + 1) % banners.length;
-      setBanner(nextIndex);
-    }, 5000);
+    setInterval(() => { setBanner((bannerIndex + 1) % banners.length); }, 5000);
 
-    // ================= โหลดข้อมูลหลัก =================
+    // โหลดข้อมูล
     async function loadStudents() {
-      const res = await fetch('/api/students');
-      const data = await res.json();
-      if (data.success) {
-        allStudents = data.data;
-        renderCourseCards(currentFilterGrade);
-        renderHistoryTable();
+      try {
+        const res = await fetch('/api/students');
+        const data = await res.json();
+        if (data.success) {
+          allStudents = data.data;
+          renderCourseCards(currentFilterGrade);
+          renderHistoryTable();
+        }
+      } catch (err) {
+        console.error("โหลดข้อมูลล้มเหลว:", err);
       }
     }
 
-    // ================= หน้าระดับชั้น & หน้าหลัก =================
     function filterByGrade(grade) {
       currentFilterGrade = grade;
       switchView('dashboardView', document.getElementById('menu-dashboard'));
-      
-      document.getElementById('courseListTitle').innerText = 
-        grade === 'ทั้งหมด' ? 'คอร์สที่ปรากฏ (ทั้งหมด)' : `คอร์สที่ปรากฏ (ระดับชั้น ${grade})`;
-        
+      document.getElementById('courseListTitle').innerText = grade === 'ทั้งหมด' ? 'คอร์สที่ปรากฏ (ทั้งหมด)' : `คอร์สที่ปรากฏ (ระดับชั้น ${grade})`;
       renderCourseCards(grade);
     }
 
     function renderCourseCards(grade = 'ทั้งหมด') {
       const grid = document.getElementById('courseGrid');
-      
       let filteredStudents = allStudents;
       if(grade !== 'ทั้งหมด') {
         filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
       }
-
       if (filteredStudents.length === 0) {
         grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px;">ยังไม่มีข้อมูลคอร์สเรียนในหมวดหมู่นี้</div>';
         return;
       }
-
       grid.innerHTML = filteredStudents.map(st => `
         <div class="course-card" onclick="openDetailView('${st.id}')">
           <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}</div>
@@ -401,7 +375,6 @@
       `).join('');
     }
 
-    // ================= หน้าประวัตินักเรียน =================
     function renderHistoryTable() {
       const tbody = document.getElementById('historyTableBody');
       if (allStudents.length === 0) {
@@ -420,24 +393,21 @@
       `).join('');
     }
 
-    // ================= หน้ารายละเอียดคอร์ส =================
     async function openDetailView(id) {
-      switchView('detailView'); // เปลี่ยน UI เป็นหน้า Detail ทันที
       if (!id) return;
       currentStudentId = id;
       const st = allStudents.find(s => s.id === id);
-      
       document.getElementById('stAvatar').innerText = st.nickname.charAt(0);
       document.getElementById('stFullName').innerText = `${st.full_name} (น้อง${st.nickname})`;
       document.getElementById('stGrade').innerText = st.grade_level || '-';
       document.getElementById('stCourse').innerText = st.course_title || 'ทั่วไป';
       document.getElementById('stCode').innerText = st.parent_access_code;
       
+      switchView('detailView');
       loadProgress();
       loadTutorChat();
     }
 
-    // (ฟังก์ชัน Roadmap และ Chat ใช้ของเดิมที่ทำงานสมบูรณ์แล้ว)
     async function loadProgress() {
       const res = await fetch(`/api/students/${currentStudentId}/progress`);
       const data = await res.json();
@@ -525,7 +495,7 @@
       loadProgress();
     }
 
-    // ================= แก้ไขบั๊กเพิ่มนักเรียน =================
+    // แก้บั๊ก: ต้องให้เซิร์ฟเวอร์เซฟเสร็จ ค่อยเรียกโหลดข้อมูลมาวาดการ์ดใหม่
     async function openAddStudent() {
       const nickname = prompt('ชื่อเล่นนักเรียน:');
       if (!nickname) return;
@@ -533,15 +503,13 @@
       const gradeLevel = prompt('ระดับชั้น (เช่น ป.1, ม.3):');
       const courseTitle = prompt('ชื่อคอร์สที่เรียน (เช่น คณิตศาสตร์ ป.3):');
       
-      // ส่งข้อมูลไปบันทึก
       await fetch('/api/students', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nickname, fullName: fullName || nickname, gradeLevel: gradeLevel || 'ทั่วไป', courseTitle: courseTitle || 'คอร์สเรียนทั่วไป' })
       });
       
-      // *** รอโหลดข้อมูลใหม่ให้เสร็จก่อน แล้วค่อยสลับหน้า ***
-      await loadStudents(); 
+      await loadStudents(); // รอซิงค์ฐานข้อมูลเสร็จ
       switchView('dashboardView', document.getElementById('menu-dashboard')); 
     }
 
@@ -595,12 +563,14 @@
       const input = document.getElementById('tutorMsgInput');
       const msg = input.value.trim();
       if (!msg || !currentStudentId) return;
-      await fetch('/api/comments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ studentId: currentStudentId, senderRole: 'tutor', senderName: 'ผู้สอน', message: msg }) });
+      await fetch('/api/comments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ studentId: currentStudentId, senderRole: 'tutor', senderName: 'คุณครู', message: msg }) });
       input.value = '';
       loadTutorChat();
     }
 
     setInterval(() => { if (currentStudentId) loadTutorChat(); }, 8000);
+    
+    // โหลดหน้าแรกสุด
     loadStudents();
   </script>
 </body>
