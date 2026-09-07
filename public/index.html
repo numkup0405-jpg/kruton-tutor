@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kruton Tutor - Dashboard</title>
-  <link rel="icon" type="image/png" href="/logo.png.png">
+  <link rel="icon" type="image/png" href="/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -14,19 +14,19 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
     body { background: var(--bg-color); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
-    
+
     /* ================= 1. Sidebar ================= */
     .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
     .sidebar-brand { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
     .sidebar-brand img { width: 45px; height: 45px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); object-fit: cover; }
     .brand-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
-    
+
     .sidebar-menu { padding: 20px 16px; flex: 1; overflow-y: auto; }
     .menu-item { padding: 12px 16px; border-radius: 10px; color: var(--text-muted); font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
     .menu-item .menu-label { display: flex; align-items: center; gap: 10px; }
     .menu-item:hover { background: var(--bg-color); color: var(--primary); }
     .menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; border-left: 4px solid var(--primary); }
-    
+
     .caret { transition: transform 0.3s; font-size: 0.8rem; }
     .menu-item.open .caret { transform: rotate(180deg); }
     .submenu { display: none; padding-left: 36px; margin-bottom: 8px; }
@@ -40,16 +40,16 @@
     /* ================= 2. Main Content ================= */
     .main-wrapper { flex: 1; margin-left: 260px; padding: 30px 40px; display: flex; flex-direction: column; gap: 30px; }
 
-    /* --- Banner Carousel --- */
     .banner-container {
       background: linear-gradient(135deg, #1e3a8a, var(--primary));
       background-size: cover; background-position: center; background-repeat: no-repeat;
       border-radius: 20px; height: 220px; display: flex; flex-direction: column;
       align-items: center; justify-content: center; color: white; position: relative;
       box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: center;
-      transition: background-image 0.5s ease-in-out;
     }
-    .banner-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none; }
+    .banner-overlay {
+      position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none;
+    }
     .banner-content { z-index: 2; padding: 0 20px; position: relative; }
     .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
@@ -57,12 +57,21 @@
     .banner-controls { position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 8px; }
     .btn-edit-banner, .btn-remove-banner {
       background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px;
-      border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s;
+      border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: 0.2s;
     }
     .btn-edit-banner:hover, .btn-remove-banner:hover { background: white; transform: scale(1.05); }
-    .banner-dots { position: absolute; bottom: 15px; display: flex; gap: 8px; z-index: 2; }
-    .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; transition: 0.3s;}
-    .dot.active { background: white; width: 20px; border-radius: 10px; }
+
+    .banner-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.85); border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .banner-arrow:hover { background: white; }
+    .banner-arrow.prev { left: 15px; }
+    .banner-arrow.next { right: 15px; }
+    .banner-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 6px; }
+    .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.2s; }
+    .banner-dot.active { background: white; width: 22px; border-radius: 4px; }
+
+    .slide-manage-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+    .slide-manage-item img { width: 70px; height: 44px; object-fit: cover; border-radius: 6px; }
 
     .view-section { display: none; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -71,17 +80,6 @@
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .section-title { font-size: 1.4rem; font-weight: 700; color: var(--text); }
 
-    /* --- Promoted Course Cards --- */
-    .promo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
-    .promo-card { background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); cursor: pointer; transition: 0.2s; display: flex; flex-direction: column;}
-    .promo-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: #bfdbfe; }
-    .promo-cover { width: 100%; height: 140px; object-fit: cover; background: #e2e8f0; }
-    .promo-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
-    .promo-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
-    .promo-desc { font-size: 0.85rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px; flex: 1;}
-    .promo-footer { font-size: 0.8rem; color: var(--secondary); font-weight: 600; text-align: right; }
-
-    /* --- Course Grid (Active Students) --- */
     .add-course-btn-group { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
     .fab-button { width: 45px; height: 45px; border-radius: 50%; background: var(--surface); color: var(--primary); border: 2px dashed var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 300; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s; }
     .add-course-btn-group:hover .fab-button { background: var(--primary-light); transform: scale(1.05); }
@@ -93,14 +91,12 @@
     .course-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 5px; background: var(--primary); }
     .course-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
 
-    /* --- History Table --- */
     .history-card { background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border); overflow-x: auto; }
     .history-table { width: 100%; border-collapse: collapse; min-width: 600px; }
     .history-table th, .history-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
     .history-table th { background: #f8fafc; font-weight: 600; color: var(--text-muted); font-size: 0.9rem; }
     .history-table tr:hover td { background: #f1f5f9; cursor: pointer; }
 
-    /* --- Components --- */
     .back-btn { background: white; border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; margin-bottom: 20px; }
     .back-btn:hover { background: #f1f5f9; }
     .card { background: var(--surface); border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--border); }
@@ -112,6 +108,7 @@
     .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
     .btn-danger { background: #fee2e2; color: #b91c1c; }
     .topic-card-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px dashed var(--border); gap: 16px; }
+    .topic-left { display: flex; gap: 12px; align-items: flex-start; flex: 1; }
     .badge-num { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; background: #f1f5f9; }
     .status-select-pill { padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid; outline: none; margin-left: 8px; }
     .status-select-pill.completed { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
@@ -124,10 +121,18 @@
     .chat-msg.parent { align-self: flex-start; background: #f1f5f9; border: 1px solid var(--border); }
     .select-st { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.95rem; }
 
-    /* Modals */
-    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 999; align-items: center; justify-content: center; padding: 20px;}
-    .modal-content { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;}
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 999; align-items: center; justify-content: center; }
+    .modal-content { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; }
+
     #connectionBanner { display:none; background:#fef2f2; color:#b91c1c; padding:12px 20px; border-radius:12px; font-size:0.85rem; font-weight:500; border:1px solid #fecaca; }
+
+    .promo-card { padding: 0; }
+    .promo-cover { width: 100%; height: 140px; object-fit: cover; background: #f1f5f9; }
+    .promo-body { padding: 18px; }
+    .promo-cover-placeholder { width: 100%; height: 140px; background: linear-gradient(135deg, #dbeafe, #eff6ff); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 2rem; }
+    .promo-detail-cover { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; }
+    .promo-video-frame { width: 100%; aspect-ratio: 16/9; border-radius: 12px; border: none; margin-bottom: 16px; }
+    .modal-content.wide { max-width: 640px; }
   </style>
 </head>
 <body>
@@ -135,17 +140,21 @@
   <!-- ================= 1. Sidebar ================= -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <img src="/logo.png" alt="Logo" onerror="this.onerror=null; this.src='/logo.png.png';">
+      <img src="/logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
       <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Dashboard System</span></div>
     </div>
 
     <div class="sidebar-menu">
-      <div class="menu-item active" id="menu-dashboard" onclick="switchView('dashboardView', this); currentFilterGrade = 'ทั้งหมด'; renderCourseCards('ทั้งหมด'); document.getElementById('courseListTitle').innerText = 'รายชื่อนักเรียนในคอร์ส (ทั้งหมด)';">
-        <div class="menu-label"><span>📚</span> หน้าหลัก / คอร์ส</div>
+      <div class="menu-item active" id="menu-dashboard" onclick="switchView('dashboardView', this); currentFilterGrade = 'ทั้งหมด'; renderCourseCards('ทั้งหมด'); document.getElementById('courseListTitle').innerText = 'คอร์สที่ปรากฏ (ทั้งหมด)';">
+        <div class="menu-label"><span>📚</span> คอร์สที่ปรากฏ</div>
       </div>
 
       <div class="menu-item" id="menu-history" onclick="switchView('historyView', this)">
         <div class="menu-label"><span>👤</span> ประวัตินักเรียน</div>
+      </div>
+
+      <div class="menu-item" id="menu-promo" onclick="switchView('promoView', this)">
+        <div class="menu-label"><span>📣</span> คอร์สโปรโมท</div>
       </div>
 
       <div class="menu-item" onclick="toggleSubmenu(this)">
@@ -170,45 +179,39 @@
     </div>
 
     <div class="sidebar-bottom">
-      <button class="btn-add-topic" onclick="openAddStudent()">+ เพิ่มรายชื่อนักเรียน</button>
+      <button class="btn-add-topic" onclick="openAddStudent()">+ เพิ่มคอร์ส / นักเรียน</button>
     </div>
   </aside>
 
   <!-- ================= 2. Main Content ================= -->
   <main class="main-wrapper">
 
-    <div id="connectionBanner">⚠️ ยังไม่ได้ตั้งค่า Firebase และ/หรือ ImgBB โปรดใส่ค่า apiKey ในไฟล์</div>
+    <div id="connectionBanner">⚠️ ยังไม่ได้ตั้งค่า Firebase และ/หรือ ImgBB — โปรดใส่ค่า firebaseConfig และ IMGBB_API_KEY ในไฟล์นี้ก่อนใช้งาน (ดูคำแนะนำท้ายข้อความ)</div>
 
-    <!-- Banner ประกาศ (รองรับหลายรูป สไลด์ได้) -->
+    <!-- Banner ประกาศ (รองรับหลายหน้า เลื่อนดูได้ อัปโหลดรูปจริงผ่าน ImgBB) -->
     <div class="banner-container" id="mainBanner">
       <div class="banner-controls">
-        <button class="btn-edit-banner" onclick="promptAddBanner()">📷 เพิ่มป้ายประกาศ</button>
-        <button class="btn-remove-banner" onclick="removeCurrentBanner()">✖ ลบป้ายนี้</button>
+        <button class="btn-edit-banner" onclick="document.getElementById('bannerFileInput').click()">📷 เพิ่มรูปประกาศ</button>
+        <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
       </div>
+      <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileChange(event)">
+      <button class="banner-arrow prev" onclick="prevSlide()" style="display:none;" id="bannerPrevBtn">‹</button>
+      <button class="banner-arrow next" onclick="nextSlide()" style="display:none;" id="bannerNextBtn">›</button>
       <div class="banner-overlay" id="bannerOverlay"></div>
       <div class="banner-content">
         <h2 id="bannerTitle">ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
         <p id="bannerDesc" class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครอง</p>
       </div>
-      <div class="banner-dots" id="bannerDotsContainer"></div>
+      <div class="banner-dots" id="bannerDots"></div>
     </div>
 
     <!-- VIEW 1: Dashboard -->
     <div id="dashboardView" class="view-section active">
-      
-      <!-- ส่วนที่เพิ่มใหม่: คอร์สโปรโมท -->
       <div class="section-header">
-        <h3 class="section-title">✨ คอร์สที่เปิดสอน (โปรโมท)</h3>
-        <button class="btn btn-outline" onclick="openAddPromoModal()" style="font-size: 0.8rem;">+ เพิ่มคอร์สโปรโมท</button>
-      </div>
-      <div id="promoGrid" class="promo-grid"></div>
-
-      <!-- ส่วนเดิม: คอร์สของนักเรียนที่กำลังเรียน -->
-      <div class="section-header">
-        <h3 class="section-title" id="courseListTitle">รายชื่อนักเรียนในคอร์ส (ทั้งหมด)</h3>
+        <h3 class="section-title" id="courseListTitle">คอร์สที่ปรากฏ (ทั้งหมด)</h3>
         <div class="add-course-btn-group" onclick="openAddStudent()">
           <div class="fab-button">+</div>
-          <span class="add-course-label">เพิ่มนักเรียนเข้าเรียน</span>
+          <span class="add-course-label">เพิ่มเมนู / เพิ่มคอร์ส</span>
         </div>
       </div>
       <div id="courseGrid" class="course-grid"></div>
@@ -236,6 +239,18 @@
       </div>
     </div>
 
+    <!-- VIEW: คอร์สโปรโมท (ไม่ผูกกับนักเรียนจริง ใช้โชว์ก่อนสมัครเรียน) -->
+    <div id="promoView" class="view-section">
+      <div class="section-header">
+        <h3 class="section-title">คอร์สโปรโมท</h3>
+        <div class="add-course-btn-group" onclick="openAddPromo()">
+          <div class="fab-button">+</div>
+          <span class="add-course-label">เพิ่มคอร์สโปรโมท</span>
+        </div>
+      </div>
+      <div id="promoGrid" class="course-grid"></div>
+    </div>
+
     <!-- VIEW 3: Detail View -->
     <div id="detailView" class="view-section">
       <button class="back-btn" onclick="switchView('dashboardView', document.getElementById('menu-dashboard'))">⬅️ ย้อนกลับไปหน้าคอร์ส</button>
@@ -254,7 +269,7 @@
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 8px;">
           <button class="btn btn-outline" onclick="editCurrentStudent()">✏️ แก้ไขข้อมูล</button>
-          <button class="btn btn-danger" onclick="deleteCurrentStudent()">🗑️ ลบข้อมูล</button>
+          <button class="btn btn-danger" onclick="deleteCurrentStudent()">🗑️ ลบคอร์สนี้</button>
         </div>
       </div>
 
@@ -278,51 +293,41 @@
 
   </main>
 
-  <!-- Modals -->
+  <!-- Modal รายละเอียดคอร์สโปรโมท -->
+  <div id="promoDetailModal" class="modal-backdrop">
+    <div class="modal-content wide">
+      <div style="display:flex; justify-content: space-between; align-items:flex-start; margin-bottom: 12px;">
+        <h3 id="promoDetailTitle" style="font-size: 1.3rem; font-weight: 700; color: var(--primary);"></h3>
+        <button class="action-link" style="font-size:1.1rem;" onclick="closePromoDetailModal()">✖</button>
+      </div>
+      <img id="promoDetailCover" class="promo-detail-cover" style="display:none;">
+      <div id="promoDetailVideoBox"></div>
+      <p id="promoDetailDesc" style="color: var(--text); line-height: 1.6; white-space: pre-wrap; margin-bottom: 20px;"></p>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <button class="btn btn-outline" onclick="document.getElementById('promoCoverInput').click()">🖼️ เปลี่ยนรูปปก</button>
+          <input type="file" id="promoCoverInput" accept="image/*" style="display:none" onchange="handlePromoCoverChange(event)">
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline" onclick="editPromoCourse()">✏️ แก้ไข</button>
+          <button class="btn btn-danger" onclick="deletePromoCourse()">🗑️ ลบ</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- 1. Modal เพิ่มคอร์สโปรโมท -->
-  <div id="addPromoModal" class="modal-backdrop">
+  <!-- Modal จัดการรูปประกาศทั้งหมด -->
+  <div id="manageSlidesModal" class="modal-backdrop">
     <div class="modal-content">
-      <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">+ สร้างคอร์สโปรโมทใหม่</h3>
-      
-      <label style="font-size: 0.85rem; color: var(--text-muted);">ชื่อคอร์ส:</label>
-      <input type="text" id="promoTitleInput" class="select-st" style="margin-top: 6px; margin-bottom: 12px;" placeholder="เช่น คอร์สติวคณิตศาสตร์ ม.ปลาย">
-      
-      <label style="font-size: 0.85rem; color: var(--text-muted);">คำอธิบายคอร์ส:</label>
-      <textarea id="promoDescInput" class="select-st" style="height: 80px; margin-top: 6px; margin-bottom: 12px; resize: none;" placeholder="รายละเอียดคอร์สเรียน..."></textarea>
-      
-      <label style="font-size: 0.85rem; color: var(--text-muted);">ลิงก์วิดีโอแนะนำ (YouTube URL):</label>
-      <input type="text" id="promoVidInput" class="select-st" style="margin-top: 6px; margin-bottom: 12px;" placeholder="https://www.youtube.com/watch?v=...">
-
-      <label style="font-size: 0.85rem; color: var(--text-muted);">รูปภาพหน้าปกคอร์ส:</label>
-      <input type="file" id="promoImgInput" accept="image/*" class="select-st" style="margin-top: 6px; padding: 8px;">
-
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
-        <button class="btn btn-outline" onclick="document.getElementById('addPromoModal').style.display='none'">ยกเลิก</button>
-        <button class="btn btn-primary" id="savePromoBtn" onclick="savePromotedCourse()">บันทึกคอร์ส</button>
+      <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">จัดการรูปประกาศ</h3>
+      <div id="slideManageList" style="max-height: 320px; overflow-y: auto;"></div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <button class="btn btn-outline" onclick="closeManageSlidesModal()">ปิด</button>
       </div>
     </div>
   </div>
 
-  <!-- 2. Modal ดูรายละเอียดคอร์สโปรโมท (สำหรับกดดูวิดีโอ) -->
-  <div id="viewPromoModal" class="modal-backdrop">
-    <div class="modal-content" style="max-width: 600px;">
-      <img id="viewPromoCover" src="" style="width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:16px; background:#f1f5f9;">
-      <h3 id="viewPromoTitle" style="font-size: 1.4rem; color: var(--primary); margin-bottom: 8px;"></h3>
-      <p id="viewPromoDesc" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 16px; white-space: pre-wrap;"></p>
-      
-      <div id="viewPromoVideoContainer" style="margin-bottom: 16px; border-radius: 12px; overflow: hidden; display:none;">
-        <iframe id="viewPromoVideo" width="100%" height="315" frameborder="0" allowfullscreen></iframe>
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 10px;">
-         <button class="btn btn-danger" id="deletePromoBtn">🗑️ ลบคอร์สนี้</button>
-         <button class="btn btn-outline" onclick="document.getElementById('viewPromoModal').style.display='none'">ปิด</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3. Modal อัปเดตผลการเรียน -->
+  <!-- Modal อัปเดตผลการเรียน -->
   <div id="updateModal" class="modal-backdrop">
     <div class="modal-content">
       <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">อัปเดตผลการเรียน</h3>
@@ -338,12 +343,15 @@
     </div>
   </div>
 
-  <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="uploadNewBanner(event)">
-
+  <!-- ============== Firebase SDK (compat, ใช้งานง่ายแบบ script ปกติ) ============== -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
+    // =====================================================================
+    // 🔧 ขั้นตอนที่ 1: นำค่า config จาก Firebase Console มาใส่แทนที่ตรงนี้
+    //    Firebase Console > Project settings > General > Your apps > SDK setup and configuration
+    // =====================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyCFatAoxaWxXzTCunzpx_9Etuv9OL1Ei14",
       authDomain: "kruton-tutor.firebaseapp.com",
@@ -353,6 +361,8 @@
       appId: "1:426629568710:web:e4b584205077902429fc7"
     };
 
+    // 🔧 ขั้นตอนที่ 2: สมัครฟรีที่ https://api.imgbb.com/ (ไม่ต้องผูกบัตร) แล้วเอา API key มาใส่ตรงนี้
+    //    ใช้สำหรับอัปโหลดรูปแบนเนอร์ และไฟล์แนบในหัวข้อการเรียน (แทน Firebase Storage ที่ต้องผูกบัตร)
     const IMGBB_API_KEY = "094dc9f217fc7542e2e59197cf8bdf10";
 
     const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
@@ -364,191 +374,22 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    // อัปโหลดไฟล์รูปไปที่ ImgBB แล้วคืนค่า URL ของรูปที่อัปโหลดสำเร็จ
     async function uploadImageToImgbb(file) {
-      if (!isImgbbConfigured) throw new Error('ยังไม่ได้ตั้งค่า IMGBB_API_KEY');
+      if (!isImgbbConfigured) {
+        throw new Error('ยังไม่ได้ตั้งค่า IMGBB_API_KEY ในไฟล์ (ดูคำแนะนำท้ายข้อความ)');
+      }
       const fd = new FormData();
       fd.append('image', file);
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: fd });
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: fd
+      });
       const data = await res.json();
       if (!data.success) throw new Error(data.error?.message || 'อัปโหลดรูปไม่สำเร็จ');
       return data.data.url;
     }
 
-    // ================= ระบบป้ายประกาศหลายรูป (Array Banners) =================
-    let bannerList = [];
-    let currentBannerIndex = 0;
-    let bannerInterval = null;
-
-    function initBannerListener() {
-      db.collection('settings').doc('bannerData').onSnapshot(doc => {
-        const data = doc.data();
-        bannerList = data?.items || [];
-        if(bannerList.length === 0) {
-          bannerList = [{ imageUrl: null, title: "ยินดีต้อนรับสู่ระบบ Kruton Tutor", desc: "จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครอง" }];
-        }
-        renderBannerDots();
-        setBanner(0);
-      });
-    }
-
-    function renderBannerDots() {
-      const container = document.getElementById('bannerDotsContainer');
-      container.innerHTML = bannerList.map((_, i) => `<div class="dot ${i===0?'active':''}" onclick="setBanner(${i})"></div>`).join('');
-    }
-
-    function setBanner(index) {
-      if(bannerList.length === 0) return;
-      currentBannerIndex = index;
-      const b = bannerList[index];
-      const banner = document.getElementById('mainBanner');
-      const overlay = document.getElementById('bannerOverlay');
-      
-      document.getElementById('bannerTitle').innerText = b.title || '';
-      document.getElementById('bannerDesc').innerText = b.desc || '';
-      
-      if (b.imageUrl) {
-        banner.style.backgroundImage = `url('${b.imageUrl}')`;
-        overlay.style.display = 'block';
-      } else {
-        banner.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, var(--primary))';
-        overlay.style.display = 'none';
-      }
-
-      document.querySelectorAll('.dot').forEach((dot, i) => dot.classList.toggle('active', i === index));
-      
-      clearInterval(bannerInterval);
-      if(bannerList.length > 1) {
-        bannerInterval = setInterval(() => { setBanner((currentBannerIndex + 1) % bannerList.length); }, 5000);
-      }
-    }
-
-    let tempBannerMeta = {};
-    function promptAddBanner() {
-      const title = prompt("หัวข้อป้ายประกาศ:");
-      if(title === null) return;
-      const desc = prompt("คำอธิบาย:");
-      tempBannerMeta = { title, desc };
-      document.getElementById('bannerFileInput').click();
-    }
-
-    async function uploadNewBanner(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const btn = document.querySelector('.btn-edit-banner');
-      btn.innerText = '⏳ อัปโหลด...'; btn.disabled = true;
-      try {
-        const url = await uploadImageToImgbb(file);
-        const newItem = { imageUrl: url, title: tempBannerMeta.title, desc: tempBannerMeta.desc };
-        const updatedList = [...bannerList.filter(b => b.imageUrl !== null), newItem];
-        await db.collection('settings').doc('bannerData').set({ items: updatedList }, { merge: true });
-      } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
-      btn.innerText = '📷 เพิ่มป้ายประกาศ'; btn.disabled = false;
-      event.target.value = '';
-    }
-
-    async function removeCurrentBanner() {
-      if(bannerList.length <= 1 && !bannerList[0].imageUrl) return alert("ไม่มีรูปให้ลบแล้วครับ");
-      if (!confirm('ยืนยันลบป้ายประกาศนี้?')) return;
-      const updatedList = bannerList.filter((_, i) => i !== currentBannerIndex);
-      await db.collection('settings').doc('bannerData').set({ items: updatedList }, { merge: true });
-    }
-
-    // ================= ระบบคอร์สโปรโมท =================
-    let allPromos = [];
-    function initPromoListener() {
-      db.collection('promoted_courses').orderBy('createdAt', 'desc').onSnapshot(snap => {
-        allPromos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderPromos();
-      });
-    }
-
-    function renderPromos() {
-      const grid = document.getElementById('promoGrid');
-      if (allPromos.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem; border: 1px dashed var(--border); border-radius: 12px;">ยังไม่มีคอร์สโปรโมท</div>';
-        return;
-      }
-      grid.innerHTML = allPromos.map(p => `
-        <div class="promo-card" onclick="viewPromotedCourse('${p.id}')">
-          <img class="promo-cover" src="${p.coverUrl || 'https://via.placeholder.com/300x150?text=No+Image'}" alt="Cover">
-          <div class="promo-body">
-            <h4 class="promo-title">${p.title}</h4>
-            <p class="promo-desc">${p.desc || ''}</p>
-            <div class="promo-footer">คลิกดูรายละเอียด ➜</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function openAddPromoModal() { document.getElementById('addPromoModal').style.display = 'flex'; }
-    
-    function extractYouTubeId(url) {
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    async function savePromotedCourse() {
-      const title = document.getElementById('promoTitleInput').value.trim();
-      const desc = document.getElementById('promoDescInput').value.trim();
-      const vidUrl = document.getElementById('promoVidInput').value.trim();
-      const fileInput = document.getElementById('promoImgInput');
-      
-      if(!title) return alert('กรุณาใส่ชื่อคอร์ส');
-      const btn = document.getElementById('savePromoBtn');
-      btn.disabled = true; btn.innerText = 'กำลังบันทึก...';
-      
-      try {
-        let coverUrl = null;
-        if (fileInput.files.length > 0) {
-          coverUrl = await uploadImageToImgbb(fileInput.files[0]);
-        }
-        await db.collection('promoted_courses').add({
-          title, desc, coverUrl, videoUrl: vidUrl,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        document.getElementById('addPromoModal').style.display = 'none';
-        document.getElementById('promoTitleInput').value = '';
-        document.getElementById('promoDescInput').value = '';
-        document.getElementById('promoVidInput').value = '';
-        fileInput.value = '';
-      } catch (err) { alert('บันทึกไม่สำเร็จ: ' + err.message); }
-      btn.disabled = false; btn.innerText = 'บันทึกคอร์ส';
-    }
-
-    function viewPromotedCourse(id) {
-      const p = allPromos.find(x => x.id === id);
-      if(!p) return;
-      document.getElementById('viewPromoCover').src = p.coverUrl || 'https://via.placeholder.com/600x200?text=No+Image';
-      document.getElementById('viewPromoTitle').innerText = p.title;
-      document.getElementById('viewPromoDesc').innerText = p.desc || 'ไม่มีคำอธิบาย';
-      
-      const vidContainer = document.getElementById('viewPromoVideoContainer');
-      const vidIframe = document.getElementById('viewPromoVideo');
-      
-      if(p.videoUrl) {
-        const ytId = extractYouTubeId(p.videoUrl);
-        if(ytId) {
-          vidIframe.src = `https://www.youtube.com/embed/${ytId}`;
-          vidContainer.style.display = 'block';
-        } else {
-          vidContainer.style.display = 'none';
-        }
-      } else {
-        vidContainer.style.display = 'none';
-      }
-
-      document.getElementById('deletePromoBtn').onclick = async () => {
-        if(confirm('ลบคอร์สโปรโมทนี้?')) {
-          await db.collection('promoted_courses').doc(id).delete();
-          document.getElementById('viewPromoModal').style.display = 'none';
-        }
-      };
-      
-      document.getElementById('viewPromoModal').style.display = 'flex';
-    }
-
-    // ================= ระบบโครงสร้างเก่า (การจัดการนักเรียน) =================
     let currentStudentId = null;
     let allStudents = [];
     let currentTopics = [];
@@ -556,8 +397,118 @@
     let unsubTopics = null;
     let unsubComments = null;
 
-    function generateAccessCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
+    function generateAccessCode() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
 
+    // ================= ระบบป้ายประกาศแบบหลายหน้า (Carousel, อัปโหลดรูปจริงผ่าน ImgBB) =================
+    let bannerSlides = [];
+    let currentSlideIndex = 0;
+    let bannerAutoTimer = null;
+
+    function initBannerListener() {
+      db.collection('bannerSlides').orderBy('createdAt', 'asc').onSnapshot(snapshot => {
+        bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (currentSlideIndex >= bannerSlides.length) currentSlideIndex = 0;
+        renderBannerSlide();
+        renderBannerDots();
+        renderSlideManageList();
+        setupBannerAutoplay();
+      }, err => console.error('โหลดข้อมูลแบนเนอร์ล้มเหลว:', err));
+    }
+
+    function renderBannerSlide() {
+      const banner = document.getElementById('mainBanner');
+      const overlay = document.getElementById('bannerOverlay');
+      const prevBtn = document.getElementById('bannerPrevBtn');
+      const nextBtn = document.getElementById('bannerNextBtn');
+      if (bannerSlides.length > 0) {
+        banner.style.backgroundImage = `url('${bannerSlides[currentSlideIndex].imageUrl}')`;
+        overlay.style.display = 'block';
+      } else {
+        banner.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, var(--primary))';
+        overlay.style.display = 'none';
+      }
+      const showArrows = bannerSlides.length > 1;
+      prevBtn.style.display = showArrows ? 'flex' : 'none';
+      nextBtn.style.display = showArrows ? 'flex' : 'none';
+    }
+
+    function renderBannerDots() {
+      const dotsBox = document.getElementById('bannerDots');
+      if (bannerSlides.length <= 1) { dotsBox.innerHTML = ''; return; }
+      dotsBox.innerHTML = bannerSlides.map((s, i) => `<div class="banner-dot ${i === currentSlideIndex ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('');
+    }
+
+    function goToSlide(i) {
+      currentSlideIndex = i;
+      renderBannerSlide();
+      renderBannerDots();
+      setupBannerAutoplay();
+    }
+    function nextSlide() {
+      if (bannerSlides.length === 0) return;
+      currentSlideIndex = (currentSlideIndex + 1) % bannerSlides.length;
+      renderBannerSlide(); renderBannerDots();
+    }
+    function prevSlide() {
+      if (bannerSlides.length === 0) return;
+      currentSlideIndex = (currentSlideIndex - 1 + bannerSlides.length) % bannerSlides.length;
+      renderBannerSlide(); renderBannerDots();
+    }
+    function setupBannerAutoplay() {
+      if (bannerAutoTimer) clearInterval(bannerAutoTimer);
+      if (bannerSlides.length > 1) {
+        bannerAutoTimer = setInterval(nextSlide, 5000);
+      }
+    }
+
+    async function handleBannerFileChange(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const btn = document.querySelector('.btn-edit-banner');
+      const originalText = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = '⏳ กำลังอัปโหลด...';
+      try {
+        const url = await uploadImageToImgbb(file);
+        await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      } catch (err) {
+        alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message);
+      }
+      btn.disabled = false;
+      btn.innerText = originalText;
+      event.target.value = '';
+    }
+
+    function openManageSlidesModal() {
+      renderSlideManageList();
+      document.getElementById('manageSlidesModal').style.display = 'flex';
+    }
+    function closeManageSlidesModal() { document.getElementById('manageSlidesModal').style.display = 'none'; }
+
+    function renderSlideManageList() {
+      const list = document.getElementById('slideManageList');
+      if (!list) return;
+      if (bannerSlides.length === 0) {
+        list.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 16px 0;">ยังไม่มีรูปประกาศ กด "เพิ่มรูปประกาศ" เพื่อเริ่มต้น</div>';
+        return;
+      }
+      list.innerHTML = bannerSlides.map((s, i) => `
+        <div class="slide-manage-item">
+          <img src="${s.imageUrl}" alt="slide">
+          <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
+          <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
+        </div>
+      `).join('');
+    }
+
+    async function deleteBannerSlide(id) {
+      if (!confirm('ยืนยันลบรูปประกาศนี้?')) return;
+      await db.collection('bannerSlides').doc(id).delete();
+    }
+
+    // ================= Navigation =================
     function switchView(viewId, menuElement = null) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
       if (menuElement) {
@@ -575,27 +526,33 @@
       submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
     }
 
+    // ================= โหลดข้อมูลนักเรียน/คอร์ส แบบเรียลไทม์ =================
     function initStudentsListener() {
       db.collection('students').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
         allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderCourseCards(currentFilterGrade);
         renderHistoryTable();
+      }, err => {
+        console.error("โหลดข้อมูลล้มเหลว:", err);
+        alert('เชื่อมต่อฐานข้อมูลล้มเหลว โปรดตรวจสอบค่า Firebase config และ Security Rules');
       });
     }
 
     function filterByGrade(grade) {
       currentFilterGrade = grade;
       switchView('dashboardView', document.getElementById('menu-dashboard'));
-      document.getElementById('courseListTitle').innerText = grade === 'ทั้งหมด' ? 'รายชื่อนักเรียนในคอร์ส (ทั้งหมด)' : `รายชื่อนักเรียน (ระดับชั้น ${grade})`;
+      document.getElementById('courseListTitle').innerText = grade === 'ทั้งหมด' ? 'คอร์สที่ปรากฏ (ทั้งหมด)' : `คอร์สที่ปรากฏ (ระดับชั้น ${grade})`;
       renderCourseCards(grade);
     }
 
     function renderCourseCards(grade = 'ทั้งหมด') {
       const grid = document.getElementById('courseGrid');
       let filteredStudents = allStudents;
-      if (grade !== 'ทั้งหมด') filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
+      if (grade !== 'ทั้งหมด') {
+        filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
+      }
       if (filteredStudents.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px;">ยังไม่มีข้อมูลนักเรียนในหมวดหมู่นี้</div>';
+        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px;">ยังไม่มีข้อมูลคอร์สเรียนในหมวดหมู่นี้</div>';
         return;
       }
       grid.innerHTML = filteredStudents.map(st => `
@@ -628,19 +585,27 @@
       `).join('');
     }
 
+    // ================= ระบบเพิ่มและจัดการนักเรียน/คอร์ส (ต่อ Firestore จริง) =================
     async function openAddStudent() {
-      const nickname = prompt('ชื่อเล่นนักเรียน:');
-      if (!nickname) return;
-      const fullName = prompt('ชื่อ-นามสกุลจริง:');
-      const gradeLevel = prompt('ระดับชั้น (เช่น ป.1, ม.3):');
-      const courseTitle = prompt('ชื่อคอร์สที่เรียน (เช่น คณิตศาสตร์ ป.3):');
+      try {
+        const nickname = prompt('ชื่อเล่นนักเรียน:');
+        if (!nickname) return;
+        const fullName = prompt('ชื่อ-นามสกุลจริง:');
+        const gradeLevel = prompt('ระดับชั้น (เช่น ป.1, ม.3):');
+        const courseTitle = prompt('ชื่อคอร์สที่เรียน (เช่น คณิตศาสตร์ ป.3):');
 
-      const docRef = await db.collection('students').add({
-        nickname, full_name: fullName || nickname, grade_level: gradeLevel || 'ทั่วไป',
-        course_title: courseTitle || 'คอร์สเรียนทั่วไป', parent_access_code: generateAccessCode(),
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      openDetailView(docRef.id);
+        const docRef = await db.collection('students').add({
+          nickname,
+          full_name: fullName || nickname,
+          grade_level: gradeLevel || 'ทั่วไป',
+          course_title: courseTitle || 'คอร์สเรียนทั่วไป',
+          parent_access_code: generateAccessCode(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        openDetailView(docRef.id);
+      } catch (err) {
+        alert('เชื่อมต่อฐานข้อมูลล้มเหลว: ' + err.message);
+      }
     }
 
     function openDetailView(id) {
@@ -665,32 +630,42 @@
       const st = allStudents.find(s => s.id === currentStudentId);
       if (!st) return;
       const nickname = prompt('แก้ไขชื่อเล่น:', st.nickname);
-      if(!nickname) return;
       const fullName = prompt('แก้ไขชื่อ-นามสกุล:', st.full_name);
       const gradeLevel = prompt('แก้ไขระดับชั้น:', st.grade_level);
       const courseTitle = prompt('แก้ไขวิชาคอร์ส:', st.course_title);
-      await db.collection('students').doc(currentStudentId).update({ nickname, full_name: fullName, grade_level: gradeLevel, course_title: courseTitle });
-      openDetailView(currentStudentId);
+
+      if (nickname) {
+        await db.collection('students').doc(currentStudentId).update({
+          nickname, full_name: fullName, grade_level: gradeLevel, course_title: courseTitle
+        });
+        openDetailView(currentStudentId);
+      }
     }
 
     async function deleteCurrentStudent() {
-      if (!confirm('ยืนยันลบข้อมูลนักเรียนคนนี้?')) return;
-      const topicsSnap = await db.collection('topics').where('student_id', '==', currentStudentId).get();
-      const commentsSnap = await db.collection('comments').where('student_id', '==', currentStudentId).get();
-      const batch = db.batch();
-      topicsSnap.forEach(d => batch.delete(d.ref));
-      commentsSnap.forEach(d => batch.delete(d.ref));
-      batch.delete(db.collection('students').doc(currentStudentId));
-      await batch.commit();
+      if (!confirm('โปรดระวัง: ยืนยันการลบคอร์ส/นักเรียนคนนี้พร้อมข้อมูลทั้งหมดหรือไม่?')) return;
+      try {
+        const topicsSnap = await db.collection('topics').where('student_id', '==', currentStudentId).get();
+        const commentsSnap = await db.collection('comments').where('student_id', '==', currentStudentId).get();
+        const batch = db.batch();
+        topicsSnap.forEach(d => batch.delete(d.ref));
+        commentsSnap.forEach(d => batch.delete(d.ref));
+        batch.delete(db.collection('students').doc(currentStudentId));
+        await batch.commit();
+      } catch (err) {
+        alert('ลบข้อมูลไม่สำเร็จ: ' + err.message);
+      }
       switchView('dashboardView', document.getElementById('menu-dashboard'));
     }
 
+    // ================= ระบบแผนการเรียน (เรียลไทม์) =================
     function loadProgress() {
-      unsubTopics = db.collection('topics').where('student_id', '==', currentStudentId).onSnapshot(snapshot => {
-        currentTopics = snapshot.docs.map(d => ({ topic_id: d.id, ...d.data() }));
-        currentTopics.sort((a, b) => (a.sequence_order || 0) - (b.sequence_order || 0));
-        renderTopicList();
-      });
+      unsubTopics = db.collection('topics').where('student_id', '==', currentStudentId)
+        .onSnapshot(snapshot => {
+          currentTopics = snapshot.docs.map(d => ({ topic_id: d.id, ...d.data() }));
+          currentTopics.sort((a, b) => (a.sequence_order || 0) - (b.sequence_order || 0));
+          renderTopicList();
+        }, err => console.error('โหลดแผนการเรียนล้มเหลว:', err));
     }
 
     function renderTopicList() {
@@ -727,9 +702,21 @@
     }
 
     async function addTopicPrompt() {
-      const title = prompt('กำหนดหัวข้อการเรียนรู้ใหม่:');
-      if (!title) return;
-      await db.collection('topics').add({ student_id: currentStudentId, title, status: 'pending', sequence_order: currentTopics.length + 1, tutor_notes: '', attachments: [], createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      try {
+        const title = prompt('กำหนดหัวข้อการเรียนรู้ใหม่:');
+        if (!title) return;
+        await db.collection('topics').add({
+          student_id: currentStudentId,
+          title,
+          status: 'pending',
+          sequence_order: currentTopics.length + 1,
+          tutor_notes: '',
+          attachments: [],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (e) {
+        alert('เกิดข้อผิดพลาดในการเพิ่มหัวข้อ: ' + e.message);
+      }
     }
 
     async function editTopicName(topicId, oldTitle) {
@@ -737,10 +724,12 @@
       if (!title || title === oldTitle) return;
       await db.collection('topics').doc(topicId).update({ title });
     }
+
     async function deleteTopic(topicId) {
       if (!confirm('ยืนยันลบหัวข้อการเรียนรู้นี้?')) return;
       await db.collection('topics').doc(topicId).delete();
     }
+
     async function changeTopicStatus(topicId, newStatus) {
       await db.collection('topics').doc(topicId).update({ status: newStatus });
     }
@@ -753,6 +742,7 @@
       document.getElementById('updateModal').style.display = 'flex';
     }
     function closeUpdateModal() { document.getElementById('updateModal').style.display = 'none'; }
+
     async function saveTopicDetails() {
       const topicId = document.getElementById('modalTopicId').value;
       const notes = document.getElementById('modalTutorNotes').value;
@@ -768,14 +758,22 @@
           const url = await uploadImageToImgbb(file);
           newAttachments.push({ file_name: file.name, file_url: url });
         }
-        const updateData = { status: t ? (t.status || 'pending') : 'pending', tutor_notes: notes };
-        if (newAttachments.length > 0) updateData.attachments = firebase.firestore.FieldValue.arrayUnion(...newAttachments);
+        const updateData = {
+          status: t ? (t.status || 'pending') : 'pending',
+          tutor_notes: notes
+        };
+        if (newAttachments.length > 0) {
+          updateData.attachments = firebase.firestore.FieldValue.arrayUnion(...newAttachments);
+        }
         await db.collection('topics').doc(topicId).update(updateData);
-      } catch (err) { alert('บันทึกไม่สำเร็จ: ' + err.message); }
+      } catch (err) {
+        alert('บันทึกไม่สำเร็จ: ' + err.message);
+      }
       btn.disabled = false; btn.innerText = 'บันทึก';
       closeUpdateModal();
     }
 
+    // ================= ระบบแชท (เรียลไทม์) =================
     function copyParentLink() {
       const link = `${window.location.origin}/parent.html`;
       navigator.clipboard.writeText(link);
@@ -784,16 +782,20 @@
 
     function loadTutorChat() {
       if (!currentStudentId) return;
-      unsubComments = db.collection('comments').where('student_id', '==', currentStudentId).onSnapshot(snapshot => {
-        const comments = snapshot.docs.map(d => d.data());
-        comments.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-        renderChat(comments);
-      });
+      unsubComments = db.collection('comments').where('student_id', '==', currentStudentId)
+        .onSnapshot(snapshot => {
+          const comments = snapshot.docs.map(d => d.data());
+          comments.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+          renderChat(comments);
+        }, err => console.error('โหลดแชทล้มเหลว:', err));
     }
 
     function renderChat(comments) {
       const box = document.getElementById('tutorChatBox');
-      if (comments.length === 0) { box.innerHTML = '<div style="text-align:center; color: var(--text-muted); font-size:0.85rem; padding: 10px 0;">ยังไม่มีข้อความ</div>'; return; }
+      if (comments.length === 0) {
+        box.innerHTML = '<div style="text-align:center; color: var(--text-muted); font-size:0.85rem; padding: 10px 0;">ยังไม่มีข้อความ</div>';
+        return;
+      }
       box.innerHTML = comments.map(c => `
         <div class="chat-msg ${c.sender_role}">
           <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 2px; opacity: 0.8;">${c.sender_name}</div>
@@ -807,14 +809,134 @@
       const input = document.getElementById('tutorMsgInput');
       const msg = input.value.trim();
       if (!msg || !currentStudentId) return;
-      await db.collection('comments').add({ student_id: currentStudentId, sender_role: 'tutor', senderName: 'คุณครู', message: msg, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await db.collection('comments').add({
+        student_id: currentStudentId,
+        sender_role: 'tutor',
+        sender_name: 'คุณครู',
+        message: msg,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
       input.value = '';
     }
 
-    // เริ่มทำงานเมื่อเปิดเว็บ
+    // ================= ระบบคอร์สโปรโมท (ไม่ผูกนักเรียน ใช้โชว์ก่อนสมัครเรียน) =================
+    let promoCourses = [];
+    let currentPromoId = null;
+
+    function initPromoListener() {
+      db.collection('promoCourses').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+        promoCourses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderPromoGrid();
+      }, err => console.error('โหลดคอร์สโปรโมทล้มเหลว:', err));
+    }
+
+    function renderPromoGrid() {
+      const grid = document.getElementById('promoGrid');
+      if (promoCourses.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px;">ยังไม่มีคอร์สโปรโมท กด "+ เพิ่มคอร์สโปรโมท" เพื่อเริ่มต้น</div>';
+        return;
+      }
+      grid.innerHTML = promoCourses.map(p => `
+        <div class="course-card promo-card" onclick="openPromoDetail('${p.id}')">
+          ${p.coverImageUrl ? `<img class="promo-cover" src="${p.coverImageUrl}">` : `<div class="promo-cover-placeholder">📣</div>`}
+          <div class="promo-body">
+            <div class="course-title">${p.title}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.description || ''}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function openAddPromo() {
+      const title = prompt('ชื่อคอร์สที่จะโปรโมท:');
+      if (!title) return;
+      const description = prompt('คำอธิบายคอร์ส (แนะนำเนื้อหา จุดเด่น ฯลฯ):') || '';
+      const videoUrl = prompt('ลิงก์วิดีโอแนะนำ (เช่น YouTube) หรือลิงก์ที่เกี่ยวข้อง — เว้นว่างได้ถ้าไม่มี:') || '';
+      try {
+        await db.collection('promoCourses').add({
+          title, description, videoUrl, coverImageUrl: null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (err) {
+        alert('เพิ่มคอร์สโปรโมทไม่สำเร็จ: ' + err.message);
+      }
+    }
+
+    function getYoutubeEmbedUrl(url) {
+      if (!url) return null;
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/
+      ];
+      for (const p of patterns) {
+        const m = url.match(p);
+        if (m) return `https://www.youtube.com/embed/${m[1]}`;
+      }
+      return null;
+    }
+
+    function openPromoDetail(id) {
+      currentPromoId = id;
+      const p = promoCourses.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('promoDetailTitle').innerText = p.title;
+      document.getElementById('promoDetailDesc').innerText = p.description || '';
+
+      const coverImg = document.getElementById('promoDetailCover');
+      if (p.coverImageUrl) { coverImg.src = p.coverImageUrl; coverImg.style.display = 'block'; }
+      else { coverImg.style.display = 'none'; }
+
+      const videoBox = document.getElementById('promoDetailVideoBox');
+      const embedUrl = getYoutubeEmbedUrl(p.videoUrl);
+      if (embedUrl) {
+        videoBox.innerHTML = `<iframe class="promo-video-frame" src="${embedUrl}" allowfullscreen></iframe>`;
+      } else if (p.videoUrl) {
+        videoBox.innerHTML = `<a href="${p.videoUrl}" target="_blank" class="btn btn-outline" style="display:inline-block; margin-bottom:16px;">🔗 เปิดลิงก์ที่เกี่ยวข้อง</a>`;
+      } else {
+        videoBox.innerHTML = '';
+      }
+
+      document.getElementById('promoDetailModal').style.display = 'flex';
+    }
+    function closePromoDetailModal() {
+      document.getElementById('promoDetailModal').style.display = 'none';
+      document.getElementById('promoDetailVideoBox').innerHTML = '';
+    }
+
+    async function handlePromoCoverChange(event) {
+      const file = event.target.files[0];
+      if (!file || !currentPromoId) return;
+      try {
+        const url = await uploadImageToImgbb(file);
+        await db.collection('promoCourses').doc(currentPromoId).update({ coverImageUrl: url });
+        document.getElementById('promoDetailCover').src = url;
+        document.getElementById('promoDetailCover').style.display = 'block';
+      } catch (err) {
+        alert('อัปโหลดรูปปกไม่สำเร็จ: ' + err.message);
+      }
+      event.target.value = '';
+    }
+
+    async function editPromoCourse() {
+      const p = promoCourses.find(x => x.id === currentPromoId);
+      if (!p) return;
+      const title = prompt('แก้ไขชื่อคอร์ส:', p.title);
+      if (!title) return;
+      const description = prompt('แก้ไขคำอธิบาย:', p.description || '');
+      const videoUrl = prompt('แก้ไขลิงก์วิดีโอ/ลิงก์ที่เกี่ยวข้อง:', p.videoUrl || '');
+      await db.collection('promoCourses').doc(currentPromoId).update({ title, description, videoUrl });
+      openPromoDetail(currentPromoId);
+    }
+
+    async function deletePromoCourse() {
+      if (!confirm('ยืนยันลบคอร์สโปรโมทนี้?')) return;
+      await db.collection('promoCourses').doc(currentPromoId).delete();
+      closePromoDetailModal();
+    }
+
+    // โหลดหน้าแรกสุด
     initBannerListener();
-    initPromoListener();
     initStudentsListener();
+    initPromoListener();
   </script>
 </body>
 </html>
