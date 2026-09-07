@@ -154,10 +154,6 @@
         <div class="menu-label"><span>👤</span> ประวัตินักเรียน</div>
       </div>
 
-      <div class="menu-item" id="menu-promo" onclick="switchView('promoView', this)">
-        <div class="menu-label"><span>📣</span> คอร์สโปรโมท</div>
-      </div>
-
       <div class="menu-item" onclick="toggleSubmenu(this)">
         <div class="menu-label"><span>📊</span> จัดการระดับชั้น</div>
         <span class="caret">▼</span>
@@ -191,7 +187,7 @@
   <!-- ================= 2. Main Content ================= -->
   <main class="main-wrapper">
 
-    <div id="connectionBanner">⚠️ ยังไม่ได้ตั้งค่า Firebase และ/หรือ ImgBB — โปรดใส่ค่า firebaseConfig และ IMGBB_API_KEY ในไฟล์นี้ก่อนใช้งาน (ดูคำแนะนำท้ายข้อความ)</div>
+    <div id="connectionBanner"⚠️ ยังไม่ได้ตั้งค่า Firebase และ/หรือ ImgBB — โปรดใส่ค่า firebaseConfig และ IMGBB_API_KEY ในไฟล์นี้ก่อนใช้งาน (ดูคำแนะนำท้ายข้อความ)</div>
 
     <!-- Banner ประกาศ (รองรับหลายหน้า เลื่อนดูได้ อัปโหลดรูปจริงผ่าน ImgBB) -->
     <div class="banner-container" id="mainBanner">
@@ -214,9 +210,15 @@
     <div id="dashboardView" class="view-section active">
       <div class="section-header">
         <h3 class="section-title" id="courseListTitle">คอร์สที่ปรากฏ (ทั้งหมด)</h3>
-        <div class="add-course-btn-group" onclick="openAddStudent()">
-          <div class="fab-button">+</div>
-          <span class="add-course-label">เพิ่มเมนู / เพิ่มคอร์ส</span>
+        <div style="display:flex; align-items:center; gap: 24px;">
+          <div class="add-course-btn-group" onclick="openAddPromo()">
+            <div class="fab-button" style="border-color:#f59e0b; color:#f59e0b;">✨</div>
+            <span class="add-course-label" style="color:#f59e0b;">เพิ่มคอร์สโปรโมท</span>
+          </div>
+          <div class="add-course-btn-group" onclick="openAddStudent()">
+            <div class="fab-button">+</div>
+            <span class="add-course-label">เพิ่มเมนู / เพิ่มคอร์ส</span>
+          </div>
         </div>
       </div>
       <div id="courseGrid" class="course-grid"></div>
@@ -242,18 +244,6 @@
           <tbody id="historyTableBody"></tbody>
         </table>
       </div>
-    </div>
-
-    <!-- VIEW: คอร์สโปรโมท (ไม่ผูกกับนักเรียนจริง ใช้โชว์ก่อนสมัครเรียน) -->
-    <div id="promoView" class="view-section">
-      <div class="section-header">
-        <h3 class="section-title">คอร์สโปรโมท</h3>
-        <div class="add-course-btn-group" onclick="openAddPromo()">
-          <div class="fab-button">+</div>
-          <span class="add-course-label">เพิ่มคอร์สโปรโมท</span>
-        </div>
-      </div>
-      <div id="promoGrid" class="course-grid"></div>
     </div>
 
     <!-- VIEW 3: Detail View -->
