@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kruton Tutor - สำหรับผู้ปกครอง</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb; --primary-light: #eff6ff; --secondary: #4f46e5;
+      --bg-color: #f8fafc; --surface: #ffffff; --text: #1e293b;
+      --text-muted: #64748b; --border: #e2e8f0; --success: #10b981; --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
+    body { background: var(--bg-color); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+    /* ================= Sidebar ================= */
+    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+    .sidebar-brand { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .sidebar-brand img { width: 45px; height: 45px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); object-fit: cover; }
+    .brand-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
+
+    .sidebar-menu { padding: 20px 16px; flex: 1; overflow-y: auto; }
+    .menu-item { padding: 12px 16px; border-radius: 10px; color: var(--text-muted); font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
+    .menu-item .menu-label { display: flex; align-items: center; gap: 10px; }
+    .menu-item:hover { background: var(--bg-color); color: var(--primary); }
+    .menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; border-left: 4px solid var(--primary); }
+
+    .caret { transition: transform 0.3s; font-size: 0.8rem; }
+    .menu-item.open .caret { transform: rotate(180deg); }
+    .submenu { display: none; padding-left: 36px; margin-bottom: 8px; }
+    .submenu-item { padding: 8px 12px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; }
+    .submenu-item:hover { color: var(--primary); background: #f1f5f9; font-weight: 500; }
+
+    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+
+    /* ================= Main Content ================= */
+    .main-wrapper { flex: 1; margin-left: 260px; padding: 30px 40px; display: flex; flex-direction: column; gap: 30px; }
+
+    .banner-container {
+      background: linear-gradient(135deg, #1e3a8a, var(--primary));
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      border-radius: 20px; height: 220px; display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: flex-start; color: white; position: relative;
+      box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left;
+    }
+    .banner-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none; }
+    .banner-content { z-index: 2; padding: 26px 28px; position: relative; }
+    .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    .banner-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.85); border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+    .banner-arrow.prev { left: 15px; } .banner-arrow.next { right: 15px; }
+    .banner-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 6px; }
+    .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; }
+    .banner-dot.active { background: white; width: 22px; border-radius: 4px; }
+
+    .view-section { display: none; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .view-section.active { display: block; }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-title { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+
+    .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .course-card { background: var(--surface); border-radius: 16px; padding: 24px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+    .course-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.06); border-color: #bfdbfe; }
+    .course-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 5px; background: var(--primary); }
+    .course-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+
+    .promo-card { padding: 0; }
+    .promo-cover { width: 100%; height: 140px; object-fit: cover; background: #f1f5f9; }
+    .promo-body { padding: 18px; }
+    .promo-cover-placeholder { width: 100%; height: 140px; background: linear-gradient(135deg, #dbeafe, #eff6ff); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 2rem; }
+    .promo-badge-inline { position: absolute; top: 10px; left: 10px; background: #f59e0b; color: white; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; z-index: 2; }
+    .promo-type-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 6px; margin-top: 8px; }
+    .promo-type-tag.online { background: #dcfce7; color: #166534; }
+    .promo-type-tag.onsite { background: #dbeafe; color: #1e40af; }
+
+    .history-card { background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border); overflow-x: auto; }
+    .history-table { width: 100%; border-collapse: collapse; min-width: 500px; }
+    .history-table th, .history-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .history-table th { background: #f8fafc; font-weight: 600; color: var(--text-muted); font-size: 0.9rem; }
+    .history-table tr:hover td { background: #f1f5f9; cursor: pointer; }
+
+    .back-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 14px 24px; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(37,99,235,0.1); }
+    .back-btn:hover { background: var(--primary-light); }
+    .card { background: var(--surface); border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--border); }
+    .profile-header { display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+    .profile-avatar { width: 60px; height: 60px; background: var(--primary-light); color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; }
+    .tag { background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; margin-right: 6px; display: inline-block; margin-top: 4px; }
+
+    .topic-folder { border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+    .topic-folder-header { display:flex; align-items:center; justify-content:space-between; padding: 14px 16px; background:#f8fafc; cursor: pointer; }
+    .session-item { padding: 12px 16px; border-top: 1px dashed var(--border); }
+    .status-pill { padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+    .status-pill.completed { background: #dcfce7; color: #166534; }
+    .status-pill.in_progress { background: #fef08a; color: #854d0e; }
+    .status-pill.pending { background: #f1f5f9; color: #64748b; }
+
+    .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; font-size: 0.9rem; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+    .chat-box { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .chat-msg { padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; max-width: 80%; }
+    .chat-msg.tutor { align-self: flex-start; background: #f1f5f9; border: 1px solid var(--border); }
+    .chat-msg.parent { align-self: flex-end; background: var(--primary); color: white; }
+    .select-st { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.95rem; }
+    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); background: white; border-radius: 16px; }
+
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 999; align-items: center; justify-content: center; }
+    .modal-content { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; }
+    .modal-content.wide { max-width: 640px; }
+    .promo-detail-cover { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; }
+    .promo-video-frame { width: 100%; aspect-ratio: 16/9; border-radius: 12px; border: none; margin-bottom: 16px; }
+    .action-link { background: none; border: none; cursor: pointer; font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
+      <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">สำหรับผู้ปกครอง</span></div>
+    </div>
+    <div class="sidebar-menu">
+      <div class="menu-item active" id="menu-dashboard" onclick="switchView('dashboardView', this); currentFilterGrade = 'ทั้งหมด'; renderCourseCards('ทั้งหมด'); document.getElementById('courseListTitle').innerText = 'คอร์สที่ปรากฏ (ทั้งหมด)';">
+        <div class="menu-label"><span>📚</span> คอร์สที่ปรากฏ</div>
+      </div>
+      <div class="menu-item" id="menu-history" onclick="switchView('historyView', this)">
+        <div class="menu-label"><span>👤</span> ประวัตินักเรียน</div>
+      </div>
+      <div class="menu-item" onclick="toggleSubmenu(this)">
+        <div class="menu-label"><span>📊</span> จัดการระดับชั้น</div>
+        <span class="caret">▼</span>
+      </div>
+      <div class="submenu" id="gradeSubmenu">
+        <div class="submenu-item" onclick="filterByGrade('ทั้งหมด')">ดูทั้งหมด</div>
+        <div class="submenu-item" onclick="filterByGrade('ป.1')">ระดับชั้น ป.1</div>
+        <div class="submenu-item" onclick="filterByGrade('ป.2')">ระดับชั้น ป.2</div>
+        <div class="submenu-item" onclick="filterByGrade('ป.3')">ระดับชั้น ป.3</div>
+        <div class="submenu-item" onclick="filterByGrade('ป.4')">ระดับชั้น ป.4</div>
+        <div class="submenu-item" onclick="filterByGrade('ป.5')">ระดับชั้น ป.5</div>
+        <div class="submenu-item" onclick="filterByGrade('ป.6')">ระดับชั้น ป.6</div>
+        <div class="submenu-item" onclick="filterByGrade('ม.1')">ระดับชั้น ม.1</div>
+        <div class="submenu-item" onclick="filterByGrade('ม.2')">ระดับชั้น ม.2</div>
+        <div class="submenu-item" onclick="filterByGrade('ม.3')">ระดับชั้น ม.3</div>
+        <div class="submenu-item" onclick="filterByGrade('ม.4')">ระดับชั้น ม.4</div>
+        <div class="submenu-item" onclick="filterByGrade('ม.5')">ระดับชั้น ม.5</div>
+        <div class="submenu-item" onclick="filterByGrade('ม.6')">ระดับชั้น ม.6</div>
+      </div>
+    </div>
+    <div class="sidebar-bottom">👀 โหมดดูอย่างเดียวสำหรับผู้ปกครอง</div>
+  </aside>
+
+  <main class="main-wrapper">
+    <div class="banner-container" id="mainBanner">
+      <div class="banner-overlay" id="bannerOverlay"></div>
+      <button class="banner-arrow prev" onclick="prevSlide()" style="display:none;" id="bannerPrevBtn">‹</button>
+      <button class="banner-arrow next" onclick="nextSlide()" style="display:none;" id="bannerNextBtn">›</button>
+      <div class="banner-content">
+        <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
+        <p class="banner-desc">ติดตามความคืบหน้า และพูดคุยกับคุณครูได้ที่นี่</p>
+      </div>
+      <div class="banner-dots" id="bannerDots"></div>
+    </div>
+
+    <div id="dashboardView" class="view-section active">
+      <div class="section-header">
+        <h3 class="section-title" id="courseListTitle">คอร์สที่ปรากฏ (ทั้งหมด)</h3>
+      </div>
+      <div id="courseGrid" class="course-grid"></div>
+    </div>
+
+    <div id="historyView" class="view-section">
+      <div class="section-header"><h3 class="section-title">ประวัตินักเรียนทั้งหมด</h3></div>
+      <div class="history-card">
+        <table class="history-table">
+          <thead><tr><th>ชื่อ-นามสกุล</th><th>ชื่อเล่น</th><th>ระดับชั้น</th><th>คอร์สที่เรียน</th></tr></thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="detailView" class="view-section">
+      <button class="back-btn" onclick="switchView('dashboardView', document.getElementById('menu-dashboard'))">⬅️ ย้อนกลับไปหน้าคอร์ส</button>
+      <div class="card">
+        <div class="profile-header">
+          <div id="stAvatar" class="profile-avatar">น</div>
+          <div style="flex: 1;">
+            <h2 id="stFullName" style="font-size: 1.4rem; color: var(--primary);">น้อง...</h2>
+            <div style="margin-top: 8px;">
+              <span class="tag">📚 คอร์ส: <span id="stCourse"></span></span>
+              <span class="tag">🎓 ชั้น: <span id="stGrade"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="font-size: 1.15rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;">📍 แผนการเรียนรู้ &amp; ความคืบหน้า</h3>
+        <div id="topicList"></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--primary);">💬 พูดคุยกับคุณครู</h3>
+        <div id="tutorChatBox" class="chat-box"></div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="tutorMsgInput" class="select-st" placeholder="พิมพ์ข้อความถึงคุณครู..." onkeypress="if(event.key==='Enter') sendParentComment()">
+          <button class="btn btn-primary" onclick="sendParentComment()">ส่ง</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="promoDetailModal" class="modal-backdrop">
+    <div class="modal-content wide">
+      <div style="display:flex; justify-content: space-between; align-items:flex-start; margin-bottom: 12px;">
+        <h3 id="promoDetailTitle" style="font-size: 1.3rem; font-weight: 700; color: var(--primary);"></h3>
+        <button class="action-link" onclick="closePromoDetailModal()">✖</button>
+      </div>
+      <img id="promoDetailCover" class="promo-detail-cover" style="display:none;">
+      <div id="promoDetailType" style="margin-bottom: 12px;"></div>
+      <div id="promoDetailVideoBox"></div>
+      <p id="promoDetailDesc" style="color: var(--text); line-height: 1.6; white-space: pre-wrap;"></p>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFatAoxaWxXzTCunzpx_9Etuv9OL1Ei14",
+      authDomain: "kruton-tutor.firebaseapp.com",
+      projectId: "kruton-tutor",
+      storageBucket: "kruton-tutor.firebasestorage.app",
+      messagingSenderId: "426629568710",
+      appId: "1:426629568710:web:e4b584205077902429fc7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let allStudents = [], promoCourses = [], currentTopics = [], currentSessions = [];
+    let currentStudentId = null, currentPromoId = null, currentFilterGrade = 'ทั้งหมด';
+    let expandedTopics = new Set();
+    let unsubTopics = null, unsubSessions = null, unsubComments = null;
+    let bannerSlides = [], currentSlideIndex = 0, bannerAutoTimer = null;
+
+    // ================= Navigation =================
+    function switchView(viewId, menuElement = null) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      if (menuElement) {
+        document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+        menuElement.classList.add('active');
+      }
+      const banner = document.getElementById('mainBanner');
+      if (banner) banner.style.display = (viewId === 'detailView') ? 'none' : 'flex';
+      document.getElementById(viewId).classList.add('active');
+    }
+    function toggleSubmenu(element) {
+      element.classList.toggle('open');
+      const submenu = document.getElementById('gradeSubmenu');
+      submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // ================= แบนเนอร์ (อ่านอย่างเดียว) =================
+    function initBannerListener() {
+      db.collection('bannerSlides').onSnapshot(snapshot => {
+        bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        bannerSlides.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+        if (currentSlideIndex >= bannerSlides.length) currentSlideIndex = 0;
+        renderBannerSlide(); renderBannerDots(); setupBannerAutoplay();
+      });
+    }
+    function renderBannerSlide() {
+      const banner = document.getElementById('mainBanner');
+      const overlay = document.getElementById('bannerOverlay');
+      if (bannerSlides.length > 0) {
+        banner.style.backgroundImage = `url('${bannerSlides[currentSlideIndex].imageUrl}')`;
+        overlay.style.display = 'block';
+      } else {
+        banner.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, var(--primary))';
+        overlay.style.display = 'none';
+      }
+      const showArrows = bannerSlides.length > 1;
+      document.getElementById('bannerPrevBtn').style.display = showArrows ? 'flex' : 'none';
+      document.getElementById('bannerNextBtn').style.display = showArrows ? 'flex' : 'none';
+    }
+    function renderBannerDots() {
+      const box = document.getElementById('bannerDots');
+      if (bannerSlides.length <= 1) { box.innerHTML = ''; return; }
+      box.innerHTML = bannerSlides.map((s, i) => `<div class="banner-dot ${i === currentSlideIndex ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('');
+    }
+    function goToSlide(i) { currentSlideIndex = i; renderBannerSlide(); renderBannerDots(); }
+    function nextSlide() { if (!bannerSlides.length) return; currentSlideIndex = (currentSlideIndex + 1) % bannerSlides.length; renderBannerSlide(); renderBannerDots(); }
+    function prevSlide() { if (!bannerSlides.length) return; currentSlideIndex = (currentSlideIndex - 1 + bannerSlides.length) % bannerSlides.length; renderBannerSlide(); renderBannerDots(); }
+    function setupBannerAutoplay() { if (bannerAutoTimer) clearInterval(bannerAutoTimer); if (bannerSlides.length > 1) bannerAutoTimer = setInterval(nextSlide, 5000); }
+
+    // ================= นักเรียน/คอร์ส (อ่านอย่างเดียว) =================
+    function initStudentsListener() {
+      db.collection('students').onSnapshot(snapshot => {
+        allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCourseCards(currentFilterGrade);
+        renderHistoryTable();
+      });
+    }
+    function initPromoListener() {
+      db.collection('promoCourses').onSnapshot(snapshot => {
+        promoCourses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCourseCards(currentFilterGrade);
+      });
+    }
+
+    function filterByGrade(grade) {
+      currentFilterGrade = grade;
+      switchView('dashboardView', document.getElementById('menu-dashboard'));
+      document.getElementById('courseListTitle').innerText = grade === 'ทั้งหมด' ? 'คอร์สที่ปรากฏ (ทั้งหมด)' : `คอร์สที่ปรากฏ (ระดับชั้น ${grade})`;
+      renderCourseCards(grade);
+    }
+
+    function renderCourseCards(grade = 'ทั้งหมด') {
+      const grid = document.getElementById('courseGrid');
+      let filteredStudents = allStudents;
+      if (grade !== 'ทั้งหมด') filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
+
+      const showPromo = grade === 'ทั้งหมด' && promoCourses.length > 0;
+      const promoHtml = showPromo ? promoCourses.map(p => `
+        <div class="course-card promo-card" style="position:relative;" onclick="openPromoDetail('${p.id}')">
+          <span class="promo-badge-inline">✨ โปรโมท</span>
+          ${p.coverImageUrl ? `<img class="promo-cover" src="${p.coverImageUrl}">` : `<div class="promo-cover-placeholder">📣</div>`}
+          <div class="promo-body">
+            <div class="course-title">${p.title}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.description || ''}</div>
+            ${p.format ? `<span class="promo-type-tag ${p.format.toLowerCase().includes('online') ? 'online' : 'onsite'}">${p.format.toLowerCase().includes('online') ? '💻' : '📍'} ${p.format}${p.location ? ' · ' + p.location : ''}</span>` : ''}
+          </div>
+        </div>`).join('') : '';
+
+      if (filteredStudents.length === 0 && !showPromo) {
+        grid.innerHTML = '<div style="grid-column: 1/-1;" class="empty-state">ยังไม่มีข้อมูลคอร์สเรียนในหมวดหมู่นี้</div>';
+        return;
+      }
+      const studentHtml = filteredStudents.map(st => `
+        <div class="course-card" onclick="openDetailView('${st.id}')">
+          <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}</div>
+          <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">👤 น้อง${st.nickname} (${st.full_name})</div>
+          <div style="font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #f1f5f9;">
+            <span style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px;">ชั้น: ${st.grade_level || '-'}</span>
+            <span style="color: var(--primary); font-weight: 600;">ดูรายละเอียด ➜</span>
+          </div>
+        </div>`).join('');
+      grid.innerHTML = promoHtml + studentHtml;
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('historyTableBody');
+      if (allStudents.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">ไม่มีข้อมูล</td></tr>'; return; }
+      tbody.innerHTML = allStudents.map(st => `
+        <tr onclick="openDetailView('${st.id}')">
+          <td>${st.full_name}</td><td>น้อง${st.nickname}</td><td>${st.grade_level || '-'}</td><td>${st.course_title || 'ทั่วไป'}</td>
+        </tr>`).join('');
+    }
+
+    // ================= รายละเอียดนักเรียน (อ่านอย่างเดียว + ตอบแชทได้) =================
+    function openDetailView(id) {
+      if (!id) return;
+      currentStudentId = id;
+      const st = allStudents.find(s => s.id === id);
+      if (!st) return;
+      document.getElementById('stAvatar').innerText = st.nickname.charAt(0);
+      document.getElementById('stFullName').innerText = `${st.full_name} (น้อง${st.nickname})`;
+      document.getElementById('stGrade').innerText = st.grade_level || '-';
+      document.getElementById('stCourse').innerText = st.course_title || 'ทั่วไป';
+      switchView('detailView');
+      if (unsubTopics) unsubTopics();
+      if (unsubSessions) unsubSessions();
+      if (unsubComments) unsubComments();
+      expandedTopics = new Set();
+      loadProgress();
+      loadChat();
+    }
+
+    function loadProgress() {
+      unsubTopics = db.collection('topics').where('student_id', '==', currentStudentId).onSnapshot(snapshot => {
+        currentTopics = snapshot.docs.map(d => ({ topic_id: d.id, ...d.data() }));
+        currentTopics.sort((a, b) => (a.sequence_order || 0) - (b.sequence_order || 0));
+        renderTopicList();
+      });
+      unsubSessions = db.collection('topicSessions').where('student_id', '==', currentStudentId).onSnapshot(snapshot => {
+        currentSessions = snapshot.docs.map(d => ({ session_id: d.id, ...d.data() }));
+        currentSessions.sort((a, b) => (a.sequence_order || 0) - (b.sequence_order || 0));
+        renderTopicList();
+      });
+    }
+    function toggleTopicExpand(id) { if (expandedTopics.has(id)) expandedTopics.delete(id); else expandedTopics.add(id); renderTopicList(); }
+    function statusLabel(s) { if (s === 'completed') return 'ผ่านเกณฑ์'; if (s === 'in_progress') return 'กำลังเรียน'; return 'รอดำเนินการ'; }
+
+    function renderTopicList() {
+      const list = document.getElementById('topicList');
+      if (currentTopics.length === 0) { list.innerHTML = '<div class="empty-state">ยังไม่มีข้อมูลแผนการเรียน</div>'; return; }
+      list.innerHTML = currentTopics.map(t => {
+        const sessions = currentSessions.filter(s => s.topic_id === t.topic_id);
+        const isOpen = expandedTopics.has(t.topic_id);
+        const doneCount = sessions.filter(s => s.status === 'completed').length;
+        const sessionsHtml = sessions.map(s => {
+          const status = s.status || 'pending';
+          const filesHtml = (s.attachments && s.attachments.length > 0) ? '<div style="margin-top:8px;">' + s.attachments.map(a => `<a href="${a.file_url}" target="_blank" style="font-size:0.78rem; padding:4px 10px; background:#eff6ff; color:var(--primary); border-radius:6px; text-decoration:none; margin-right:6px; display:inline-block; margin-top:4px;">${a.file_type === 'pdf' ? '📄' : '🖼️'} ${a.file_name}</a>`).join('') + '</div>' : '';
+          const noteHtml = s.tutor_notes ? `<div style="font-size:0.85rem; color:#334155; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px;"><b>บันทึกจากคุณครู:</b> ${s.tutor_notes}</div>` : '';
+          return `<div class="session-item">
+            <div style="display:flex; align-items:center; flex-wrap:wrap; gap:8px;">
+              <b style="font-size:0.92rem;">${s.title}</b><span class="status-pill ${status}">${statusLabel(status)}</span>
+            </div>${noteHtml}${filesHtml}</div>`;
+        }).join('') || '<div class="session-item" style="color:var(--text-muted); font-size:0.85rem;">ยังไม่มีบทเรียนย่อยในหัวข้อนี้</div>';
+        return `<div class="topic-folder">
+          <div class="topic-folder-header" onclick="toggleTopicExpand('${t.topic_id}')">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="display:inline-block; transform: rotate(${isOpen ? '90deg' : '0deg'});">▶</span>
+              <b>📁 ${t.title}</b><span class="tag" style="margin:0;">${doneCount}/${sessions.length} บทเรียน</span>
+            </div>
+          </div>
+          ${isOpen ? `<div>${sessionsHtml}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    function loadChat() {
+      unsubComments = db.collection('comments').where('student_id', '==', currentStudentId).onSnapshot(snapshot => {
+        const comments = snapshot.docs.map(d => d.data());
+        comments.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+        renderChat(comments);
+      });
+    }
+    function renderChat(comments) {
+      const box = document.getElementById('tutorChatBox');
+      if (comments.length === 0) { box.innerHTML = '<div class="empty-state" style="padding:12px 0;">ยังไม่มีข้อความ</div>'; return; }
+      box.innerHTML = comments.map(c => `
+        <div class="chat-msg ${c.sender_role === 'tutor' ? 'tutor' : 'parent'}">
+          <div style="font-size:0.72rem; font-weight:600; margin-bottom:2px; opacity:0.8;">${c.sender_name}</div>
+          <div>${c.message}</div>
+        </div>`).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+    async function sendParentComment() {
+      const input = document.getElementById('tutorMsgInput');
+      const msg = input.value.trim();
+      if (!msg || !currentStudentId) return;
+      await db.collection('comments').add({
+        student_id: currentStudentId, sender_role: 'parent', sender_name: 'ผู้ปกครอง',
+        message: msg, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      input.value = '';
+    }
+
+    // ================= คอร์สโปรโมท (อ่านอย่างเดียว) =================
+    function getYoutubeEmbedUrl(url) {
+      if (!url) return null;
+      const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+      return m ? `https://www.youtube.com/embed/${m[1]}` : null;
+    }
+    function openPromoDetail(id) {
+      currentPromoId = id;
+      const p = promoCourses.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('promoDetailTitle').innerText = p.title;
+      document.getElementById('promoDetailDesc').innerText = p.description || '';
+      const typeBox = document.getElementById('promoDetailType');
+      if (p.format) {
+        const isOnline = p.format.toLowerCase().includes('online');
+        typeBox.innerHTML = `<span class="promo-type-tag ${isOnline ? 'online' : 'onsite'}">${isOnline ? '💻' : '📍'} ${p.format}${p.location ? ' · ' + p.location : ''}</span>`;
+      } else typeBox.innerHTML = '';
+      const coverImg = document.getElementById('promoDetailCover');
+      if (p.coverImageUrl) { coverImg.src = p.coverImageUrl; coverImg.style.display = 'block'; } else coverImg.style.display = 'none';
+      const videoBox = document.getElementById('promoDetailVideoBox');
+      const embedUrl = getYoutubeEmbedUrl(p.videoUrl);
+      if (embedUrl) videoBox.innerHTML = `<iframe class="promo-video-frame" src="${embedUrl}" allowfullscreen></iframe>`;
+      else if (p.videoUrl) videoBox.innerHTML = `<a href="${p.videoUrl}" target="_blank" class="btn btn-outline" style="display:inline-block; margin-bottom:16px;">🔗 เปิดลิงก์ที่เกี่ยวข้อง</a>`;
+      else videoBox.innerHTML = '';
+      document.getElementById('promoDetailModal').style.display = 'flex';
+    }
+    function closePromoDetailModal() {
+      document.getElementById('promoDetailModal').style.display = 'none';
+      document.getElementById('promoDetailVideoBox').innerHTML = '';
+    }
+
+    initBannerListener();
+    initStudentsListener();
+    initPromoListener();
+  </script>
+</body>
+</html>
