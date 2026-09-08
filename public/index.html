@@ -97,8 +97,8 @@
     .history-table th { background: #f8fafc; font-weight: 600; color: var(--text-muted); font-size: 0.9rem; }
     .history-table tr:hover td { background: #f1f5f9; cursor: pointer; }
 
-    .back-btn { background: white; border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; margin-bottom: 20px; }
-    .back-btn:hover { background: #f1f5f9; }
+    .back-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 14px 24px; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(37,99,235,0.1); }
+    .back-btn:hover { background: var(--primary-light); }
     .card { background: var(--surface); border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--border); }
     .profile-header { display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
     .profile-avatar { width: 60px; height: 60px; background: var(--primary-light); color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; }
@@ -134,6 +134,11 @@
     .promo-video-frame { width: 100%; aspect-ratio: 16/9; border-radius: 12px; border: none; margin-bottom: 16px; }
     .modal-content.wide { max-width: 640px; }
     .promo-badge-inline { position: absolute; top: 10px; left: 10px; background: #f59e0b; color: white; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; z-index: 2; }
+    .promo-type-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 6px; margin-top: 8px; }
+    .promo-type-tag.online { background: #dcfce7; color: #166534; }
+    .promo-type-tag.onsite { background: #dbeafe; color: #1e40af; }
+    .quick-edit-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.08); z-index: 3; }
+    .quick-edit-btn:hover { background: var(--primary-light); }
   </style>
 </head>
 <body>
@@ -271,7 +276,7 @@
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
           <h3 style="font-size: 1.15rem; font-weight: 600; color: var(--primary);">📍 แผนการเรียนรู้</h3>
-          <button class="btn btn-primary" onclick="addTopicPrompt()" style="font-size: 0.85rem;">+ เพิ่มเนื้อหา</button>
+          <button class="btn btn-primary" onclick="addTopicPrompt()" style="font-size: 0.85rem;">+ เพิ่มหัวข้อหลัก</button>
         </div>
         <div id="topicList"></div>
       </div>
@@ -296,6 +301,7 @@
         <button class="action-link" style="font-size:1.1rem;" onclick="closePromoDetailModal()">✖</button>
       </div>
       <img id="promoDetailCover" class="promo-detail-cover" style="display:none;">
+      <div id="promoDetailType" style="margin-bottom: 12px;"></div>
       <div id="promoDetailVideoBox"></div>
       <p id="promoDetailDesc" style="color: var(--text); line-height: 1.6; white-space: pre-wrap; margin-bottom: 20px;"></p>
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -329,8 +335,8 @@
       <input type="hidden" id="modalTopicId">
       <label style="font-size: 0.85rem; color: var(--text-muted);">บันทึกย่อ / ข้อเสนอแนะ:</label>
       <textarea id="modalTutorNotes" class="select-st" style="height: 100px; margin-top: 6px; resize: none;"></textarea>
-      <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 16px;">แนบหลักฐาน (รูปภาพเท่านั้น):</label>
-      <input type="file" id="modalFiles" accept="image/*" multiple class="select-st" style="margin-top: 6px; padding: 8px;">
+      <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 16px;">แนบหลักฐาน (รูปภาพ หรือ PDF):</label>
+      <input type="file" id="modalFiles" accept="image/*,application/pdf" multiple class="select-st" style="margin-top: 6px; padding: 8px;">
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
         <button class="btn btn-outline" onclick="closeUpdateModal()">ยกเลิก</button>
         <button class="btn btn-primary" id="saveModalBtn" onclick="saveTopicDetails()">บันทึก</button>
@@ -383,6 +389,25 @@
       const data = await res.json();
       if (!data.success) throw new Error(data.error?.message || 'อัปโหลดรูปไม่สำเร็จ');
       return data.data.url;
+    }
+
+    // อัปโหลดไฟล์ที่ไม่ใช่รูปภาพ (เช่น PDF) ผ่าน catbox.moe (ฟรี ไม่ต้องมี API key)
+    async function uploadFileToCatbox(file) {
+      const fd = new FormData();
+      fd.append('reqtype', 'fileupload');
+      fd.append('fileToUpload', file);
+      const res = await fetch('https://catbox.moe/user/api.php', { method: 'POST', body: fd });
+      const text = await res.text();
+      if (!text || !text.trim().startsWith('http')) throw new Error('อัปโหลดไฟล์ไม่สำเร็จ: ' + text);
+      return text.trim();
+    }
+
+    // เลือกวิธีอัปโหลดอัตโนมัติตามชนิดไฟล์: รูปภาพ → ImgBB, ไฟล์อื่น (เช่น PDF) → catbox.moe
+    async function uploadFileGeneric(file) {
+      if (file.type.startsWith('image/')) {
+        return await uploadImageToImgbb(file);
+      }
+      return await uploadFileToCatbox(file);
     }
 
     let currentStudentId = null;
@@ -555,6 +580,7 @@
           <div class="promo-body">
             <div class="course-title">${p.title}</div>
             <div style="font-size: 0.85rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.description || ''}</div>
+            ${p.format ? `<span class="promo-type-tag ${p.format.toLowerCase().includes('online') ? 'online' : 'onsite'}">${p.format.toLowerCase().includes('online') ? '💻' : '📍'} ${p.format}${p.location ? ' · ' + p.location : ''}</span>` : ''}
           </div>
         </div>
       `).join('') : '';
@@ -565,7 +591,8 @@
       }
 
       const studentHtml = filteredStudents.map(st => `
-        <div class="course-card" onclick="openDetailView('${st.id}')">
+        <div class="course-card" style="position:relative;" onclick="openDetailView('${st.id}')">
+          <button class="quick-edit-btn" onclick="event.stopPropagation(); quickEditStudent('${st.id}')" title="แก้ไขด่วน">✏️</button>
           <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}</div>
           <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">👤 น้อง${st.nickname} (${st.full_name})</div>
           <div style="font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #f1f5f9;">
@@ -597,6 +624,20 @@
     }
 
     // ================= ระบบเพิ่มและจัดการนักเรียน/คอร์ส (ต่อ Firestore จริง) =================
+    async function quickEditStudent(id) {
+      const st = allStudents.find(s => s.id === id);
+      if (!st) return;
+      const nickname = prompt('แก้ไขชื่อเล่น:', st.nickname);
+      const fullName = prompt('แก้ไขชื่อ-นามสกุล:', st.full_name);
+      const gradeLevel = prompt('แก้ไขระดับชั้น:', st.grade_level);
+      const courseTitle = prompt('แก้ไขวิชาคอร์ส:', st.course_title);
+      if (nickname) {
+        await db.collection('students').doc(id).update({
+          nickname, full_name: fullName, grade_level: gradeLevel, course_title: courseTitle
+        });
+      }
+    }
+
     async function openAddStudent() {
       try {
         const nickname = prompt('ชื่อเล่นนักเรียน:');
@@ -632,7 +673,9 @@
 
       switchView('detailView');
       if (unsubTopics) unsubTopics();
+      if (unsubSessions) unsubSessions();
       if (unsubComments) unsubComments();
+      expandedTopics = new Set();
       loadProgress();
       loadTutorChat();
     }
@@ -657,9 +700,11 @@
       if (!confirm('โปรดระวัง: ยืนยันการลบคอร์ส/นักเรียนคนนี้พร้อมข้อมูลทั้งหมดหรือไม่?')) return;
       try {
         const topicsSnap = await db.collection('topics').where('student_id', '==', currentStudentId).get();
+        const sessionsSnap = await db.collection('topicSessions').where('student_id', '==', currentStudentId).get();
         const commentsSnap = await db.collection('comments').where('student_id', '==', currentStudentId).get();
         const batch = db.batch();
         topicsSnap.forEach(d => batch.delete(d.ref));
+        sessionsSnap.forEach(d => batch.delete(d.ref));
         commentsSnap.forEach(d => batch.delete(d.ref));
         batch.delete(db.collection('students').doc(currentStudentId));
         await batch.commit();
@@ -669,7 +714,11 @@
       switchView('dashboardView', document.getElementById('menu-dashboard'));
     }
 
-    // ================= ระบบแผนการเรียน (เรียลไทม์) =================
+    // ================= ระบบแผนการเรียน: หัวข้อหลัก (topics) + หัวข้อย่อยรายวัน (sessions) =================
+    let currentSessions = [];
+    let expandedTopics = new Set();
+    let unsubSessions = null;
+
     function loadProgress() {
       unsubTopics = db.collection('topics').where('student_id', '==', currentStudentId)
         .onSnapshot(snapshot => {
@@ -677,106 +726,180 @@
           currentTopics.sort((a, b) => (a.sequence_order || 0) - (b.sequence_order || 0));
           renderTopicList();
         }, err => console.error('โหลดแผนการเรียนล้มเหลว:', err));
+
+      unsubSessions = db.collection('topicSessions').where('student_id', '==', currentStudentId)
+        .onSnapshot(snapshot => {
+          currentSessions = snapshot.docs.map(d => ({ session_id: d.id, ...d.data() }));
+          currentSessions.sort((a, b) => (a.sequence_order || 0) - (b.sequence_order || 0));
+          renderTopicList();
+        }, err => console.error('โหลดบทเรียนย่อยล้มเหลว:', err));
+    }
+
+    function toggleTopicExpand(topicId) {
+      if (expandedTopics.has(topicId)) expandedTopics.delete(topicId);
+      else expandedTopics.add(topicId);
+      renderTopicList();
     }
 
     function renderTopicList() {
       const list = document.getElementById('topicList');
       if (currentTopics.length === 0) {
-        list.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 12px;">คลิกปุ่ม "+ เพิ่มเนื้อหา" เพื่อเริ่มต้น</div>';
+        list.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 12px;">คลิกปุ่ม "+ เพิ่มหัวข้อหลัก" เพื่อเริ่มต้น</div>';
         return;
       }
       list.innerHTML = currentTopics.map(t => {
-        const status = t.status || 'pending';
-        let filesHtml = (t.attachments && t.attachments.length > 0) ? '<div style="margin-top: 8px;">' + t.attachments.map(a => `<a href="${a.file_url}" target="_blank" style="font-size: 0.75rem; padding: 4px 10px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #475569; margin-right: 4px;">📎 ${a.file_name}</a>`).join('') + '</div>' : '';
-        let noteHtml = t.tutor_notes ? `<div style="font-size: 0.85rem; color: #334155; margin-top: 8px; background: #f8fafc; padding: 10px; border-radius: 8px;"><b>บันทึก:</b> ${t.tutor_notes}</div>` : '';
-        return `
-          <div class="topic-card-item">
-            <div class="topic-left">
-              <div class="badge-num">${t.sequence_order}</div>
-              <div style="flex: 1;">
-                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-                  <b style="font-size: 1rem;">${t.title}</b>
-                  <select class="status-select-pill ${status}" onchange="changeTopicStatus('${t.topic_id}', this.value)">
-                    <option value="pending" ${status === 'pending' ? 'selected' : ''}>รอดำเนินการ</option>
-                    <option value="in_progress" ${status === 'in_progress' ? 'selected' : ''}>กำลังเรียน</option>
-                    <option value="completed" ${status === 'completed' ? 'selected' : ''}>ผ่านเกณฑ์</option>
-                  </select>
-                  <button class="action-link" onclick="editTopicName('${t.topic_id}', '${t.title}')">✏️</button>
-                  <button class="action-link delete" onclick="deleteTopic('${t.topic_id}')">🗑️</button>
+        const sessions = currentSessions.filter(s => s.topic_id === t.topic_id);
+        const isOpen = expandedTopics.has(t.topic_id);
+        const doneCount = sessions.filter(s => s.status === 'completed').length;
+
+        const sessionsHtml = sessions.map(s => {
+          const status = s.status || 'pending';
+          let filesHtml = (s.attachments && s.attachments.length > 0) ? '<div style="margin-top: 8px;">' + s.attachments.map(a => `<a href="${a.file_url}" target="_blank" style="font-size: 0.75rem; padding: 4px 10px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #475569; margin-right: 4px;">${a.file_type === 'pdf' ? '📄' : '📎'} ${a.file_name}</a>`).join('') + '</div>' : '';
+          let noteHtml = s.tutor_notes ? `<div style="font-size: 0.85rem; color: #334155; margin-top: 8px; background: #f8fafc; padding: 10px; border-radius: 8px;"><b>บันทึก:</b> ${s.tutor_notes}</div>` : '';
+          return `
+            <div class="topic-card-item" style="padding-left: 8px;">
+              <div class="topic-left">
+                <div class="badge-num" style="background:#eff6ff; color:var(--primary);">${s.sequence_order}</div>
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                    <b style="font-size: 0.95rem;">${s.title}</b>
+                    <select class="status-select-pill ${status}" onchange="changeSessionStatus('${s.session_id}', this.value)">
+                      <option value="pending" ${status === 'pending' ? 'selected' : ''}>รอดำเนินการ</option>
+                      <option value="in_progress" ${status === 'in_progress' ? 'selected' : ''}>กำลังเรียน</option>
+                      <option value="completed" ${status === 'completed' ? 'selected' : ''}>ผ่านเกณฑ์</option>
+                    </select>
+                    <button class="action-link" onclick="editSessionName('${s.session_id}', '${s.title}')">✏️</button>
+                    <button class="action-link delete" onclick="deleteSession('${s.session_id}')">🗑️</button>
+                  </div>
+                  ${noteHtml}${filesHtml}
                 </div>
-                ${noteHtml}${filesHtml}
+              </div>
+              <div><button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px;" onclick="openUpdateModal('${s.session_id}')">📝 อัปเดตผล</button></div>
+            </div>`;
+        }).join('') || '<div style="padding: 12px 0 12px 44px; color: var(--text-muted); font-size: 0.85rem;">ยังไม่มีบทเรียนย่อย กด "+ เพิ่มบทเรียนย่อย" เพื่อเริ่มต้น</div>';
+
+        return `
+          <div style="border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding: 14px 16px; background:#f8fafc; cursor:pointer;" onclick="toggleTopicExpand('${t.topic_id}')">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="transition:0.2s; display:inline-block; transform: rotate(${isOpen ? '90deg' : '0deg'});">▶</span>
+                <b style="font-size: 1rem;">📁 ${t.title}</b>
+                <span class="tag" style="margin:0;">${doneCount}/${sessions.length} บทเรียน</span>
+              </div>
+              <div style="display:flex; gap:4px;" onclick="event.stopPropagation();">
+                <button class="btn btn-outline" style="font-size:0.78rem; padding:5px 10px;" onclick="addSessionPrompt('${t.topic_id}')">+ เพิ่มบทเรียนย่อย</button>
+                <button class="action-link" onclick="editTopicName('${t.topic_id}', '${t.title}')">✏️</button>
+                <button class="action-link delete" onclick="deleteTopic('${t.topic_id}')">🗑️</button>
               </div>
             </div>
-            <div><button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px;" onclick="openUpdateModal('${t.topic_id}')">📝 อัปเดตผล</button></div>
+            ${isOpen ? `<div style="padding: 4px 16px;">${sessionsHtml}</div>` : ''}
           </div>`;
       }).join('');
     }
 
     async function addTopicPrompt() {
       try {
-        const title = prompt('กำหนดหัวข้อการเรียนรู้ใหม่:');
+        const title = prompt('กำหนดหัวข้อหลัก (เช่น ชื่อบท/หน่วยการเรียน):');
         if (!title) return;
-        await db.collection('topics').add({
+        const docRef = await db.collection('topics').add({
           student_id: currentStudentId,
           title,
-          status: 'pending',
           sequence_order: currentTopics.length + 1,
-          tutor_notes: '',
-          attachments: [],
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        expandedTopics.add(docRef.id);
       } catch (e) {
         alert('เกิดข้อผิดพลาดในการเพิ่มหัวข้อ: ' + e.message);
       }
     }
 
     async function editTopicName(topicId, oldTitle) {
-      const title = prompt('แก้ไขชื่อหัวข้อ:', oldTitle);
+      const title = prompt('แก้ไขชื่อหัวข้อหลัก:', oldTitle);
       if (!title || title === oldTitle) return;
       await db.collection('topics').doc(topicId).update({ title });
     }
 
     async function deleteTopic(topicId) {
-      if (!confirm('ยืนยันลบหัวข้อการเรียนรู้นี้?')) return;
-      await db.collection('topics').doc(topicId).delete();
+      if (!confirm('ยืนยันลบหัวข้อหลักนี้? บทเรียนย่อยทั้งหมดข้างในจะถูกลบไปด้วย')) return;
+      const sessSnap = await db.collection('topicSessions').where('topic_id', '==', topicId).get();
+      const batch = db.batch();
+      sessSnap.forEach(d => batch.delete(d.ref));
+      batch.delete(db.collection('topics').doc(topicId));
+      await batch.commit();
     }
 
-    async function changeTopicStatus(topicId, newStatus) {
-      await db.collection('topics').doc(topicId).update({ status: newStatus });
+    async function addSessionPrompt(topicId) {
+      try {
+        const title = prompt('ชื่อบทเรียนย่อย (เช่น เนื้อหาที่เรียนวันนี้):');
+        if (!title) return;
+        const count = currentSessions.filter(s => s.topic_id === topicId).length;
+        await db.collection('topicSessions').add({
+          student_id: currentStudentId,
+          topic_id: topicId,
+          title,
+          status: 'pending',
+          sequence_order: count + 1,
+          tutor_notes: '',
+          attachments: [],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        expandedTopics.add(topicId);
+      } catch (e) {
+        alert('เกิดข้อผิดพลาดในการเพิ่มบทเรียนย่อย: ' + e.message);
+      }
     }
 
-    function openUpdateModal(topicId) {
-      const t = currentTopics.find(x => x.topic_id === topicId);
-      document.getElementById('modalTopicId').value = topicId;
-      document.getElementById('modalTutorNotes').value = t ? (t.tutor_notes || '') : '';
+    async function editSessionName(sessionId, oldTitle) {
+      const title = prompt('แก้ไขชื่อบทเรียนย่อย:', oldTitle);
+      if (!title || title === oldTitle) return;
+      await db.collection('topicSessions').doc(sessionId).update({ title });
+    }
+
+    async function deleteSession(sessionId) {
+      if (!confirm('ยืนยันลบบทเรียนย่อยนี้?')) return;
+      await db.collection('topicSessions').doc(sessionId).delete();
+    }
+
+    async function changeSessionStatus(sessionId, newStatus) {
+      await db.collection('topicSessions').doc(sessionId).update({ status: newStatus });
+    }
+
+    function openUpdateModal(sessionId) {
+      const s = currentSessions.find(x => x.session_id === sessionId);
+      document.getElementById('modalTopicId').value = sessionId;
+      document.getElementById('modalTutorNotes').value = s ? (s.tutor_notes || '') : '';
       document.getElementById('modalFiles').value = '';
       document.getElementById('updateModal').style.display = 'flex';
     }
     function closeUpdateModal() { document.getElementById('updateModal').style.display = 'none'; }
 
     async function saveTopicDetails() {
-      const topicId = document.getElementById('modalTopicId').value;
+      const sessionId = document.getElementById('modalTopicId').value;
       const notes = document.getElementById('modalTutorNotes').value;
       const filesInput = document.getElementById('modalFiles');
       const btn = document.getElementById('saveModalBtn');
-      const t = currentTopics.find(x => x.topic_id === topicId);
+      const s = currentSessions.find(x => x.session_id === sessionId);
 
       btn.disabled = true; btn.innerText = 'กำลังบันทึก...';
       try {
         const newAttachments = [];
         for (let i = 0; i < filesInput.files.length; i++) {
           const file = filesInput.files[i];
-          const url = await uploadImageToImgbb(file);
-          newAttachments.push({ file_name: file.name, file_url: url });
+          const url = await uploadFileGeneric(file);
+          newAttachments.push({
+            file_name: file.name,
+            file_url: url,
+            file_type: file.type === 'application/pdf' ? 'pdf' : 'image'
+          });
         }
         const updateData = {
-          status: t ? (t.status || 'pending') : 'pending',
+          status: s ? (s.status || 'pending') : 'pending',
           tutor_notes: notes
         };
         if (newAttachments.length > 0) {
           updateData.attachments = firebase.firestore.FieldValue.arrayUnion(...newAttachments);
         }
-        await db.collection('topics').doc(topicId).update(updateData);
+        await db.collection('topicSessions').doc(sessionId).update(updateData);
       } catch (err) {
         alert('บันทึกไม่สำเร็จ: ' + err.message);
       }
@@ -863,12 +986,20 @@
       const title = prompt('ชื่อคอร์สที่จะโปรโมท:');
       if (!title) return;
       const description = prompt('คำอธิบายคอร์ส (แนะนำเนื้อหา จุดเด่น ฯลฯ):') || '';
+      const location = prompt('สถานที่เรียน (เช่น สาขาสุขุมวิท, ตึก A ชั้น 3):') || '';
+      const format = prompt('รูปแบบการเรียน พิมพ์ "online" หรือ "onsite":', 'onsite') || '';
       const videoUrl = prompt('ลิงก์วิดีโอแนะนำ (เช่น YouTube) หรือลิงก์ที่เกี่ยวข้อง — เว้นว่างได้ถ้าไม่มี:') || '';
       try {
         await db.collection('promoCourses').add({
-          title, description, videoUrl, coverImageUrl: null,
+          title, description, videoUrl, location, format, coverImageUrl: null,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        // บังคับกลับไปหน้า "ทั้งหมด" เพื่อให้เห็นคอร์สที่เพิ่งเพิ่มทันที (คอร์สโปรโมทโชว์เฉพาะโหมดนี้)
+        currentFilterGrade = 'ทั้งหมด';
+        document.getElementById('courseListTitle').innerText = 'คอร์สที่ปรากฏ (ทั้งหมด)';
+        switchView('dashboardView', document.getElementById('menu-dashboard'));
+        renderCourseCards('ทั้งหมด');
+        alert('เพิ่มคอร์สโปรโมท "' + title + '" สำเร็จ! เลื่อนดูในหน้าหลักได้เลย');
       } catch (err) {
         alert('เพิ่มคอร์สโปรโมทไม่สำเร็จ: ' + err.message);
       }
@@ -892,6 +1023,14 @@
       if (!p) return;
       document.getElementById('promoDetailTitle').innerText = p.title;
       document.getElementById('promoDetailDesc').innerText = p.description || '';
+
+      const typeBox = document.getElementById('promoDetailType');
+      if (p.format) {
+        const isOnline = p.format.toLowerCase().includes('online');
+        typeBox.innerHTML = `<span class="promo-type-tag ${isOnline ? 'online' : 'onsite'}">${isOnline ? '💻' : '📍'} ${p.format}${p.location ? ' · ' + p.location : ''}</span>`;
+      } else {
+        typeBox.innerHTML = '';
+      }
 
       const coverImg = document.getElementById('promoDetailCover');
       if (p.coverImageUrl) { coverImg.src = p.coverImageUrl; coverImg.style.display = 'block'; }
@@ -934,8 +1073,10 @@
       const title = prompt('แก้ไขชื่อคอร์ส:', p.title);
       if (!title) return;
       const description = prompt('แก้ไขคำอธิบาย:', p.description || '');
+      const location = prompt('แก้ไขสถานที่เรียน:', p.location || '');
+      const format = prompt('แก้ไขรูปแบบการเรียน (online/onsite):', p.format || '');
       const videoUrl = prompt('แก้ไขลิงก์วิดีโอ/ลิงก์ที่เกี่ยวข้อง:', p.videoUrl || '');
-      await db.collection('promoCourses').doc(currentPromoId).update({ title, description, videoUrl });
+      await db.collection('promoCourses').doc(currentPromoId).update({ title, description, location, format, videoUrl });
       openPromoDetail(currentPromoId);
     }
 
