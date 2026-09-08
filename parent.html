@@ -239,6 +239,7 @@
     const db = firebase.firestore();
 
     let allStudents = [], promoCourses = [], currentTopics = [], currentSessions = [];
+    let studentsReady = false, promoReady = false;
     let currentStudentId = null, currentPromoId = null, currentFilterGrade = 'ทั้งหมด';
     let expandedTopics = new Set();
     let unsubTopics = null, unsubSessions = null, unsubComments = null;
@@ -298,6 +299,7 @@
     function initStudentsListener() {
       db.collection('students').onSnapshot(snapshot => {
         allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        studentsReady = true;
         renderCourseCards(currentFilterGrade);
         renderHistoryTable();
       });
@@ -305,6 +307,7 @@
     function initPromoListener() {
       db.collection('promoCourses').onSnapshot(snapshot => {
         promoCourses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        promoReady = true;
         renderCourseCards(currentFilterGrade);
       });
     }
@@ -318,6 +321,10 @@
 
     function renderCourseCards(grade = 'ทั้งหมด') {
       const grid = document.getElementById('courseGrid');
+      if (!studentsReady || !promoReady) {
+        grid.innerHTML = '<div style="grid-column: 1/-1;" class="empty-state">⏳ กำลังโหลดข้อมูล...</div>';
+        return;
+      }
       let filteredStudents = allStudents;
       if (grade !== 'ทั้งหมด') filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
 

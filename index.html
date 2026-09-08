@@ -414,6 +414,7 @@
     let allStudents = [];
     let currentTopics = [];
     let currentFilterGrade = 'ทั้งหมด';
+    let studentsReady = false, promoReady = false;
     let unsubTopics = null;
     let unsubComments = null;
 
@@ -552,6 +553,7 @@
       db.collection('students').onSnapshot(snapshot => {
         allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         allStudents.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        studentsReady = true;
         renderCourseCards(currentFilterGrade);
         renderHistoryTable();
       }, err => {
@@ -569,6 +571,10 @@
 
     function renderCourseCards(grade = 'ทั้งหมด') {
       const grid = document.getElementById('courseGrid');
+      if (!studentsReady || !promoReady) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted);">⏳ กำลังโหลดข้อมูล...</div>';
+        return;
+      }
       let filteredStudents = allStudents;
       if (grade !== 'ทั้งหมด') {
         filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
@@ -972,6 +978,7 @@
       db.collection('promoCourses').onSnapshot(snapshot => {
         promoCourses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         promoCourses.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        promoReady = true;
         renderPromoGrid();
         renderCourseCards(currentFilterGrade);
       }, err => console.error('โหลดคอร์สโปรโมทล้มเหลว:', err));
