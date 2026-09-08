@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kruton Tutor - Dashboard</title>
-  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="icon" type="image/png" href="logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -146,7 +146,7 @@
   <!-- ================= 1. Sidebar ================= -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <img src="/logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
+      <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
       <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Dashboard System</span></div>
     </div>
 
@@ -920,7 +920,7 @@
 
     // ================= ระบบแชท (เรียลไทม์) =================
     function copyParentLink() {
-      const link = `${window.location.origin}/parent.html`;
+      const link = new URL('parent.html', window.location.href).href;
       navigator.clipboard.writeText(link);
       alert(`คัดลอกลิงก์สำหรับผู้ปกครองสำเร็จ:\n${link}`);
     }
