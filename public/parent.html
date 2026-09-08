@@ -86,15 +86,19 @@
     let unsubTopics = null, unsubSessions = null, unsubComments = null;
     let currentTopics = [], currentSessions = [];
 
-    // โหลดรายชื่อนักเรียนทั้งหมดมาใส่ dropdown
-    db.collection('students').orderBy('nickname').onSnapshot(snapshot => {
+    // โหลดรายชื่อนักเรียนทั้งหมดมาใส่ dropdown (ไม่ใช้ orderBy บน server เพื่อตัดปัญหาเรื่อง index ออกไป เรียงฝั่ง client แทน)
+    console.log('[parent.html] เริ่มเชื่อมต่อ Firestore...');
+    db.collection('students').onSnapshot(snapshot => {
+      console.log('[parent.html] ได้รับข้อมูลนักเรียนจำนวน:', snapshot.size, 'คน');
       allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      allStudents.sort((a, b) => (a.nickname || '').localeCompare(b.nickname || '', 'th'));
       const select = document.getElementById('studentSelect');
       const currentVal = select.value;
       select.innerHTML = '<option value="">-- กรุณาเลือกนักเรียน --</option>' +
-        allStudents.map(s => `<option value="${s.id}">น้อง${s.nickname} (${s.full_name}) - ชั้น ${s.grade_level || '-'}</option>`).join('');
+        allStudents.map(s => `<option value="${s.id}">น้อง${s.nickname || '?'} (${s.full_name || '-'}) - ชั้น ${s.grade_level || '-'}</option>`).join('');
       if (currentVal) select.value = currentVal;
     }, err => {
+      console.error('[parent.html] โหลดรายชื่อนักเรียนล้มเหลว:', err);
       document.getElementById('studentDetailBox').innerHTML = '<div class="card empty-state">เชื่อมต่อฐานข้อมูลล้มเหลว: ' + err.message + '</div>';
     });
 
