@@ -40,13 +40,13 @@
 
     .banner-container {
       background: linear-gradient(135deg, #1e3a8a, var(--primary));
-      background-size: cover; background-position: center; background-repeat: no-repeat;
-      border-radius: 20px; height: 220px; display: flex; flex-direction: column;
+      border-radius: 20px; min-height: 220px; display: flex; flex-direction: column;
       align-items: flex-start; justify-content: flex-start; color: white; position: relative;
       box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left;
     }
+    .banner-img { width: 100%; height: auto; max-height: 560px; object-fit: contain; display: none; background: #0f172a; }
     .banner-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none; }
-    .banner-content { z-index: 2; padding: 26px 28px; position: relative; }
+    .banner-content { z-index: 2; padding: 26px 28px; position: absolute; top: 0; left: 0; }
     .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
     .banner-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.85); border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
@@ -155,6 +155,7 @@
 
   <main class="main-wrapper">
     <div class="banner-container" id="mainBanner">
+      <img id="bannerImg" class="banner-img">
       <div class="banner-overlay" id="bannerOverlay"></div>
       <button class="banner-arrow prev" onclick="prevSlide()" style="display:none;" id="bannerPrevBtn">‹</button>
       <button class="banner-arrow next" onclick="nextSlide()" style="display:none;" id="bannerNextBtn">›</button>
@@ -239,7 +240,6 @@
     const db = firebase.firestore();
 
     let allStudents = [], promoCourses = [], currentTopics = [], currentSessions = [];
-    let studentsReady = false, promoReady = false;
     let currentStudentId = null, currentPromoId = null, currentFilterGrade = 'ทั้งหมด';
     let expandedTopics = new Set();
     let unsubTopics = null, unsubSessions = null, unsubComments = null;
@@ -272,13 +272,15 @@
       });
     }
     function renderBannerSlide() {
-      const banner = document.getElementById('mainBanner');
+      const bannerImg = document.getElementById('bannerImg');
       const overlay = document.getElementById('bannerOverlay');
       if (bannerSlides.length > 0) {
-        banner.style.backgroundImage = `url('${bannerSlides[currentSlideIndex].imageUrl}')`;
+        bannerImg.src = bannerSlides[currentSlideIndex].imageUrl;
+        bannerImg.style.display = 'block';
         overlay.style.display = 'block';
       } else {
-        banner.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, var(--primary))';
+        bannerImg.style.display = 'none';
+        bannerImg.removeAttribute('src');
         overlay.style.display = 'none';
       }
       const showArrows = bannerSlides.length > 1;
@@ -299,7 +301,6 @@
     function initStudentsListener() {
       db.collection('students').onSnapshot(snapshot => {
         allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        studentsReady = true;
         renderCourseCards(currentFilterGrade);
         renderHistoryTable();
       });
@@ -307,7 +308,6 @@
     function initPromoListener() {
       db.collection('promoCourses').onSnapshot(snapshot => {
         promoCourses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        promoReady = true;
         renderCourseCards(currentFilterGrade);
       });
     }
@@ -321,10 +321,6 @@
 
     function renderCourseCards(grade = 'ทั้งหมด') {
       const grid = document.getElementById('courseGrid');
-      if (!studentsReady || !promoReady) {
-        grid.innerHTML = '<div style="grid-column: 1/-1;" class="empty-state">⏳ กำลังโหลดข้อมูล...</div>';
-        return;
-      }
       let filteredStudents = allStudents;
       if (grade !== 'ทั้งหมด') filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
 
@@ -490,14 +486,6 @@
     initStudentsListener();
     initPromoListener();
 
-    setTimeout(() => {
-      if (!studentsReady || !promoReady) {
-        console.warn('โหลดข้อมูลช้ากว่าปกติ (เกิน 5 วินาที) แสดงผลไปก่อนเท่าที่มีข้อมูล');
-        studentsReady = true;
-        promoReady = true;
-        renderCourseCards(currentFilterGrade);
-      }
-    }, 5000);
   </script>
 </body>
 </html>

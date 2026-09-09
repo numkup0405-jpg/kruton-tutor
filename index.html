@@ -42,15 +42,15 @@
 
     .banner-container {
       background: linear-gradient(135deg, #1e3a8a, var(--primary));
-      background-size: cover; background-position: center; background-repeat: no-repeat;
-      border-radius: 20px; height: 220px; display: flex; flex-direction: column;
+      border-radius: 20px; min-height: 220px; display: flex; flex-direction: column;
       align-items: flex-start; justify-content: flex-start; color: white; position: relative;
       box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left;
     }
+    .banner-img { width: 100%; height: auto; max-height: 560px; object-fit: contain; display: none; background: #0f172a; }
     .banner-overlay {
       position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none;
     }
-    .banner-content { z-index: 2; padding: 26px 28px; position: relative; }
+    .banner-content { z-index: 2; padding: 26px 28px; position: absolute; top: 0; left: 0; }
     .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 
@@ -196,6 +196,7 @@
 
     <!-- Banner ประกาศ (รองรับหลายหน้า เลื่อนดูได้ อัปโหลดรูปจริงผ่าน ImgBB) -->
     <div class="banner-container" id="mainBanner">
+      <img id="bannerImg" class="banner-img">
       <div class="banner-controls">
         <button class="btn-edit-banner" onclick="document.getElementById('bannerFileInput').click()">📷 เพิ่มรูปประกาศ</button>
         <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
@@ -414,7 +415,6 @@
     let allStudents = [];
     let currentTopics = [];
     let currentFilterGrade = 'ทั้งหมด';
-    let studentsReady = false, promoReady = false;
     let unsubTopics = null;
     let unsubComments = null;
 
@@ -440,15 +440,17 @@
     }
 
     function renderBannerSlide() {
-      const banner = document.getElementById('mainBanner');
+      const bannerImg = document.getElementById('bannerImg');
       const overlay = document.getElementById('bannerOverlay');
       const prevBtn = document.getElementById('bannerPrevBtn');
       const nextBtn = document.getElementById('bannerNextBtn');
       if (bannerSlides.length > 0) {
-        banner.style.backgroundImage = `url('${bannerSlides[currentSlideIndex].imageUrl}')`;
+        bannerImg.src = bannerSlides[currentSlideIndex].imageUrl;
+        bannerImg.style.display = 'block';
         overlay.style.display = 'block';
       } else {
-        banner.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, var(--primary))';
+        bannerImg.style.display = 'none';
+        bannerImg.removeAttribute('src');
         overlay.style.display = 'none';
       }
       const showArrows = bannerSlides.length > 1;
@@ -553,7 +555,6 @@
       db.collection('students').onSnapshot(snapshot => {
         allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         allStudents.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-        studentsReady = true;
         renderCourseCards(currentFilterGrade);
         renderHistoryTable();
       }, err => {
@@ -571,10 +572,6 @@
 
     function renderCourseCards(grade = 'ทั้งหมด') {
       const grid = document.getElementById('courseGrid');
-      if (!studentsReady || !promoReady) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted);">⏳ กำลังโหลดข้อมูล...</div>';
-        return;
-      }
       let filteredStudents = allStudents;
       if (grade !== 'ทั้งหมด') {
         filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
@@ -978,7 +975,6 @@
       db.collection('promoCourses').onSnapshot(snapshot => {
         promoCourses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         promoCourses.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-        promoReady = true;
         renderPromoGrid();
         renderCourseCards(currentFilterGrade);
       }, err => console.error('โหลดคอร์สโปรโมทล้มเหลว:', err));
@@ -1119,14 +1115,6 @@
     initPromoListener();
 
     // กันหน้าค้างที่ "กำลังโหลดข้อมูล..." ตลอดไป ถ้าโหลดนานเกิน 5 วินาที ให้แสดงผลไปก่อนเท่าที่มี
-    setTimeout(() => {
-      if (!studentsReady || !promoReady) {
-        console.warn('โหลดข้อมูลช้ากว่าปกติ (เกิน 5 วินาที) แสดงผลไปก่อนเท่าที่มีข้อมูล');
-        studentsReady = true;
-        promoReady = true;
-        renderCourseCards(currentFilterGrade);
-      }
-    }, 5000);
   </script>
 </body>
 </html>
