@@ -489,6 +489,15 @@
     initBannerListener();
     initStudentsListener();
     initPromoListener();
+
+    setTimeout(() => {
+      if (!studentsReady || !promoReady) {
+        console.warn('โหลดข้อมูลช้ากว่าปกติ (เกิน 5 วินาที) แสดงผลไปก่อนเท่าที่มีข้อมูล');
+        studentsReady = true;
+        promoReady = true;
+        renderCourseCards(currentFilterGrade);
+      }
+    }, 5000);
   </script>
 </body>
 </html>
