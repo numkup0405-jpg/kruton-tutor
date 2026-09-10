@@ -15,10 +15,10 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
     body { background: var(--bg-color); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-    /* ปุ่มสามขีดลอยถาวรที่มุมซ้ายบน */
+    /* ปุ่มสามขีดลอยถาวรที่มุมซ้ายบน (ขยับออกข้างโลโก้ ไม่บังแล้ว) */
     .floating-menu-btn {
       position: fixed;
-      top: 20px;
+      top: 18px;
       left: 20px;
       z-index: 1000;
       background: white;
@@ -39,7 +39,7 @@
     /* ================= Sidebar ================= */
     .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 999; transition: transform 0.3s ease; }
     .sidebar.collapsed { transform: translateX(-260px); }
-    .sidebar-brand { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .sidebar-brand { padding: 20px 16px 20px 75px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); min-height: 85px; }
     .sidebar-brand img { width: 45px; height: 45px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); object-fit: cover; }
     .brand-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
 
