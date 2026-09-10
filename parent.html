@@ -42,12 +42,10 @@
     .main-wrapper { flex: 1; margin-left: 260px; padding: 30px 40px; display: flex; flex-direction: column; gap: 30px; transition: margin-left 0.3s ease; }
     .main-wrapper.expanded { margin-left: 0; }
 
-    .mobile-header-bar { display: none; align-items: center; gap: 12px; margin-bottom: 10px; }
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-260px); }
       .sidebar.mobile-open { transform: translateX(0); }
-      .main-wrapper { margin-left: 0; padding: 15px; }
-      .mobile-header-bar { display: flex; }
+      .main-wrapper { margin-left: 0; padding: 20px 15px; }
     }
 
     .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
@@ -137,7 +135,7 @@
         <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
         <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">สำหรับผู้ปกครอง</span></div>
       </div>
-      <button class="btn-toggle-sidebar" onclick="toggleSidebar()" title="ซ่อน/แสดงเมนู">☰</button>
+      <button class="btn-toggle-sidebar" onclick="toggleSidebar()" title="ซ่อน/แสดงเมนู">✕</button>
     </div>
     <div class="sidebar-menu">
       <div class="menu-item active" id="menu-dashboard" onclick="switchView('dashboardView', this); currentFilterGrade = 'ทั้งหมด'; renderCourseCards('ทั้งหมด'); document.getElementById('courseListTitle').innerText = 'คอร์สที่ปรากฏ (ทั้งหมด)';">
@@ -170,9 +168,9 @@
   </aside>
 
   <main class="main-wrapper" id="mainContent">
-    <div class="mobile-header-bar">
-      <button class="btn btn-outline" onclick="toggleSidebar()" style="font-size: 1.1rem; padding: 6px 12px;">☰ เมนู</button>
-      <span style="font-weight: 700; color: var(--primary);">Kruton Tutor ผู้ปกครอง</span>
+    <!-- ปุ่มลอย ☰ เมนู สำหรับเปิด-ปิด Sidebar ตลอดเวลา -->
+    <div style="margin-bottom: 15px;">
+      <button class="btn btn-outline" onclick="toggleSidebar()" style="background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 1rem; padding: 8px 16px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;">☰ เมนู</button>
     </div>
 
     <div class="banner-container" id="mainBanner">
