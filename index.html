@@ -16,10 +16,13 @@
     body { background: var(--bg-color); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
     /* ================= 1. Sidebar ================= */
-    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
-    .sidebar-brand { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s ease; }
+    .sidebar.collapsed { transform: translateX(-260px); }
+    .sidebar-brand { padding: 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .brand-left { display: flex; align-items: center; gap: 12px; }
     .sidebar-brand img { width: 45px; height: 45px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); object-fit: cover; }
     .brand-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
+    .btn-toggle-sidebar { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 4px; }
 
     .sidebar-menu { padding: 20px 16px; flex: 1; overflow-y: auto; }
     .menu-item { padding: 12px 16px; border-radius: 10px; color: var(--text-muted); font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
@@ -38,34 +41,31 @@
     .btn-add-topic:hover { background: var(--primary-light); }
 
     /* ================= 2. Main Content ================= */
-    .main-wrapper { flex: 1; margin-left: 260px; padding: 30px 40px; display: flex; flex-direction: column; gap: 30px; }
+    .main-wrapper { flex: 1; margin-left: 260px; padding: 30px 40px; display: flex; flex-direction: column; gap: 30px; transition: margin-left 0.3s ease; }
+    .main-wrapper.expanded { margin-left: 0; }
 
-    .banner-container {
-      background: linear-gradient(135deg, #1e3a8a, var(--primary));
-      border-radius: 20px; min-height: 220px; display: flex; flex-direction: column;
-      align-items: flex-start; justify-content: flex-start; color: white; position: relative;
-      box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left;
+    .mobile-header-bar { display: none; align-items: center; gap: 12px; margin-bottom: 10px; }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-260px); }
+      .sidebar.mobile-open { transform: translateX(0); }
+      .main-wrapper { margin-left: 0; padding: 15px; }
+      .mobile-header-bar { display: flex; }
     }
+
+    .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
     .banner-img { width: 100%; height: auto; max-height: 560px; object-fit: contain; display: none; background: #0f172a; }
-    .banner-overlay {
-      position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none;
-    }
+    .banner-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none; }
     .banner-content { z-index: 2; padding: 26px 28px; position: absolute; top: 0; left: 0; }
     .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 
     .banner-controls { position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 8px; }
-    .btn-edit-banner, .btn-remove-banner {
-      background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px;
-      border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: 0.2s;
-    }
+    .btn-edit-banner, .btn-remove-banner { background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
     .btn-edit-banner:hover, .btn-remove-banner:hover { background: white; transform: scale(1.05); }
 
     .banner-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.85); border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
     .banner-arrow:hover { background: white; }
-    .banner-arrow.prev { left: 15px; }
-    .banner-arrow.next { right: 15px; }
+    .banner-arrow.prev { left: 15px; } .banner-arrow.next { right: 15px; }
     .banner-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 6px; }
     .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.2s; }
     .banner-dot.active { background: white; width: 22px; border-radius: 4px; }
@@ -137,15 +137,24 @@
     .promo-type-tag.onsite { background: #dbeafe; color: #1e40af; }
     .quick-edit-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.08); z-index: 3; }
     .quick-edit-btn:hover { background: var(--primary-light); }
+
+    /* Collapsible Note Box */
+    .note-box-container { margin-top: 8px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .note-box-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f1f5f9; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+    .note-box-content { padding: 10px 12px; font-size: 0.85rem; color: #334155; white-space: pre-wrap; line-height: 1.6; display: none; }
+    .note-box-content.open { display: block; }
   </style>
 </head>
 <body>
 
   <!-- ================= 1. Sidebar ================= -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="appSidebar">
     <div class="sidebar-brand">
-      <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
-      <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Dashboard System</span></div>
+      <div class="brand-left">
+        <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
+        <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Dashboard System</span></div>
+      </div>
+      <button class="btn-toggle-sidebar" onclick="toggleSidebar()" title="ซ่อน/แสดงเมนู">✕</button>
     </div>
 
     <div class="sidebar-menu">
@@ -188,7 +197,13 @@
   </aside>
 
   <!-- ================= 2. Main Content ================= -->
-  <main class="main-wrapper">
+  <main class="main-wrapper" id="mainContent">
+
+    <!-- แถบมือถือสำหรับกดเปิดเมนู -->
+    <div class="mobile-header-bar">
+      <button class="btn btn-outline" onclick="toggleSidebar()" style="font-size: 1.1rem; padding: 6px 12px;">☰ เมนู</button>
+      <span style="font-weight: 700; color: var(--primary);">Kruton Tutor Dashboard</span>
+    </div>
 
     <!-- แจ้งเตือนสถานะ Google Drive -->
     <div id="authBanner" style="background:#eff6ff; color:#1e40af; padding:12px 20px; border-radius:12px; font-size:0.85rem; font-weight:600; border:1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -296,7 +311,7 @@
 
   </main>
 
-  <!-- Modal รายละเอียดคอร์สโปรโมท -->
+  <!-- Modals -->
   <div id="promoDetailModal" class="modal-backdrop">
     <div class="modal-content wide">
       <div style="display:flex; justify-content: space-between; align-items:flex-start; margin-bottom: 12px;">
@@ -320,7 +335,6 @@
     </div>
   </div>
 
-  <!-- Modal จัดการรูปประกาศทั้งหมด -->
   <div id="manageSlidesModal" class="modal-backdrop">
     <div class="modal-content">
       <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">จัดการรูปประกาศ</h3>
@@ -331,7 +345,6 @@
     </div>
   </div>
 
-  <!-- Modal อัปเดตผลการเรียน -->
   <div id="updateModal" class="modal-backdrop">
     <div class="modal-content">
       <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">อัปเดตผลการเรียน</h3>
@@ -347,15 +360,12 @@
     </div>
   </div>
 
-  <!-- Firebase & Google Drive SDK -->
+  <!-- Scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <script>
-    // =====================================================================
-    // 1. Firebase Config
-    // =====================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyCFatAoxaWxXzTCunzpx_9Etuv9OL1Ei14",
       authDomain: "kruton-tutor.firebaseapp.com",
@@ -367,9 +377,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // =====================================================================
-    // 2. Google Drive API Config
-    // =====================================================================
     const GOOGLE_CLIENT_ID = '426629568710-ljt1a1ac70lgdm846ieer4hpieg3kj50.apps.googleusercontent.com';
     const GOOGLE_API_KEY = 'AIzaSyBMeOJFJ5xgRnb_LKd2deOTWLGlARcFg7M';
     
@@ -396,7 +403,26 @@
       tokenClient.requestAccessToken({prompt: 'consent'});
     }
 
-    // ฟังก์ชันหลักอัปโหลดเข้า Drive
+    // ฟังก์ชันพับเปิด/ปิด Sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      const mainContent = document.getElementById('mainContent');
+      if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('mobile-open');
+      } else {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+      }
+    }
+
+    // ฟังก์ชันพับเปิด/ปิดกล่องบันทึกย่อย
+    function toggleNoteBox(headerEl) {
+      const content = headerEl.nextElementSibling;
+      const arrow = headerEl.querySelector('.note-arrow');
+      content.classList.toggle('open');
+      arrow.style.transform = content.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
+    }
+
     async function uploadFileToDrive(file) {
       if (!driveAccessToken) {
         throw new Error('กรุณากดปุ่ม "ล็อกอินเชื่อมต่อ Drive" ที่ด้านบนก่อนอัปโหลดไฟล์ครับ');
@@ -412,34 +438,23 @@
           const base64Data = reader.result.split(',')[1];
           const metadata = { 'name': file.name, 'mimeType': file.type };
           const multipartRequestBody =
-            delimiter +
-            'Content-Type: application/json\r\n\r\n' +
-            JSON.stringify(metadata) +
-            delimiter +
-            'Content-Type: ' + file.type + '\r\n' +
-            'Content-Transfer-Encoding: base64\r\n\r\n' +
-            base64Data +
-            close_delim;
+            delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) +
+            delimiter + 'Content-Type: ' + file.type + '\r\nContent-Transfer-Encoding: base64\r\n\r\n' + base64Data + close_delim;
 
           try {
             const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
               method: 'POST',
-              headers: {
-                'Authorization': 'Bearer ' + driveAccessToken,
-                'Content-Type': 'multipart/related; boundary=' + boundary
-              },
+              headers: { 'Authorization': 'Bearer ' + driveAccessToken, 'Content-Type': 'multipart/related; boundary=' + boundary },
               body: multipartRequestBody
             });
             const data = await res.json();
             if(data.error) throw new Error(data.error.message);
 
-            // ทำให้เป็นสาธารณะ
             await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}/permissions?key=${GOOGLE_API_KEY}`, {
               method: 'POST',
               headers: { 'Authorization': 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' },
               body: JSON.stringify({ role: 'reader', type: 'anyone' })
             });
-
             resolve(data.webViewLink);
           } catch(e) { reject(e); }
         };
@@ -454,7 +469,6 @@
 
     function generateAccessCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
 
-    // ================= ระบบป้ายประกาศแบบหลายหน้า =================
     let bannerSlides = [];
     let currentSlideIndex = 0;
     let bannerAutoTimer = null;
@@ -464,10 +478,7 @@
         bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         bannerSlides.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
         if (currentSlideIndex >= bannerSlides.length) currentSlideIndex = 0;
-        renderBannerSlide();
-        renderBannerDots();
-        renderSlideManageList();
-        setupBannerAutoplay();
+        renderBannerSlide(); renderBannerDots(); renderSlideManageList(); setupBannerAutoplay();
       });
     }
 
@@ -478,12 +489,9 @@
       const nextBtn = document.getElementById('bannerNextBtn');
       if (bannerSlides.length > 0) {
         bannerImg.src = bannerSlides[currentSlideIndex].imageUrl;
-        bannerImg.style.display = 'block';
-        overlay.style.display = 'block';
+        bannerImg.style.display = 'block'; overlay.style.display = 'block';
       } else {
-        bannerImg.style.display = 'none';
-        bannerImg.removeAttribute('src');
-        overlay.style.display = 'none';
+        bannerImg.style.display = 'none'; bannerImg.removeAttribute('src'); overlay.style.display = 'none';
       }
       const showArrows = bannerSlides.length > 1;
       prevBtn.style.display = showArrows ? 'flex' : 'none';
@@ -508,11 +516,10 @@
       const originalText = btn.innerText;
       btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const url = await uploadFileToDrive(file); // ใช้ Google Drive
+        const url = await uploadFileToDrive(file);
         await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
-      btn.disabled = false; btn.innerText = originalText;
-      event.target.value = '';
+      btn.disabled = false; btn.innerText = originalText; event.target.value = '';
     }
 
     function openManageSlidesModal() { renderSlideManageList(); document.getElementById('manageSlidesModal').style.display = 'flex'; }
@@ -526,12 +533,10 @@
           <img src="${s.imageUrl}" alt="slide">
           <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
           <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
-        </div>
-      `).join('');
+        </div>`).join('');
     }
     async function deleteBannerSlide(id) { if (!confirm('ยืนยันลบรูปประกาศนี้?')) return; await db.collection('bannerSlides').doc(id).delete(); }
 
-    // ================= Navigation =================
     function switchView(viewId, menuElement = null) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
       if (menuElement) {
@@ -549,13 +554,11 @@
       submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
     }
 
-    // ================= นักเรียน/คอร์ส =================
     function initStudentsListener() {
       db.collection('students').onSnapshot(snapshot => {
         allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         allStudents.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-        renderCourseCards(currentFilterGrade);
-        renderHistoryTable();
+        renderCourseCards(currentFilterGrade); renderHistoryTable();
       });
     }
 
@@ -646,8 +649,7 @@
       if (unsubSessions) unsubSessions();
       if (unsubComments) unsubComments();
       expandedTopics = new Set();
-      loadProgress();
-      loadTutorChat();
+      loadProgress(); loadTutorChat();
     }
 
     async function editCurrentStudent() {
@@ -674,7 +676,6 @@
       switchView('dashboardView', document.getElementById('menu-dashboard'));
     }
 
-    // ================= ระบบแผนการเรียน (Topics & Sessions) =================
     let currentTopics = [];
     let currentSessions = [];
     let expandedTopics = new Set();
@@ -705,7 +706,16 @@
         const sessionsHtml = sessions.map(s => {
           const status = s.status || 'pending';
           let filesHtml = (s.attachments && s.attachments.length > 0) ? '<div style="margin-top: 8px;">' + s.attachments.map(a => `<a href="${a.file_url}" target="_blank" style="font-size: 0.75rem; padding: 4px 10px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #475569; margin-right: 4px;">${a.file_type === 'pdf' ? '📄' : '📎'} ${a.file_name}</a>`).join('') + '</div>' : '';
-          let noteHtml = s.tutor_notes ? `<div style="font-size: 0.85rem; color: #334155; margin-top: 8px; background: #f8fafc; padding: 10px; border-radius: 8px; white-space: pre-wrap; line-height: 1.6;"><b>บันทึก:</b>\n${s.tutor_notes}</div>` : '';
+          
+          let noteHtml = s.tutor_notes ? `
+            <div class="note-box-container">
+              <div class="note-box-header" onclick="toggleNoteBox(this)">
+                <span>📝 บันทึกจากคุณครู (คลิกเพื่อพับ/ขยาย)</span>
+                <span class="note-arrow" style="transition: transform 0.2s;">▶</span>
+              </div>
+              <div class="note-box-content">${s.tutor_notes}</div>
+            </div>` : '';
+
           return `
             <div class="topic-card-item" style="padding-left: 8px;">
               <div class="topic-left">
@@ -795,7 +805,7 @@
         const newAttachments = [];
         for (let i = 0; i < filesInput.files.length; i++) {
           const file = filesInput.files[i];
-          const url = await uploadFileToDrive(file); // ใช้ Google Drive
+          const url = await uploadFileToDrive(file);
           newAttachments.push({ file_name: file.name, file_url: url, file_type: file.type === 'application/pdf' ? 'pdf' : 'image' });
         }
         const updateData = { status: s ? (s.status || 'pending') : 'pending', tutor_notes: notes };
@@ -806,7 +816,6 @@
       closeUpdateModal();
     }
 
-    // ================= ระบบแชท =================
     function copyParentLink() { const link = new URL('parent.html', window.location.href).href; navigator.clipboard.writeText(link); alert(`คัดลอกลิงก์สำหรับผู้ปกครองสำเร็จ:\n${link}`); }
     function loadTutorChat() {
       if (!currentStudentId) return;
@@ -830,7 +839,6 @@
       input.value = '';
     }
 
-    // ================= ระบบคอร์สโปรโมท =================
     let promoCourses = [];
     let currentPromoId = null;
 
@@ -892,13 +900,12 @@
       const originalText = btn.innerText;
       btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const url = await uploadFileToDrive(file); // ใช้ Google Drive
+        const url = await uploadFileToDrive(file);
         await db.collection('promoCourses').doc(currentPromoId).update({ coverImageUrl: url });
         document.getElementById('promoDetailCover').src = url;
         document.getElementById('promoDetailCover').style.display = 'block';
       } catch (err) { alert('อัปโหลดรูปปกไม่สำเร็จ: ' + err.message); }
-      btn.disabled = false; btn.innerText = originalText;
-      event.target.value = '';
+      btn.disabled = false; btn.innerText = originalText; event.target.value = '';
     }
 
     async function editPromoCourse() {
@@ -920,7 +927,6 @@
       closePromoDetailModal();
     }
 
-    // โหลดหน้าแรกสุด
     initBannerListener();
     initStudentsListener();
     initPromoListener();
