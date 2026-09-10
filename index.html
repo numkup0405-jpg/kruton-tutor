@@ -705,7 +705,7 @@
         const sessionsHtml = sessions.map(s => {
           const status = s.status || 'pending';
           let filesHtml = (s.attachments && s.attachments.length > 0) ? '<div style="margin-top: 8px;">' + s.attachments.map(a => `<a href="${a.file_url}" target="_blank" style="font-size: 0.75rem; padding: 4px 10px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #475569; margin-right: 4px;">${a.file_type === 'pdf' ? '📄' : '📎'} ${a.file_name}</a>`).join('') + '</div>' : '';
-          let noteHtml = s.tutor_notes ? `<div style="font-size: 0.85rem; color: #334155; margin-top: 8px; background: #f8fafc; padding: 10px; border-radius: 8px;"><b>บันทึก:</b> ${s.tutor_notes}</div>` : '';
+          let noteHtml = s.tutor_notes ? `<div style="font-size: 0.85rem; color: #334155; margin-top: 8px; background: #f8fafc; padding: 10px; border-radius: 8px; white-space: pre-wrap; line-height: 1.6;"><b>บันทึก:</b>\n${s.tutor_notes}</div>` : '';
           return `
             <div class="topic-card-item" style="padding-left: 8px;">
               <div class="topic-left">
