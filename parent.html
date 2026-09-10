@@ -15,8 +15,29 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
     body { background: var(--bg-color); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
+    /* ปุ่มสามขีดลอยถาวรที่มุมซ้ายบน (ไม่หายไปไหนแน่นอน) */
+    .floating-menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: white;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      font-size: 1.2rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      transition: 0.2s;
+    }
+    .floating-menu-btn:hover { background: var(--primary-light); }
+
     /* ================= Sidebar ================= */
-    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s ease; }
+    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 999; transition: transform 0.3s ease; }
     .sidebar.collapsed { transform: translateX(-260px); }
     .sidebar-brand { padding: 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
     .brand-left { display: flex; align-items: center; gap: 12px; }
@@ -129,13 +150,16 @@
 </head>
 <body>
 
+  <!-- ปุ่มสามขีดลอยถาวรที่มุมซ้ายบน (ไม่หายไปไหนแน่นอน) -->
+  <button class="floating-menu-btn" onclick="toggleSidebar()" title="เปิด/ปิดเมนู">☰</button>
+
   <aside class="sidebar" id="appSidebar">
     <div class="sidebar-brand">
       <div class="brand-left">
         <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
         <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">สำหรับผู้ปกครอง</span></div>
       </div>
-      <button class="btn-toggle-sidebar" onclick="toggleSidebar()" title="ซ่อน/แสดงเมนู">☰</button>
+      <button class="btn-toggle-sidebar" onclick="toggleSidebar()" title="ซ่อน/แสดงเมนู">✕</button>
     </div>
     <div class="sidebar-menu">
       <div class="menu-item active" id="menu-dashboard" onclick="switchView('dashboardView', this); currentFilterGrade = 'ทั้งหมด'; renderCourseCards('ทั้งหมด'); document.getElementById('courseListTitle').innerText = 'คอร์สที่ปรากฏ (ทั้งหมด)';">
@@ -168,11 +192,6 @@
   </aside>
 
   <main class="main-wrapper" id="mainContent">
-    <!-- ปุ่มลอย ☰ เมนู สำหรับเปิด-ปิด Sidebar ตลอดเวลา -->
-    <div style="margin-bottom: 15px;">
-      <button class="btn btn-outline" onclick="toggleSidebar()" style="background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 1rem; padding: 8px 16px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;">☰ เมนู</button>
-    </div>
-
     <div class="banner-container" id="mainBanner">
       <img id="bannerImg" class="banner-img">
       <div class="banner-overlay" id="bannerOverlay"></div>
