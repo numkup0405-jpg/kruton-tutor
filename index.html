@@ -15,11 +15,9 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
     body { background: var(--bg-color); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-    /* ปุ่มสามขีดลอยถาวรที่มุมซ้ายบน */
     .floating-menu-btn { position: fixed; top: 18px; left: 20px; z-index: 1000; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 1.2rem; padding: 8px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.2s; }
     .floating-menu-btn:hover { background: var(--primary-light); }
 
-    /* Notification Dot */
     .notif-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--danger); border-radius: 50%; margin-left: 8px; animation: pulse 2s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
@@ -30,6 +28,7 @@
     .brand-left { display: flex; align-items: center; gap: 12px; }
     .sidebar-brand img { width: 45px; height: 45px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); object-fit: cover; }
     .brand-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
+    .btn-toggle-sidebar { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 4px; }
 
     .sidebar-menu { padding: 20px 16px; flex: 1; overflow-y: auto; }
     .menu-item { padding: 12px 16px; border-radius: 10px; color: var(--text-muted); font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
@@ -57,26 +56,10 @@
       .main-wrapper { margin-left: 0; padding: 20px 15px; }
     }
 
-    .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
-    .banner-img { width: 100%; height: auto; max-height: 560px; object-fit: contain; display: none; background: #0f172a; }
-    .banner-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none; }
-    .banner-content { z-index: 2; padding: 26px 28px; position: absolute; top: 0; left: 0; }
-    .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-
-    .banner-controls { position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 8px; }
-    .btn-edit-banner, .btn-remove-banner { background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
-    .btn-edit-banner:hover, .btn-remove-banner:hover { background: white; transform: scale(1.05); }
-
-    .banner-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.85); border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .banner-arrow:hover { background: white; }
-    .banner-arrow.prev { left: 15px; } .banner-arrow.next { right: 15px; }
-    .banner-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 6px; }
-    .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.2s; }
-    .banner-dot.active { background: white; width: 22px; border-radius: 4px; }
-
-    .slide-manage-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
-    .slide-manage-item img { width: 70px; height: 44px; object-fit: cover; border-radius: 6px; }
+    /* แบนเนอร์ดีไซน์ใหม่ สวยหรู ไม่พึ่งรูปภาพภายนอก */
+    .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; padding: 40px; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
+    .banner-container h2 { font-size: 2rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .banner-desc { font-size: 1.1rem; opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
     .view-section { display: none; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -143,7 +126,6 @@
     .quick-edit-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.08); z-index: 3; }
     .quick-edit-btn:hover { background: var(--primary-light); }
 
-    /* Collapsible Note Box */
     .note-box-container { margin-top: 8px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
     .note-box-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f1f5f9; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--primary); }
     .note-box-content { padding: 10px 12px; font-size: 0.85rem; color: #334155; white-space: pre-wrap; line-height: 1.6; display: none; }
@@ -153,16 +135,15 @@
 </head>
 <body>
 
-  <!-- ปุ่มสามขีดลอยถาวรที่มุมซ้ายบน -->
   <button class="floating-menu-btn" onclick="toggleSidebar()" title="เปิด/ปิดเมนู">☰</button>
 
-  <!-- ================= 1. Sidebar ================= -->
   <aside class="sidebar" id="appSidebar">
     <div class="sidebar-brand">
       <div class="brand-left">
         <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
         <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Dashboard System</span></div>
       </div>
+      <button class="btn-toggle-sidebar" onclick="toggleSidebar()" title="ซ่อน/แสดงเมนู">✕</button>
     </div>
 
     <div class="sidebar-menu">
@@ -204,38 +185,23 @@
     </div>
   </aside>
 
-  <!-- ================= 2. Main Content ================= -->
   <main class="main-wrapper" id="mainContent">
 
     <div style="margin-bottom: 5px;">
       <button class="btn btn-outline" onclick="toggleSidebar()" style="background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 1.05rem; padding: 8px 16px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">☰ เมนู</button>
     </div>
 
-    <!-- แจ้งเตือนสถานะ Google Drive -->
     <div id="authBanner" style="background:#eff6ff; color:#1e40af; padding:12px 20px; border-radius:12px; font-size:0.85rem; font-weight:600; border:1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
       <span>☁️ การเชื่อมต่อ Google Drive: <span id="driveStatus" style="color: #ef4444;">ยังไม่ได้ล็อกอิน</span></span>
       <button class="btn btn-primary" id="btnGoogleAuth" style="padding: 6px 12px; font-size: 0.8rem;" onclick="requestDriveAccess()">ล็อกอินเชื่อมต่อ Drive</button>
     </div>
 
-    <!-- Banner ประกาศ -->
+    <!-- แบนเนอร์ดีไซน์ใหม่ สะอาดตา ไม่เออเร่อ -->
     <div class="banner-container" id="mainBanner">
-      <img id="bannerImg" class="banner-img">
-      <div class="banner-controls">
-        <button class="btn-edit-banner" id="btnUploadBanner" onclick="document.getElementById('bannerFileInput').click()">📷 เพิ่มรูปประกาศ</button>
-        <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
-      </div>
-      <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileChange(event)">
-      <button class="banner-arrow prev" onclick="prevSlide()" style="display:none;" id="bannerPrevBtn">‹</button>
-      <button class="banner-arrow next" onclick="nextSlide()" style="display:none;" id="bannerNextBtn">›</button>
-      <div class="banner-overlay" id="bannerOverlay"></div>
-      <div class="banner-content">
-        <h2 id="bannerTitle">ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
-        <p id="bannerDesc" class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครอง</p>
-      </div>
-      <div class="banner-dots" id="bannerDots"></div>
+      <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
+      <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
     </div>
 
-    <!-- VIEW 1: Dashboard -->
     <div id="dashboardView" class="view-section active">
       <div class="section-header">
         <h3 class="section-title" id="courseListTitle">คอร์สที่ปรากฏ (ทั้งหมด)</h3>
@@ -253,29 +219,18 @@
       <div id="courseGrid" class="course-grid"></div>
     </div>
 
-    <!-- VIEW 2: History -->
     <div id="historyView" class="view-section">
-      <div class="section-header">
-        <h3 class="section-title">ประวัตินักเรียนทั้งหมด</h3>
-      </div>
+      <div class="section-header"><h3 class="section-title">ประวัตินักเรียนทั้งหมด</h3></div>
       <div class="history-card">
         <table class="history-table">
           <thead>
-            <tr>
-              <th>รหัสผู้ปกครอง</th>
-              <th>ชื่อ-นามสกุล</th>
-              <th>ชื่อเล่น</th>
-              <th>ระดับชั้น</th>
-              <th>คอร์สที่เรียน</th>
-              <th>จัดการ</th>
-            </tr>
+            <tr><th>รหัสผู้ปกครอง</th><th>ชื่อ-นามสกุล</th><th>ชื่อเล่น</th><th>ระดับชั้น</th><th>คอร์สที่เรียน</th><th>จัดการ</th></tr>
           </thead>
           <tbody id="historyTableBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- VIEW 3: Detail View -->
     <div id="detailView" class="view-section">
       <button class="back-btn" onclick="switchView('dashboardView', document.getElementById('menu-dashboard'))">⬅️ ย้อนกลับไปหน้าคอร์ส</button>
 
@@ -314,7 +269,6 @@
         </div>
       </div>
     </div>
-
   </main>
 
   <!-- Modals -->
@@ -341,16 +295,6 @@
     </div>
   </div>
 
-  <div id="manageSlidesModal" class="modal-backdrop">
-    <div class="modal-content">
-      <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">จัดการรูปประกาศ</h3>
-      <div id="slideManageList" style="max-height: 320px; overflow-y: auto;"></div>
-      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
-        <button class="btn btn-outline" onclick="closeManageSlidesModal()">ปิด</button>
-      </div>
-    </div>
-  </div>
-
   <div id="updateModal" class="modal-backdrop">
     <div class="modal-content">
       <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">อัปเดตผลการเรียน</h3>
@@ -366,7 +310,6 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -470,77 +413,9 @@
     let currentFilterGrade = 'ทั้งหมด';
     let unsubTopics = null;
     let unsubComments = null;
-    let studentNotifications = {}; // เก็บสถานะแจ้งเตือน
+    let studentNotifications = {};
 
     function generateAccessCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
-
-    let bannerSlides = [];
-    let currentSlideIndex = 0;
-    let bannerAutoTimer = null;
-
-    function initBannerListener() {
-      db.collection('bannerSlides').onSnapshot(snapshot => {
-        bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        bannerSlides.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-        if (currentSlideIndex >= bannerSlides.length) currentSlideIndex = 0;
-        renderBannerSlide(); renderBannerDots(); renderSlideManageList(); setupBannerAutoplay();
-      });
-    }
-
-    function renderBannerSlide() {
-      const bannerImg = document.getElementById('bannerImg');
-      const overlay = document.getElementById('bannerOverlay');
-      const prevBtn = document.getElementById('bannerPrevBtn');
-      const nextBtn = document.getElementById('bannerNextBtn');
-      if (bannerSlides.length > 0) {
-        bannerImg.src = bannerSlides[currentSlideIndex].imageUrl;
-        bannerImg.style.display = 'block'; overlay.style.display = 'block';
-      } else {
-        bannerImg.style.display = 'none'; bannerImg.removeAttribute('src'); overlay.style.display = 'none';
-      }
-      const showArrows = bannerSlides.length > 1;
-      prevBtn.style.display = showArrows ? 'flex' : 'none';
-      nextBtn.style.display = showArrows ? 'flex' : 'none';
-    }
-
-    function renderBannerDots() {
-      const dotsBox = document.getElementById('bannerDots');
-      if (bannerSlides.length <= 1) { dotsBox.innerHTML = ''; return; }
-      dotsBox.innerHTML = bannerSlides.map((s, i) => `<div class="banner-dot ${i === currentSlideIndex ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('');
-    }
-
-    function goToSlide(i) { currentSlideIndex = i; renderBannerSlide(); renderBannerDots(); setupBannerAutoplay(); }
-    function nextSlide() { if (bannerSlides.length === 0) return; currentSlideIndex = (currentSlideIndex + 1) % bannerSlides.length; renderBannerSlide(); renderBannerDots(); }
-    function prevSlide() { if (bannerSlides.length === 0) return; currentSlideIndex = (currentSlideIndex - 1 + bannerSlides.length) % bannerSlides.length; renderBannerSlide(); renderBannerDots(); }
-    function setupBannerAutoplay() { if (bannerAutoTimer) clearInterval(bannerAutoTimer); if (bannerSlides.length > 1) { bannerAutoTimer = setInterval(nextSlide, 5000); } }
-
-    async function handleBannerFileChange(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const btn = document.getElementById('btnUploadBanner');
-      const originalText = btn.innerText;
-      btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
-      try {
-        const url = await uploadFileToDrive(file);
-        await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-      } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
-      btn.disabled = false; btn.innerText = originalText; event.target.value = '';
-    }
-
-    function openManageSlidesModal() { renderSlideManageList(); document.getElementById('manageSlidesModal').style.display = 'flex'; }
-    function closeManageSlidesModal() { document.getElementById('manageSlidesModal').style.display = 'none'; }
-    function renderSlideManageList() {
-      const list = document.getElementById('slideManageList');
-      if (!list) return;
-      if (bannerSlides.length === 0) { list.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 16px 0;">ยังไม่มีรูปประกาศ</div>'; return; }
-      list.innerHTML = bannerSlides.map((s, i) => `
-        <div class="slide-manage-item">
-          <img src="${s.imageUrl}" alt="slide">
-          <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
-          <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
-        </div>`).join('');
-    }
-    async function deleteBannerSlide(id) { if (!confirm('ยืนยันลบรูปประกาศนี้?')) return; await db.collection('bannerSlides').doc(id).delete(); }
 
     function switchView(viewId, menuElement = null) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -548,8 +423,6 @@
         document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
         menuElement.classList.add('active');
       }
-      const banner = document.getElementById('mainBanner');
-      if (banner) { banner.style.display = (viewId === 'detailView') ? 'none' : 'flex'; }
       document.getElementById(viewId).classList.add('active');
     }
 
@@ -559,14 +432,13 @@
       submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
     }
 
-    // Listener สำหรับข้อความใหม่ทั้งหมด (เพื่อเช็ค Red Dot)
     db.collection('comments').where('sender_role', '==', 'parent').where('readByTutor', '==', false).onSnapshot(snapshot => {
       studentNotifications = {};
       snapshot.docs.forEach(doc => {
         const data = doc.data();
         studentNotifications[data.student_id] = true;
       });
-      renderCourseCards(currentFilterGrade); // รีเฟรชจุดแดงหน้าการ์ด
+      renderCourseCards(currentFilterGrade);
     });
 
     function initStudentsListener() {
@@ -663,8 +535,6 @@
       document.getElementById('stCourse').innerText = st.course_title || 'ทั่วไป';
       document.getElementById('stCode').innerText = st.parent_access_code;
       switchView('detailView');
-      
-      // ล้าง Red Dot
       document.getElementById('chatTitleLabel').innerHTML = '💬 ช่องทางติดต่อผู้ปกครอง';
 
       if (unsubTopics) unsubTopics();
@@ -832,7 +702,6 @@
           newAttachments.push({ file_name: file.name, file_url: url, file_type: file.type === 'application/pdf' ? 'pdf' : 'image' });
         }
         
-        // สร้างวันที่ปัจจุบัน
         const now = new Date();
         const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
         
@@ -853,7 +722,6 @@
         comments.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
         renderChat(comments);
         
-        // อัปเดตสถานะว่าครูอ่านแล้ว
         comments.forEach(c => {
           if (c.sender_role === 'parent' && c.readByTutor === false) {
             db.collection('comments').doc(c.id).update({ readByTutor: true });
@@ -915,13 +783,6 @@
       isAddingPromo = false;
     }
 
-    function getYoutubeEmbedUrl(url) {
-      if (!url) return null;
-      const patterns = [ /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/ ];
-      for (const p of patterns) { const m = url.match(p); if (m) return `https://www.youtube.com/embed/${m[1]}`; }
-      return null;
-    }
-
     function openPromoDetail(id) {
       currentPromoId = id;
       const p = promoCourses.find(x => x.id === id);
@@ -933,7 +794,7 @@
       const coverImg = document.getElementById('promoDetailCover');
       if (p.coverImageUrl) { coverImg.src = p.coverImageUrl; coverImg.style.display = 'block'; } else { coverImg.style.display = 'none'; }
       const videoBox = document.getElementById('promoDetailVideoBox');
-      const embedUrl = getYoutubeEmbedUrl(p.videoUrl);
+      const embedUrl = p.videoUrl ? p.videoUrl.replace('watch?v=', 'embed/') : null;
       if (embedUrl) { videoBox.innerHTML = `<iframe class="promo-video-frame" src="${embedUrl}" allowfullscreen></iframe>`; } else if (p.videoUrl) { videoBox.innerHTML = `<a href="${p.videoUrl}" target="_blank" class="btn btn-outline" style="display:inline-block; margin-bottom:16px;">🔗 เปิดลิงก์ที่เกี่ยวข้อง</a>`; } else { videoBox.innerHTML = ''; }
       document.getElementById('promoDetailModal').style.display = 'flex';
     }
@@ -973,7 +834,6 @@
       closePromoDetailModal();
     }
 
-    initBannerListener();
     initStudentsListener();
     initPromoListener();
   </script>
