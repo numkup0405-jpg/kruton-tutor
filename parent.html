@@ -15,14 +15,20 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
     body { background: var(--bg-color); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
+    /* ปุ่มสามขีดลอยถาวรที่มุมซ้ายบน */
+    .floating-menu-btn { position: fixed; top: 18px; left: 20px; z-index: 1000; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 1.2rem; padding: 8px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.2s; }
+    .floating-menu-btn:hover { background: var(--primary-light); }
+
+    /* Notification Dot */
+    .notif-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--danger); border-radius: 50%; margin-left: 8px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
     /* ================= Sidebar ================= */
-    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s ease; }
+    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 999; transition: transform 0.3s ease; }
     .sidebar.collapsed { transform: translateX(-260px); }
-    .sidebar-brand { padding: 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-    .brand-left { display: flex; align-items: center; gap: 12px; }
+    .sidebar-brand { padding: 20px 16px 20px 75px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); min-height: 85px; }
     .sidebar-brand img { width: 45px; height: 45px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); object-fit: cover; }
     .brand-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
-    .btn-toggle-sidebar { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 4px; }
 
     .sidebar-menu { padding: 20px 16px; flex: 1; overflow-y: auto; }
     .menu-item { padding: 12px 16px; border-radius: 10px; color: var(--text-muted); font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
@@ -125,21 +131,21 @@
     .note-box-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f1f5f9; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--primary); }
     .note-box-content { padding: 10px 12px; font-size: 0.85rem; color: #334155; white-space: pre-wrap; line-height: 1.6; display: none; }
     .note-box-content.open { display: block; }
+    .note-date { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; font-weight: 500; }
   </style>
 </head>
 <body>
 
-  <!-- ================= Sidebar ================= -->
+  <!-- ปุ่มสามขีดลอยถาวรที่มุมซ้ายบน -->
+  <button class="floating-menu-btn" onclick="toggleSidebar()" title="เปิด/ปิดเมนู">☰</button>
+
   <aside class="sidebar" id="appSidebar">
-    <!-- โลโก้ และปุ่มกากบาท เอาไว้เหมือนเดิมเป๊ะ -->
     <div class="sidebar-brand">
       <div class="brand-left">
         <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/45';">
         <div class="brand-title">Kruton Tutor<br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">สำหรับผู้ปกครอง</span></div>
       </div>
-      <button class="btn-toggle-sidebar" onclick="toggleSidebar()" title="ซ่อน/แสดงเมนู">✕</button>
     </div>
-
     <div class="sidebar-menu">
       <div class="menu-item active" id="menu-dashboard" onclick="switchView('dashboardView', this); currentFilterGrade = 'ทั้งหมด'; renderCourseCards('ทั้งหมด'); document.getElementById('courseListTitle').innerText = 'คอร์สที่ปรากฏ (ทั้งหมด)';">
         <div class="menu-label"><span>📚</span> คอร์สที่ปรากฏ</div>
@@ -170,10 +176,7 @@
     <div class="sidebar-bottom">👀 โหมดดูอย่างเดียวสำหรับผู้ปกครอง</div>
   </aside>
 
-  <!-- ================= Main Content ================= -->
   <main class="main-wrapper" id="mainContent">
-
-    <!-- ปุ่ม ☰ เมนู เอาไว้ตรงนี้ (ยึดตามหน้าจอหลัก ไม่กวนโลโก้) -->
     <div style="margin-bottom: 5px;">
       <button class="btn btn-outline" onclick="toggleSidebar()" style="background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 1.05rem; padding: 8px 16px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">☰ เมนู</button>
     </div>
@@ -226,7 +229,7 @@
         <div id="topicList"></div>
       </div>
       <div class="card">
-        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--primary);">💬 พูดคุยกับคุณครู</h3>
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--primary);" id="chatTitleLabel">💬 พูดคุยกับคุณครู</h3>
         <div id="tutorChatBox" class="chat-box"></div>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="tutorMsgInput" class="select-st" placeholder="พิมพ์ข้อความถึงคุณครู..." onkeypress="if(event.key==='Enter') sendParentComment()">
@@ -268,6 +271,7 @@
     let expandedTopics = new Set();
     let unsubTopics = null, unsubSessions = null, unsubComments = null;
     let bannerSlides = [], currentSlideIndex = 0, bannerAutoTimer = null;
+    let parentNotifications = {};
 
     function toggleSidebar() {
       const sidebar = document.getElementById('appSidebar');
@@ -302,6 +306,15 @@
       const submenu = document.getElementById('gradeSubmenu');
       submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
     }
+
+    db.collection('comments').where('sender_role', '==', 'tutor').where('readByParent', '==', false).onSnapshot(snapshot => {
+      parentNotifications = {};
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        parentNotifications[data.student_id] = true;
+      });
+      renderCourseCards(currentFilterGrade);
+    });
 
     function initBannerListener() {
       db.collection('bannerSlides').onSnapshot(snapshot => {
@@ -375,15 +388,18 @@
         grid.innerHTML = '<div style="grid-column: 1/-1;" class="empty-state">ยังไม่มีข้อมูลคอร์สเรียนในหมวดหมู่นี้</div>';
         return;
       }
-      const studentHtml = filteredStudents.map(st => `
+      const studentHtml = filteredStudents.map(st => {
+        const hasNotif = parentNotifications[st.id] ? '<span class="notif-dot" title="มีข้อความใหม่"></span>' : '';
+        return `
         <div class="course-card" onclick="openDetailView('${st.id}')">
-          <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}</div>
+          <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}${hasNotif}</div>
           <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">👤 น้อง${st.nickname} (${st.full_name})</div>
           <div style="font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #f1f5f9;">
             <span style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px;">ชั้น: ${st.grade_level || '-'}</span>
             <span style="color: var(--primary); font-weight: 600;">ดูรายละเอียด ➜</span>
           </div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
       grid.innerHTML = promoHtml + studentHtml;
     }
 
@@ -406,6 +422,9 @@
       document.getElementById('stGrade').innerText = st.grade_level || '-';
       document.getElementById('stCourse').innerText = st.course_title || 'ทั่วไป';
       switchView('detailView');
+      
+      document.getElementById('chatTitleLabel').innerHTML = '💬 พูดคุยกับคุณครู';
+
       if (unsubTopics) unsubTopics();
       if (unsubSessions) unsubSessions();
       if (unsubComments) unsubComments();
@@ -439,13 +458,14 @@
           const status = s.status || 'pending';
           const filesHtml = (s.attachments && s.attachments.length > 0) ? '<div style="margin-top:8px;">' + s.attachments.map(a => `<a href="${a.file_url}" target="_blank" style="font-size:0.78rem; padding:4px 10px; background:#eff6ff; color:var(--primary); border-radius:6px; text-decoration:none; margin-right:6px; display:inline-block; margin-top:4px;">${a.file_type === 'pdf' ? '📄' : '🖼️'} ${a.file_name}</a>`).join('') + '</div>' : '';
           
-          let noteHtml = s.tutor_notes ? `
+          let dateHtml = s.updatedAt ? `<span class="note-date">${s.updatedAt}</span>` : '';
+          let noteHtml = s.tutor_notes || dateHtml ? `
             <div class="note-box-container">
               <div class="note-box-header" onclick="toggleNoteBox(this)">
                 <span>📝 บันทึกจากคุณครู (คลิกเพื่อพับ/ขยาย)</span>
                 <span class="note-arrow" style="transition: transform 0.2s;">▶</span>
               </div>
-              <div class="note-box-content">${s.tutor_notes}</div>
+              <div class="note-box-content">${dateHtml}${s.tutor_notes}</div>
             </div>` : '';
 
           return `<div class="session-item">
@@ -467,9 +487,16 @@
 
     function loadChat() {
       unsubComments = db.collection('comments').where('student_id', '==', currentStudentId).onSnapshot(snapshot => {
-        const comments = snapshot.docs.map(d => d.data());
+        const comments = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         comments.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
         renderChat(comments);
+
+        // อัปเดตสถานะว่าผู้ปกครองอ่านแล้ว
+        comments.forEach(c => {
+          if (c.sender_role === 'tutor' && c.readByParent === false) {
+            db.collection('comments').doc(c.id).update({ readByParent: true });
+          }
+        });
       });
     }
     function renderChat(comments) {
@@ -488,7 +515,10 @@
       if (!msg || !currentStudentId) return;
       await db.collection('comments').add({
         student_id: currentStudentId, sender_role: 'parent', sender_name: 'ผู้ปกครอง',
-        message: msg, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        message: msg, 
+        readByParent: true,
+        readByTutor: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       input.value = '';
     }
