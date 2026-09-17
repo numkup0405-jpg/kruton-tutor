@@ -56,7 +56,7 @@
       .main-wrapper { margin-left: 0; padding: 20px 15px; }
     }
 
-    /* แบนเนอร์พร้อมปุ่มจัดการ */
+    /* แบนเนอร์พร้อมปุ่มจัดการรูป */
     .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; padding: 40px; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
     .banner-container h2 { font-size: 2rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .banner-desc { font-size: 1.1rem; opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
@@ -197,7 +197,7 @@
       <button class="btn btn-primary" id="btnGoogleAuth" style="padding: 6px 12px; font-size: 0.8rem;" onclick="requestDriveAccess()">ล็อกอินเชื่อมต่อ Drive</button>
     </div>
 
-    <!-- แบนเนอร์พร้อมปุ่มจัดการรูป -->
+    <!-- แบนเนอร์พร้อมปุ่มจัดการรูปประกาศ -->
     <div class="banner-container" id="mainBanner">
       <div class="banner-controls">
         <button class="btn-edit-banner" id="btnUploadBanner" onclick="document.getElementById('bannerFileInput').click()">📷 เพิ่มรูปประกาศ</button>
@@ -862,9 +862,6 @@
     }
 
     let bannerSlides = [];
-    let currentSlideIndex = 0;
-    let bannerAutoTimer = null;
-
     function initBannerListener() {
       db.collection('bannerSlides').onSnapshot(snapshot => {
         bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -889,15 +886,13 @@
     async function handleBannerFileChange(event) {
       const file = event.target.files[0];
       if (!file) return;
-      const btn = document.getElementById('btnUploadBanner');
-      const originalText = btn.innerText;
-      btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
+      const btn = document.getElementById('btnUploadPromo');
       try {
         const url = await uploadFileToDrive(file);
         await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
         alert('อัปโหลดรูปประกาศสำเร็จ!');
       } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
-      btn.disabled = false; btn.innerText = originalText; event.target.value = '';
+      event.target.value = '';
     }
 
     initBannerListener();
