@@ -56,10 +56,14 @@
       .main-wrapper { margin-left: 0; padding: 20px 15px; }
     }
 
-    /* แบนเนอร์ดีไซน์ใหม่ สวยหรู ไม่พึ่งรูปภาพภายนอก */
+    /* แบนเนอร์พร้อมปุ่มจัดการ */
     .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; padding: 40px; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
     .banner-container h2 { font-size: 2rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .banner-desc { font-size: 1.1rem; opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    
+    .banner-controls { position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 8px; }
+    .btn-edit-banner, .btn-remove-banner { background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
+    .btn-edit-banner:hover, .btn-remove-banner:hover { background: white; transform: scale(1.05); }
 
     .view-section { display: none; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -116,9 +120,6 @@
     .promo-cover { width: 100%; max-height: 320px; object-fit: contain; background: #f1f5f9; display: block; }
     .promo-body { padding: 18px; }
     .promo-cover-placeholder { width: 100%; height: 140px; background: linear-gradient(135deg, #dbeafe, #eff6ff); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 2rem; }
-    .promo-detail-cover { width: 100%; max-height: 480px; object-fit: contain; border-radius: 12px; margin-bottom: 16px; background: #f1f5f9; }
-    .promo-video-frame { width: 100%; aspect-ratio: 16/9; border-radius: 12px; border: none; margin-bottom: 16px; }
-    .modal-content.wide { max-width: 640px; }
     .promo-badge-inline { position: absolute; top: 10px; left: 10px; background: #f59e0b; color: white; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; z-index: 2; }
     .promo-type-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 6px; margin-top: 8px; }
     .promo-type-tag.online { background: #dcfce7; color: #166534; }
@@ -196,8 +197,13 @@
       <button class="btn btn-primary" id="btnGoogleAuth" style="padding: 6px 12px; font-size: 0.8rem;" onclick="requestDriveAccess()">ล็อกอินเชื่อมต่อ Drive</button>
     </div>
 
-    <!-- แบนเนอร์ดีไซน์ใหม่ สะอาดตา ไม่เออเร่อ -->
+    <!-- แบนเนอร์พร้อมปุ่มจัดการรูป -->
     <div class="banner-container" id="mainBanner">
+      <div class="banner-controls">
+        <button class="btn-edit-banner" id="btnUploadBanner" onclick="document.getElementById('bannerFileInput').click()">📷 เพิ่มรูปประกาศ</button>
+        <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
+      </div>
+      <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileChange(event)">
       <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
       <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
     </div>
@@ -220,11 +226,20 @@
     </div>
 
     <div id="historyView" class="view-section">
-      <div class="section-header"><h3 class="section-title">ประวัตินักเรียนทั้งหมด</h3></div>
+      <div class="section-header">
+        <h3 class="section-title">ประวัตินักเรียนทั้งหมด</h3>
+      </div>
       <div class="history-card">
         <table class="history-table">
           <thead>
-            <tr><th>รหัสผู้ปกครอง</th><th>ชื่อ-นามสกุล</th><th>ชื่อเล่น</th><th>ระดับชั้น</th><th>คอร์สที่เรียน</th><th>จัดการ</th></tr>
+            <tr>
+              <th>รหัสผู้ปกครอง</th>
+              <th>ชื่อ-นามสกุล</th>
+              <th>ชื่อเล่น</th>
+              <th>ระดับชั้น</th>
+              <th>คอร์สที่เรียน</th>
+              <th>จัดการ</th>
+            </tr>
           </thead>
           <tbody id="historyTableBody"></tbody>
         </table>
@@ -269,6 +284,7 @@
         </div>
       </div>
     </div>
+
   </main>
 
   <!-- Modals -->
@@ -295,6 +311,16 @@
     </div>
   </div>
 
+  <div id="manageSlidesModal" class="modal-backdrop">
+    <div class="modal-content">
+      <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">จัดการรูปประกาศ</h3>
+      <div id="slideManageList" style="max-height: 320px; overflow-y: auto;"></div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <button class="btn btn-outline" onclick="closeManageSlidesModal()">ปิด</button>
+      </div>
+    </div>
+  </div>
+
   <div id="updateModal" class="modal-backdrop">
     <div class="modal-content">
       <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 16px;">อัปเดตผลการเรียน</h3>
@@ -310,6 +336,7 @@
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -834,6 +861,46 @@
       closePromoDetailModal();
     }
 
+    let bannerSlides = [];
+    let currentSlideIndex = 0;
+    let bannerAutoTimer = null;
+
+    function initBannerListener() {
+      db.collection('bannerSlides').onSnapshot(snapshot => {
+        bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        bannerSlides.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+        renderSlideManageList();
+      });
+    }
+    function openManageSlidesModal() { renderSlideManageList(); document.getElementById('manageSlidesModal').style.display = 'flex'; }
+    function closeManageSlidesModal() { document.getElementById('manageSlidesModal').style.display = 'none'; }
+    function renderSlideManageList() {
+      const list = document.getElementById('slideManageList');
+      if (!list) return;
+      if (bannerSlides.length === 0) { list.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 16px 0;">ยังไม่มีรูปประกาศ</div>'; return; }
+      list.innerHTML = bannerSlides.map((s, i) => `
+        <div class="slide-manage-item">
+          <img src="${s.imageUrl}" alt="slide" style="width:70px; height:44px; object-fit:cover; border-radius:6px;">
+          <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
+          <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
+        </div>`).join('');
+    }
+    async function deleteBannerSlide(id) { if (!confirm('ยืนยันลบรูปประกาศนี้?')) return; await db.collection('bannerSlides').doc(id).delete(); }
+    async function handleBannerFileChange(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const btn = document.getElementById('btnUploadBanner');
+      const originalText = btn.innerText;
+      btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
+      try {
+        const url = await uploadFileToDrive(file);
+        await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        alert('อัปโหลดรูปประกาศสำเร็จ!');
+      } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
+      btn.disabled = false; btn.innerText = originalText; event.target.value = '';
+    }
+
+    initBannerListener();
     initStudentsListener();
     initPromoListener();
   </script>
