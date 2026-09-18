@@ -21,7 +21,6 @@
     .notif-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--danger); border-radius: 50%; margin-left: 8px; animation: pulse 2s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
-    /* ================= 1. Sidebar ================= */
     .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 999; transition: transform 0.3s ease; }
     .sidebar.collapsed { transform: translateX(-260px); }
     .sidebar-brand { padding: 20px 16px 20px 75px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); min-height: 85px; }
@@ -46,7 +45,6 @@
     .btn-add-topic { width: 100%; padding: 10px; border-radius: 10px; border: 2px dashed var(--primary); background: transparent; color: var(--primary); font-weight: 600; cursor: pointer; transition: 0.2s; }
     .btn-add-topic:hover { background: var(--primary-light); }
 
-    /* ================= 2. Main Content ================= */
     .main-wrapper { flex: 1; margin-left: 260px; padding: 30px 40px; display: flex; flex-direction: column; gap: 30px; transition: margin-left 0.3s ease; }
     .main-wrapper.expanded { margin-left: 0; }
 
@@ -66,16 +64,6 @@
     .banner-controls { position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 8px; }
     .btn-edit-banner, .btn-remove-banner { background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
     .btn-edit-banner:hover, .btn-remove-banner:hover { background: white; transform: scale(1.05); }
-
-    .banner-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.85); border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .banner-arrow:hover { background: white; }
-    .banner-arrow.prev { left: 15px; } .banner-arrow.next { right: 15px; }
-    .banner-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 6px; }
-    .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.2s; }
-    .banner-dot.active { background: white; width: 22px; border-radius: 4px; }
-
-    .slide-manage-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
-    .slide-manage-item img { width: 70px; height: 44px; object-fit: cover; border-radius: 6px; }
 
     .view-section { display: none; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -215,14 +203,10 @@
         <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
       </div>
       <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileChange(event)">
-      <button class="banner-arrow prev" onclick="prevSlide()" style="display:none;" id="bannerPrevBtn">‹</button>
-      <button class="banner-arrow next" onclick="nextSlide()" style="display:none;" id="bannerNextBtn">›</button>
-      <div class="banner-overlay" id="bannerOverlay"></div>
       <div class="banner-content" id="bannerTextContent">
-        <h2 id="bannerTitle">ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
-        <p id="bannerDesc" class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
+        <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
+        <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
       </div>
-      <div class="banner-dots" id="bannerDots"></div>
     </div>
 
     <div id="dashboardView" class="view-section active">
@@ -357,7 +341,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async></script>
 
   <script>
     const firebaseConfig = {
@@ -390,7 +373,6 @@
       arrow.style.transform = content.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
     }
 
-    // ฟังก์ชันอัปโหลดไฟล์ตรงไปที่ Firebase Storage (เสถียร ไม่ต้องผ่าน Google Drive OAuth)
     async function uploadFileToFirebase(file) {
       const storageRef = storage.ref().child('uploads/' + Date.now() + '_' + file.name);
       const snapshot = await storageRef.put(file);
@@ -825,8 +807,6 @@
     }
 
     let bannerSlides = [];
-    let currentSlideIndex = 0;
-
     function initBannerListener() {
       db.collection('bannerSlides').onSnapshot(snapshot => {
         bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -843,7 +823,7 @@
         const latestSlide = bannerSlides[bannerSlides.length - 1];
         bannerImg.src = latestSlide.imageUrl;
         bannerImg.style.display = 'block';
-        textContent.style.display = 'none'; // ซ่อนข้อความหลักเมื่อมีรูปประกาศ
+        textContent.style.display = 'none';
       } else {
         bannerImg.style.display = 'none';
         bannerImg.removeAttribute('src');
@@ -885,6 +865,7 @@
       btn.disabled = false; btn.innerText = originalText; event.target.value = '';
     }
 
+    // เรียกใช้งานฟังก์ชันเริ่มต้นทั้งหมดครบถ้วน
     initBannerListener();
     initStudentsListener();
     initPromoListener();
