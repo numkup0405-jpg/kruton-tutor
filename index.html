@@ -56,17 +56,26 @@
       .main-wrapper { margin-left: 0; padding: 20px 15px; }
     }
 
-    /* แบนเนอร์พร้อมปุ่มจัดการรูป */
-    .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; min-height: 220px; }
-    .banner-container h2 { font-size: 2rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .banner-desc { font-size: 1.1rem; opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-    .banner-img { width: 100%; height: auto; max-height: 480px; object-fit: contain; display: none; background: #0f172a; }
-    .banner-text-overlay { position: absolute; top: 0; left: 0; padding: 40px; z-index: 2; }
-    .banner-overlay-dark { position: absolute; inset: 0; background: rgba(0,0,0,0.35); z-index: 1; display: none; }
+    .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
+    .banner-img { width: 100%; height: auto; max-height: 560px; object-fit: contain; display: none; background: #0f172a; }
+    .banner-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none; }
+    .banner-content { z-index: 2; padding: 26px 28px; position: absolute; top: 0; left: 0; }
+    .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 
     .banner-controls { position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 8px; }
     .btn-edit-banner, .btn-remove-banner { background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
     .btn-edit-banner:hover, .btn-remove-banner:hover { background: white; transform: scale(1.05); }
+
+    .banner-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.85); border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .banner-arrow:hover { background: white; }
+    .banner-arrow.prev { left: 15px; } .banner-arrow.next { right: 15px; }
+    .banner-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 6px; }
+    .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.2s; }
+    .banner-dot.active { background: white; width: 22px; border-radius: 4px; }
+
+    .slide-manage-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+    .slide-manage-item img { width: 70px; height: 44px; object-fit: cover; border-radius: 6px; }
 
     .view-section { display: none; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -118,21 +127,20 @@
 
     .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 999; align-items: center; justify-content: center; }
     .modal-content { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; }
-    .modal-content.wide { max-width: 640px; }
 
     .promo-card { padding: 0; }
     .promo-cover { width: 100%; max-height: 320px; object-fit: contain; background: #f1f5f9; display: block; }
     .promo-body { padding: 18px; }
     .promo-cover-placeholder { width: 100%; height: 140px; background: linear-gradient(135deg, #dbeafe, #eff6ff); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 2rem; }
+    .promo-detail-cover { width: 100%; max-height: 480px; object-fit: contain; border-radius: 12px; margin-bottom: 16px; background: #f1f5f9; }
+    .promo-video-frame { width: 100%; aspect-ratio: 16/9; border-radius: 12px; border: none; margin-bottom: 16px; }
+    .modal-content.wide { max-width: 640px; }
     .promo-badge-inline { position: absolute; top: 10px; left: 10px; background: #f59e0b; color: white; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; z-index: 2; }
     .promo-type-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 6px; margin-top: 8px; }
     .promo-type-tag.online { background: #dcfce7; color: #166534; }
     .promo-type-tag.onsite { background: #dbeafe; color: #1e40af; }
     .quick-edit-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.08); z-index: 3; }
     .quick-edit-btn:hover { background: var(--primary-light); }
-    .promo-detail-cover { width: 100%; max-height: 480px; object-fit: contain; border-radius: 12px; margin-bottom: 16px; background: #f1f5f9; }
-    .promo-video-frame { width: 100%; aspect-ratio: 16/9; border-radius: 12px; border: none; margin-bottom: 16px; }
-    .slide-manage-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
 
     .note-box-container { margin-top: 8px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
     .note-box-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f1f5f9; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--primary); }
@@ -199,24 +207,22 @@
       <button class="btn btn-outline" onclick="toggleSidebar()" style="background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 1.05rem; padding: 8px 16px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">☰ เมนู</button>
     </div>
 
-    <div id="authBanner" style="background:#eff6ff; color:#1e40af; padding:12px 20px; border-radius:12px; font-size:0.85rem; font-weight:600; border:1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <span>☁️ การเชื่อมต่อ Google Drive: <span id="driveStatus" style="color: #ef4444;">ยังไม่ได้ล็อกอิน</span></span>
-      <button class="btn btn-primary" id="btnGoogleAuth" style="padding: 6px 12px; font-size: 0.8rem;" onclick="requestDriveAccess()">ล็อกอินเชื่อมต่อ Drive</button>
-    </div>
-
-    <!-- แบนเนอร์พร้อมปุ่มจัดการรูปประกาศ -->
+    <!-- Banner ประกาศ พร้อมปุ่มจัดการ -->
     <div class="banner-container" id="mainBanner">
-      <img id="bannerImg" class="banner-img">
-      <div class="banner-overlay-dark" id="bannerOverlayDark"></div>
+      <img id="bannerImg" class="banner-img" style="width: 100%; height: auto; max-height: 400px; object-fit: contain; display: none; border-radius: 12px; margin-bottom: 10px;">
       <div class="banner-controls">
         <button class="btn-edit-banner" id="btnUploadBanner" onclick="document.getElementById('bannerFileInput').click()">📷 เพิ่มรูปประกาศ</button>
         <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
       </div>
       <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileChange(event)">
-      <div class="banner-text-overlay">
-        <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
-        <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
+      <button class="banner-arrow prev" onclick="prevSlide()" style="display:none;" id="bannerPrevBtn">‹</button>
+      <button class="banner-arrow next" onclick="nextSlide()" style="display:none;" id="bannerNextBtn">›</button>
+      <div class="banner-overlay" id="bannerOverlay"></div>
+      <div class="banner-content" id="bannerTextContent">
+        <h2 id="bannerTitle">ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
+        <p id="bannerDesc" class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
       </div>
+      <div class="banner-dots" id="bannerDots"></div>
     </div>
 
     <div id="dashboardView" class="view-section active">
@@ -350,7 +356,8 @@
   <!-- Scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async></script>
 
   <script>
     const firebaseConfig = {
@@ -363,32 +370,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
-    const GOOGLE_CLIENT_ID = '426629568710-ljt1a1ac70lgdm846ieer4hpieg3kj50.apps.googleusercontent.com';
-    const GOOGLE_API_KEY = 'AIzaSyBMeOJFJ5xgRnb_LKd2deOTWLGlARcFg7M';
-    
-    let tokenClient;
-    let driveAccessToken = null;
-
-    window.onload = function () {
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/drive.file',
-        callback: (tokenResponse) => {
-          if (tokenResponse && tokenResponse.access_token) {
-            driveAccessToken = tokenResponse.access_token;
-            document.getElementById('driveStatus').innerText = "✅ เชื่อมต่อแล้ว (พร้อมอัปโหลด)";
-            document.getElementById('driveStatus').style.color = "#16a34a";
-            document.getElementById('btnGoogleAuth').style.display = "none";
-          }
-        },
-      });
-    };
-
-    function requestDriveAccess() {
-      if (!tokenClient) return alert('ระบบกำลังโหลด กรุณารอสักครู่');
-      tokenClient.requestAccessToken({prompt: 'consent'});
-    }
+    const storage = firebase.storage();
 
     function toggleSidebar() {
       const sidebar = document.getElementById('appSidebar');
@@ -408,52 +390,12 @@
       arrow.style.transform = content.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
     }
 
-    // แปลงลิงก์ Google Drive แบบ "เปิดดู" (.../view) ให้เป็นลิงก์ "แสดงรูปโดยตรง" (ใช้กับ <img src> ได้จริง)
-    // รองรับทั้งลิงก์ที่ถูกสร้างใหม่และลิงก์เก่าที่เคยบันทึกผิดรูปแบบไว้ก่อนหน้านี้ (self-heal อัตโนมัติ)
-    function driveDirectViewUrl(url) {
-      if (!url) return url;
-      const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
-      return url;
-    }
-
-    async function uploadFileToDrive(file) {
-      if (!driveAccessToken) {
-        throw new Error('กรุณากดปุ่ม "ล็อกอินเชื่อมต่อ Drive" ที่ด้านบนก่อนอัปโหลดไฟล์ครับ');
-      }
-      const boundary = '-------314159265358979323846';
-      const delimiter = "\r\n--" + boundary + "\r\n";
-      const close_delim = "\r\n--" + boundary + "--";
-      const reader = new FileReader();
-
-      return new Promise((resolve, reject) => {
-        reader.readAsDataURL(file);
-        reader.onload = async function() {
-          const base64Data = reader.result.split(',')[1];
-          const metadata = { 'name': file.name, 'mimeType': file.type };
-          const multipartRequestBody =
-            delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) +
-            delimiter + 'Content-Type: ' + file.type + '\r\nContent-Transfer-Encoding: base64\r\n\r\n' + base64Data + close_delim;
-
-          try {
-            const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
-              method: 'POST',
-              headers: { 'Authorization': 'Bearer ' + driveAccessToken, 'Content-Type': 'multipart/related; boundary=' + boundary },
-              body: multipartRequestBody
-            });
-            const data = await res.json();
-            if(data.error) throw new Error(data.error.message);
-
-            await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}/permissions?key=${GOOGLE_API_KEY}`, {
-              method: 'POST',
-              headers: { 'Authorization': 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ role: 'reader', type: 'anyone' })
-            });
-            // คืนค่า "id" ของไฟล์ ให้ผู้เรียกเลือกเองว่าจะประกอบเป็นลิงก์แบบเปิดดู (ไฟล์แนบ) หรือลิงก์แบบรูปภาพ (<img>)
-            resolve({ id: data.id, viewLink: data.webViewLink });
-          } catch(e) { reject(e); }
-        };
-      });
+    // ฟังก์ชันอัปโหลดไฟล์ตรงไปที่ Firebase Storage (เสถียร ไม่ต้องผ่าน Google Drive OAuth)
+    async function uploadFileToFirebase(file) {
+      const storageRef = storage.ref().child('uploads/' + Date.now() + '_' + file.name);
+      const snapshot = await storageRef.put(file);
+      const downloadURL = await snapshot.ref.getDownloadURL();
+      return downloadURL;
     }
 
     let currentStudentId = null;
@@ -480,12 +422,11 @@
       submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
     }
 
-    // แก้ไม่ให้ต้องสร้าง composite index บน Firestore: ดึงคอมเมนต์ของผู้ปกครองทั้งหมดมาก่อน แล้วค่อยกรอง readByTutor ฝั่งเบราว์เซอร์แทน
-    db.collection('comments').where('sender_role', '==', 'parent').onSnapshot(snapshot => {
+    db.collection('comments').where('sender_role', '==', 'parent').where('readByTutor', '==', false).onSnapshot(snapshot => {
       studentNotifications = {};
       snapshot.docs.forEach(doc => {
         const data = doc.data();
-        if (data.readByTutor === false) studentNotifications[data.student_id] = true;
+        studentNotifications[data.student_id] = true;
       });
       renderCourseCards(currentFilterGrade);
     });
@@ -514,7 +455,7 @@
       let promoHtml = showPromo ? promoCourses.map(p => `
         <div class="course-card promo-card" style="position:relative;" onclick="openPromoDetail('${p.id}')">
           <span class="promo-badge-inline">✨ โปรโมท</span>
-          ${p.coverImageUrl ? `<img class="promo-cover" src="${driveDirectViewUrl(p.coverImageUrl)}">` : `<div class="promo-cover-placeholder">📣</div>`}
+          ${p.coverImageUrl ? `<img class="promo-cover" src="${p.coverImageUrl}">` : `<div class="promo-cover-placeholder">📣</div>`}
           <div class="promo-body">
             <div class="course-title">${p.title || 'คอร์สโปรโมท'}</div>
             <div style="font-size: 0.85rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.description || ''}</div>
@@ -742,13 +683,13 @@
       const btn = document.getElementById('saveModalBtn');
       const s = currentSessions.find(x => x.session_id === sessionId);
 
-      btn.disabled = true; btn.innerText = 'กำลังอัปโหลดเข้า Drive...';
+      btn.disabled = true; btn.innerText = 'กำลังอัปโหลดเข้า Storage...';
       try {
         const newAttachments = [];
         for (let i = 0; i < filesInput.files.length; i++) {
           const file = filesInput.files[i];
-          const result = await uploadFileToDrive(file);
-          newAttachments.push({ file_name: file.name, file_url: result.viewLink, file_type: file.type === 'application/pdf' ? 'pdf' : 'image' });
+          const url = await uploadFileToFirebase(file);
+          newAttachments.push({ file_name: file.name, file_url: url, file_type: file.type === 'application/pdf' ? 'pdf' : 'image' });
         }
         
         const now = new Date();
@@ -841,7 +782,7 @@
       const typeBox = document.getElementById('promoDetailType');
       if (p.format) { const isOnline = p.format.toLowerCase().includes('online'); typeBox.innerHTML = `<span class="promo-type-tag ${isOnline ? 'online' : 'onsite'}">${isOnline ? '💻' : '📍'} ${p.format}${p.location ? ' · ' + p.location : ''}</span>`; } else { typeBox.innerHTML = ''; }
       const coverImg = document.getElementById('promoDetailCover');
-      if (p.coverImageUrl) { coverImg.src = driveDirectViewUrl(p.coverImageUrl); coverImg.style.display = 'block'; } else { coverImg.style.display = 'none'; }
+      if (p.coverImageUrl) { coverImg.src = p.coverImageUrl; coverImg.style.display = 'block'; } else { coverImg.style.display = 'none'; }
       const videoBox = document.getElementById('promoDetailVideoBox');
       const embedUrl = p.videoUrl ? p.videoUrl.replace('watch?v=', 'embed/') : null;
       if (embedUrl) { videoBox.innerHTML = `<iframe class="promo-video-frame" src="${embedUrl}" allowfullscreen></iframe>`; } else if (p.videoUrl) { videoBox.innerHTML = `<a href="${p.videoUrl}" target="_blank" class="btn btn-outline" style="display:inline-block; margin-bottom:16px;">🔗 เปิดลิงก์ที่เกี่ยวข้อง</a>`; } else { videoBox.innerHTML = ''; }
@@ -856,9 +797,9 @@
       const originalText = btn.innerText;
       btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const result = await uploadFileToDrive(file);
-        await db.collection('promoCourses').doc(currentPromoId).update({ coverImageUrl: result.viewLink });
-        document.getElementById('promoDetailCover').src = driveDirectViewUrl(result.viewLink);
+        const url = await uploadFileToFirebase(file);
+        await db.collection('promoCourses').doc(currentPromoId).update({ coverImageUrl: url });
+        document.getElementById('promoDetailCover').src = url;
         document.getElementById('promoDetailCover').style.display = 'block';
       } catch (err) { alert('อัปโหลดรูปปกไม่สำเร็จ: ' + err.message); }
       btn.disabled = false; btn.innerText = originalText; event.target.value = '';
@@ -884,6 +825,8 @@
     }
 
     let bannerSlides = [];
+    let currentSlideIndex = 0;
+
     function initBannerListener() {
       db.collection('bannerSlides').onSnapshot(snapshot => {
         bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -893,36 +836,41 @@
       });
     }
 
-    // จุดที่หายไปเดิม: เอารูปที่ได้จาก Firestore มาแปะที่ตัวแบนเนอร์จริงบนหน้าเว็บ (แสดงรูปล่าสุดที่อัปโหลด)
     function renderMainBanner() {
       const bannerImg = document.getElementById('bannerImg');
-      const overlayDark = document.getElementById('bannerOverlayDark');
+      const textContent = document.getElementById('bannerTextContent');
       if (bannerSlides.length > 0) {
-        const latest = bannerSlides[bannerSlides.length - 1];
-        bannerImg.src = driveDirectViewUrl(latest.imageUrl);
+        const latestSlide = bannerSlides[bannerSlides.length - 1];
+        bannerImg.src = latestSlide.imageUrl;
         bannerImg.style.display = 'block';
-        overlayDark.style.display = 'block';
+        textContent.style.display = 'none'; // ซ่อนข้อความหลักเมื่อมีรูปประกาศ
       } else {
         bannerImg.style.display = 'none';
         bannerImg.removeAttribute('src');
-        overlayDark.style.display = 'none';
+        textContent.style.display = 'block';
       }
     }
 
     function openManageSlidesModal() { renderSlideManageList(); document.getElementById('manageSlidesModal').style.display = 'flex'; }
     function closeManageSlidesModal() { document.getElementById('manageSlidesModal').style.display = 'none'; }
+    
     function renderSlideManageList() {
       const list = document.getElementById('slideManageList');
       if (!list) return;
       if (bannerSlides.length === 0) { list.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 16px 0;">ยังไม่มีรูปประกาศ</div>'; return; }
       list.innerHTML = bannerSlides.map((s, i) => `
         <div class="slide-manage-item">
-          <img src="${driveDirectViewUrl(s.imageUrl)}" alt="slide" style="width:70px; height:44px; object-fit:cover; border-radius:6px;">
+          <img src="${s.imageUrl}" alt="slide" style="width:70px; height:44px; object-fit:cover; border-radius:6px;">
           <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
           <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
         </div>`).join('');
     }
-    async function deleteBannerSlide(id) { if (!confirm('ยืนยันลบรูปประกาศนี้?')) return; await db.collection('bannerSlides').doc(id).delete(); }
+
+    async function deleteBannerSlide(id) { 
+      if (!confirm('ยืนยันลบรูปประกาศนี้?')) return; 
+      await db.collection('bannerSlides').doc(id).delete(); 
+    }
+
     async function handleBannerFileChange(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -930,11 +878,11 @@
       const originalText = btn.innerText;
       btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const result = await uploadFileToDrive(file);
-        await db.collection('bannerSlides').add({ imageUrl: result.viewLink, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        const url = await uploadFileToFirebase(file);
+        await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        alert('อัปโหลดรูปประกาศสำเร็จ!');
       } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
-      btn.disabled = false; btn.innerText = originalText;
-      event.target.value = '';
+      btn.disabled = false; btn.innerText = originalText; event.target.value = '';
     }
 
     initBannerListener();
