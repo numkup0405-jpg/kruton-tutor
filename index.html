@@ -18,9 +18,6 @@
     .floating-menu-btn { position: fixed; top: 18px; left: 20px; z-index: 1000; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 1.2rem; padding: 8px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.2s; }
     .floating-menu-btn:hover { background: var(--primary-light); }
 
-    .notif-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--danger); border-radius: 50%; margin-left: 8px; animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-
     .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 999; transition: transform 0.3s ease; }
     .sidebar.collapsed { transform: translateX(-260px); }
     .sidebar-brand { padding: 20px 16px 20px 75px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); min-height: 85px; }
@@ -55,8 +52,8 @@
     }
 
     .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
-    .banner-img { width: 100%; height: auto; max-height: 560px; object-fit: contain; display: none; background: #0f172a; border-radius: 20px; }
-    .banner-content { z-index: 2; padding: 26px 28px; position: absolute; top: 0; left: 0; }
+    .banner-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; display: none; background: #0f172a; border-radius: 20px; }
+    .banner-content { z-index: 2; padding: 30px; position: absolute; top: 0; left: 0; }
     .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 
@@ -202,7 +199,7 @@
       <button class="btn btn-primary" id="btnGoogleAuth" style="padding: 6px 12px; font-size: 0.8rem;" onclick="requestDriveAccess()">ล็อกอินเชื่อมต่อ Drive</button>
     </div>
 
-    <!-- Banner ประกาศ (แยกมาใช้ Firebase Storage เด็ดขาด 100% รูปไม่หาย ไม่พึ่ง Google Drive) -->
+    <!-- Banner ประกาศ (ระบบแสดงรูปล่าสุดอัตโนมัติ เคลียร์และใช้งานง่าย) -->
     <div class="banner-container" id="mainBanner">
       <img id="bannerImg" class="banner-img">
       <div class="banner-controls">
@@ -211,8 +208,8 @@
       </div>
       <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileChange(event)">
       <div class="banner-content" id="bannerTextContent">
-        <h2 id="bannerTitle">ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
-        <p id="bannerDesc" class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครอง</p>
+        <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
+        <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครอง</p>
       </div>
     </div>
 
@@ -343,10 +340,8 @@
     </div>
   </div>
 
-  <!-- Scripts: ใช้ทั้ง Firebase Storage (สำหรับแบนเนอร์) และ Google Drive (สำหรับไฟล์นักเรียน) ร่วมกันอย่างเป็นสัดส่วน -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <script>
@@ -360,7 +355,6 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
     const GOOGLE_CLIENT_ID = '426629568710-ljt1a1ac70lgdm846ieer4hpieg3kj50.apps.googleusercontent.com';
     const GOOGLE_API_KEY = 'AIzaSyBMeOJFJ5xgRnb_LKd2deOTWLGlARcFg7M';
@@ -406,18 +400,9 @@
       const content = headerEl.nextElementSibling;
       const arrow = headerEl.querySelector('.note-arrow');
       content.classList.toggle('open');
-      arrow.style.transform = content.classList.contains('open' ) ? 'rotate(90deg)' : 'rotate(0deg)';
+      arrow.style.transform = content.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
     }
 
-    // 1. ฟังก์ชันอัปโหลดรูปประกาศ (วิ่งตรงเข้า Firebase Storage ถาวร 100% ไม่พึ่ง Google Drive)
-    async function uploadBannerToFirebase(file) {
-      const storageRef = storage.ref().child('banners/' + Date.now() + '_' + file.name);
-      const snapshot = await storageRef.put(file);
-      const downloadURL = await snapshot.ref.getDownloadURL();
-      return downloadURL;
-    }
-
-    // 2. ฟังก์ชันอัปโหลดไฟล์งาน/การบ้านของนักเรียน (ยังใช้ Google Drive ตามเดิมของคุณครู)
     async function uploadFileToDrive(file) {
       if (!driveAccessToken) {
         throw new Error('กรุณากดปุ่ม "ล็อกอินเชื่อมต่อ Drive" ที่ด้านบนก่อนอัปโหลดไฟล์ครับ');
@@ -465,23 +450,33 @@
     function generateAccessCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
 
     let bannerSlides = [];
-    let currentSlideIndex = 0;
+
+    // ฟังก์ชันแปลงลิงก์ Google Drive ให้เป็นลิงก์รูปภาพตรงที่ <img> แสดงผลได้จริง
+    function driveDirectViewUrl(url) {
+      if (!url) return '';
+      const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      }
+      return url;
+    }
 
     function initBannerListener() {
       db.collection('bannerSlides').onSnapshot(snapshot => {
         bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         bannerSlides.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-        if (currentSlideIndex >= bannerSlides.length) currentSlideIndex = 0;
-        renderBannerSlide(); renderSlideManageList();
+        renderMainBanner();
+        renderSlideManageList();
       });
     }
 
-    function renderBannerSlide() {
+    function renderMainBanner() {
       const bannerImg = document.getElementById('bannerImg');
       const textContent = document.getElementById('bannerTextContent');
       if (bannerSlides.length > 0) {
-        const latest = bannerSlides[bannerSlides.length - 1];
-        bannerImg.src = latest.imageUrl;
+        const latestSlide = bannerSlides[bannerSlides.length - 1];
+        // แปลงลิงก์ Drive ให้แสดงผลเป็นรูปภาพได้ทันที
+        bannerImg.src = driveDirectViewUrl(latestSlide.imageUrl);
         bannerImg.style.display = 'block';
         textContent.style.display = 'none';
       } else {
@@ -498,7 +493,7 @@
       const originalText = btn.innerText;
       btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const url = await uploadBannerToFirebase(file); // ใช้ Firebase Storage สำหรับแบนเนอร์โดยเฉพาะ
+        const url = await uploadFileToDrive(file);
         await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
         alert('อัปโหลดรูปประกาศสำเร็จ!');
       } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
@@ -513,7 +508,7 @@
       if (bannerSlides.length === 0) { list.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 16px 0;">ยังไม่มีรูปประกาศ</div>'; return; }
       list.innerHTML = bannerSlides.map((s, i) => `
         <div class="slide-manage-item">
-          <img src="${s.imageUrl}" alt="slide">
+          <img src="${driveDirectViewUrl(s.imageUrl)}" alt="slide">
           <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
           <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
         </div>`).join('');
@@ -561,7 +556,7 @@
       let promoHtml = showPromo ? promoCourses.map(p => `
         <div class="course-card promo-card" style="position:relative;" onclick="openPromoDetail('${p.id}')">
           <span class="promo-badge-inline">✨ โปรโมท</span>
-          ${p.coverImageUrl ? `<img class="promo-cover" src="${p.coverImageUrl}">` : `<div class="promo-cover-placeholder">📣</div>`}
+          ${p.coverImageUrl ? `<img class="promo-cover" src="${driveDirectViewUrl(p.coverImageUrl)}">` : `<div class="promo-cover-placeholder">📣</div>`}
           <div class="promo-body">
             <div class="course-title">${p.title || 'คอร์สโปรโมท'}</div>
             <div style="font-size: 0.85rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.description || ''}</div>
@@ -776,7 +771,6 @@
     }
     function closeUpdateModal() { document.getElementById('updateModal').style.display = 'none'; }
 
-    // ฟังก์ชันบันทึกผลการเรียน พร้อมอัปโหลดไฟล์งานเข้า Google Drive ตามปกติของคุณครู
     async function saveTopicDetails() {
       const sessionId = document.getElementById('modalTopicId').value;
       const notes = document.getElementById('modalTutorNotes').value;
@@ -789,7 +783,7 @@
         const newAttachments = [];
         for (let i = 0; i < filesInput.files.length; i++) {
           const file = filesInput.files[i];
-          const url = await uploadFileToDrive(file); // ใช้ Google Drive สำหรับไฟล์นักเรียนตามเดิม
+          const url = await uploadFileToDrive(file);
           newAttachments.push({ file_name: file.name, file_url: url, file_type: file.type === 'application/pdf' ? 'pdf' : 'image' });
         }
         const updateData = { status: s ? (s.status || 'pending') : 'pending', tutor_notes: notes };
@@ -870,7 +864,7 @@
       const typeBox = document.getElementById('promoDetailType');
       if (p.format) { const isOnline = p.format.toLowerCase().includes('online'); typeBox.innerHTML = `<span class="promo-type-tag ${isOnline ? 'online' : 'onsite'}">${isOnline ? '💻' : '📍'} ${p.format}${p.location ? ' · ' + p.location : ''}</span>`; } else { typeBox.innerHTML = ''; }
       const coverImg = document.getElementById('promoDetailCover');
-      if (p.coverImageUrl) { coverImg.src = p.coverImageUrl; coverImg.style.display = 'block'; } else { coverImg.style.display = 'none'; }
+      if (p.coverImageUrl) { coverImg.src = driveDirectViewUrl(p.coverImageUrl); coverImg.style.display = 'block'; } else { coverImg.style.display = 'none'; }
       const videoBox = document.getElementById('promoDetailVideoBox');
       const embedUrl = getYoutubeEmbedUrl(p.videoUrl);
       if (embedUrl) { videoBox.innerHTML = `<iframe class="promo-video-frame" src="${embedUrl}" allowfullscreen></iframe>`; } else if (p.videoUrl) { videoBox.innerHTML = `<a href="${p.videoUrl}" target="_blank" class="btn btn-outline" style="display:inline-block; margin-bottom:16px;">🔗 เปิดลิงก์ที่เกี่ยวข้อง</a>`; } else { videoBox.innerHTML = ''; }
@@ -885,9 +879,9 @@
       const originalText = btn.innerText;
       btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const url = await uploadFileToDrive(file); // ใช้ Google Drive สำหรับปกคอร์สโปรโมท
+        const url = await uploadFileToDrive(file);
         await db.collection('promoCourses').doc(currentPromoId).update({ coverImageUrl: url });
-        document.getElementById('promoDetailCover').src = url;
+        document.getElementById('promoDetailCover').src = driveDirectViewUrl(url);
         document.getElementById('promoDetailCover').style.display = 'block';
       } catch (err) { alert('อัปโหลดรูปปกไม่สำเร็จ: ' + err.message); }
       btn.disabled = false; btn.innerText = originalText; event.target.value = '';
