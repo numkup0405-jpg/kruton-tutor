@@ -57,10 +57,13 @@
     }
 
     /* แบนเนอร์พร้อมปุ่มจัดการรูป */
-    .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; padding: 40px; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
+    .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; min-height: 220px; }
     .banner-container h2 { font-size: 2rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .banner-desc { font-size: 1.1rem; opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-    
+    .banner-img { width: 100%; height: auto; max-height: 480px; object-fit: contain; display: none; background: #0f172a; }
+    .banner-text-overlay { position: absolute; top: 0; left: 0; padding: 40px; z-index: 2; }
+    .banner-overlay-dark { position: absolute; inset: 0; background: rgba(0,0,0,0.35); z-index: 1; display: none; }
+
     .banner-controls { position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 8px; }
     .btn-edit-banner, .btn-remove-banner { background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
     .btn-edit-banner:hover, .btn-remove-banner:hover { background: white; transform: scale(1.05); }
@@ -115,6 +118,7 @@
 
     .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 999; align-items: center; justify-content: center; }
     .modal-content { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; }
+    .modal-content.wide { max-width: 640px; }
 
     .promo-card { padding: 0; }
     .promo-cover { width: 100%; max-height: 320px; object-fit: contain; background: #f1f5f9; display: block; }
@@ -126,6 +130,9 @@
     .promo-type-tag.onsite { background: #dbeafe; color: #1e40af; }
     .quick-edit-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.08); z-index: 3; }
     .quick-edit-btn:hover { background: var(--primary-light); }
+    .promo-detail-cover { width: 100%; max-height: 480px; object-fit: contain; border-radius: 12px; margin-bottom: 16px; background: #f1f5f9; }
+    .promo-video-frame { width: 100%; aspect-ratio: 16/9; border-radius: 12px; border: none; margin-bottom: 16px; }
+    .slide-manage-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
 
     .note-box-container { margin-top: 8px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
     .note-box-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f1f5f9; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--primary); }
@@ -199,13 +206,17 @@
 
     <!-- แบนเนอร์พร้อมปุ่มจัดการรูปประกาศ -->
     <div class="banner-container" id="mainBanner">
+      <img id="bannerImg" class="banner-img">
+      <div class="banner-overlay-dark" id="bannerOverlayDark"></div>
       <div class="banner-controls">
         <button class="btn-edit-banner" id="btnUploadBanner" onclick="document.getElementById('bannerFileInput').click()">📷 เพิ่มรูปประกาศ</button>
         <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
       </div>
       <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileChange(event)">
-      <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
-      <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
+      <div class="banner-text-overlay">
+        <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
+        <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
+      </div>
     </div>
 
     <div id="dashboardView" class="view-section active">
@@ -397,6 +408,15 @@
       arrow.style.transform = content.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
     }
 
+    // แปลงลิงก์ Google Drive แบบ "เปิดดู" (.../view) ให้เป็นลิงก์ "แสดงรูปโดยตรง" (ใช้กับ <img src> ได้จริง)
+    // รองรับทั้งลิงก์ที่ถูกสร้างใหม่และลิงก์เก่าที่เคยบันทึกผิดรูปแบบไว้ก่อนหน้านี้ (self-heal อัตโนมัติ)
+    function driveDirectViewUrl(url) {
+      if (!url) return url;
+      const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+      return url;
+    }
+
     async function uploadFileToDrive(file) {
       if (!driveAccessToken) {
         throw new Error('กรุณากดปุ่ม "ล็อกอินเชื่อมต่อ Drive" ที่ด้านบนก่อนอัปโหลดไฟล์ครับ');
@@ -429,7 +449,8 @@
               headers: { 'Authorization': 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' },
               body: JSON.stringify({ role: 'reader', type: 'anyone' })
             });
-            resolve(data.webViewLink);
+            // คืนค่า "id" ของไฟล์ ให้ผู้เรียกเลือกเองว่าจะประกอบเป็นลิงก์แบบเปิดดู (ไฟล์แนบ) หรือลิงก์แบบรูปภาพ (<img>)
+            resolve({ id: data.id, viewLink: data.webViewLink });
           } catch(e) { reject(e); }
         };
       });
@@ -459,11 +480,12 @@
       submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
     }
 
-    db.collection('comments').where('sender_role', '==', 'parent').where('readByTutor', '==', false).onSnapshot(snapshot => {
+    // แก้ไม่ให้ต้องสร้าง composite index บน Firestore: ดึงคอมเมนต์ของผู้ปกครองทั้งหมดมาก่อน แล้วค่อยกรอง readByTutor ฝั่งเบราว์เซอร์แทน
+    db.collection('comments').where('sender_role', '==', 'parent').onSnapshot(snapshot => {
       studentNotifications = {};
       snapshot.docs.forEach(doc => {
         const data = doc.data();
-        studentNotifications[data.student_id] = true;
+        if (data.readByTutor === false) studentNotifications[data.student_id] = true;
       });
       renderCourseCards(currentFilterGrade);
     });
@@ -492,7 +514,7 @@
       let promoHtml = showPromo ? promoCourses.map(p => `
         <div class="course-card promo-card" style="position:relative;" onclick="openPromoDetail('${p.id}')">
           <span class="promo-badge-inline">✨ โปรโมท</span>
-          ${p.coverImageUrl ? `<img class="promo-cover" src="${p.coverImageUrl}">` : `<div class="promo-cover-placeholder">📣</div>`}
+          ${p.coverImageUrl ? `<img class="promo-cover" src="${driveDirectViewUrl(p.coverImageUrl)}">` : `<div class="promo-cover-placeholder">📣</div>`}
           <div class="promo-body">
             <div class="course-title">${p.title || 'คอร์สโปรโมท'}</div>
             <div style="font-size: 0.85rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.description || ''}</div>
@@ -725,8 +747,8 @@
         const newAttachments = [];
         for (let i = 0; i < filesInput.files.length; i++) {
           const file = filesInput.files[i];
-          const url = await uploadFileToDrive(file);
-          newAttachments.push({ file_name: file.name, file_url: url, file_type: file.type === 'application/pdf' ? 'pdf' : 'image' });
+          const result = await uploadFileToDrive(file);
+          newAttachments.push({ file_name: file.name, file_url: result.viewLink, file_type: file.type === 'application/pdf' ? 'pdf' : 'image' });
         }
         
         const now = new Date();
@@ -819,7 +841,7 @@
       const typeBox = document.getElementById('promoDetailType');
       if (p.format) { const isOnline = p.format.toLowerCase().includes('online'); typeBox.innerHTML = `<span class="promo-type-tag ${isOnline ? 'online' : 'onsite'}">${isOnline ? '💻' : '📍'} ${p.format}${p.location ? ' · ' + p.location : ''}</span>`; } else { typeBox.innerHTML = ''; }
       const coverImg = document.getElementById('promoDetailCover');
-      if (p.coverImageUrl) { coverImg.src = p.coverImageUrl; coverImg.style.display = 'block'; } else { coverImg.style.display = 'none'; }
+      if (p.coverImageUrl) { coverImg.src = driveDirectViewUrl(p.coverImageUrl); coverImg.style.display = 'block'; } else { coverImg.style.display = 'none'; }
       const videoBox = document.getElementById('promoDetailVideoBox');
       const embedUrl = p.videoUrl ? p.videoUrl.replace('watch?v=', 'embed/') : null;
       if (embedUrl) { videoBox.innerHTML = `<iframe class="promo-video-frame" src="${embedUrl}" allowfullscreen></iframe>`; } else if (p.videoUrl) { videoBox.innerHTML = `<a href="${p.videoUrl}" target="_blank" class="btn btn-outline" style="display:inline-block; margin-bottom:16px;">🔗 เปิดลิงก์ที่เกี่ยวข้อง</a>`; } else { videoBox.innerHTML = ''; }
@@ -834,9 +856,9 @@
       const originalText = btn.innerText;
       btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const url = await uploadFileToDrive(file);
-        await db.collection('promoCourses').doc(currentPromoId).update({ coverImageUrl: url });
-        document.getElementById('promoDetailCover').src = url;
+        const result = await uploadFileToDrive(file);
+        await db.collection('promoCourses').doc(currentPromoId).update({ coverImageUrl: result.viewLink });
+        document.getElementById('promoDetailCover').src = driveDirectViewUrl(result.viewLink);
         document.getElementById('promoDetailCover').style.display = 'block';
       } catch (err) { alert('อัปโหลดรูปปกไม่สำเร็จ: ' + err.message); }
       btn.disabled = false; btn.innerText = originalText; event.target.value = '';
@@ -866,9 +888,27 @@
       db.collection('bannerSlides').onSnapshot(snapshot => {
         bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         bannerSlides.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+        renderMainBanner();
         renderSlideManageList();
       });
     }
+
+    // จุดที่หายไปเดิม: เอารูปที่ได้จาก Firestore มาแปะที่ตัวแบนเนอร์จริงบนหน้าเว็บ (แสดงรูปล่าสุดที่อัปโหลด)
+    function renderMainBanner() {
+      const bannerImg = document.getElementById('bannerImg');
+      const overlayDark = document.getElementById('bannerOverlayDark');
+      if (bannerSlides.length > 0) {
+        const latest = bannerSlides[bannerSlides.length - 1];
+        bannerImg.src = driveDirectViewUrl(latest.imageUrl);
+        bannerImg.style.display = 'block';
+        overlayDark.style.display = 'block';
+      } else {
+        bannerImg.style.display = 'none';
+        bannerImg.removeAttribute('src');
+        overlayDark.style.display = 'none';
+      }
+    }
+
     function openManageSlidesModal() { renderSlideManageList(); document.getElementById('manageSlidesModal').style.display = 'flex'; }
     function closeManageSlidesModal() { document.getElementById('manageSlidesModal').style.display = 'none'; }
     function renderSlideManageList() {
@@ -877,7 +917,7 @@
       if (bannerSlides.length === 0) { list.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 16px 0;">ยังไม่มีรูปประกาศ</div>'; return; }
       list.innerHTML = bannerSlides.map((s, i) => `
         <div class="slide-manage-item">
-          <img src="${s.imageUrl}" alt="slide" style="width:70px; height:44px; object-fit:cover; border-radius:6px;">
+          <img src="${driveDirectViewUrl(s.imageUrl)}" alt="slide" style="width:70px; height:44px; object-fit:cover; border-radius:6px;">
           <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
           <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
         </div>`).join('');
@@ -886,12 +926,14 @@
     async function handleBannerFileChange(event) {
       const file = event.target.files[0];
       if (!file) return;
-      const btn = document.getElementById('btnUploadPromo');
+      const btn = document.getElementById('btnUploadBanner');
+      const originalText = btn.innerText;
+      btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const url = await uploadFileToDrive(file);
-        await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        alert('อัปโหลดรูปประกาศสำเร็จ!');
+        const result = await uploadFileToDrive(file);
+        await db.collection('bannerSlides').add({ imageUrl: result.viewLink, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
+      btn.disabled = false; btn.innerText = originalText;
       event.target.value = '';
     }
 
