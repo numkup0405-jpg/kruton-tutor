@@ -15,15 +15,9 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
     body { background: var(--bg-color); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-    .floating-menu-btn { position: fixed; top: 18px; left: 20px; z-index: 1000; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 1.2rem; padding: 8px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.2s; }
-    .floating-menu-btn:hover { background: var(--primary-light); }
-
-    .notif-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--danger); border-radius: 50%; margin-left: 8px; animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-
-    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 999; transition: transform 0.3s ease; }
+    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s ease; }
     .sidebar.collapsed { transform: translateX(-260px); }
-    .sidebar-brand { padding: 20px 16px 20px 75px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); min-height: 85px; }
+    .sidebar-brand { padding: 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
     .brand-left { display: flex; align-items: center; gap: 12px; }
     .sidebar-brand img { width: 45px; height: 45px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); object-fit: cover; }
     .brand-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
@@ -56,6 +50,7 @@
 
     .banner-container { background: linear-gradient(135deg, #1e3a8a, var(--primary)); border-radius: 20px; min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; color: white; position: relative; box-shadow: 0 10px 25px rgba(37,99,235,0.2); overflow: hidden; text-align: left; }
     .banner-img { width: 100%; height: auto; max-height: 560px; object-fit: contain; display: none; background: #0f172a; }
+    .banner-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 1; display: none; }
     .banner-content { z-index: 2; padding: 26px 28px; position: absolute; top: 0; left: 0; }
     .banner-container h2 { font-size: 1.8rem; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .banner-desc { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
@@ -63,6 +58,16 @@
     .banner-controls { position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 8px; }
     .btn-edit-banner, .btn-remove-banner { background: rgba(255, 255, 255, 0.9); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
     .btn-edit-banner:hover, .btn-remove-banner:hover { background: white; transform: scale(1.05); }
+
+    .banner-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.85); border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .banner-arrow:hover { background: white; }
+    .banner-arrow.prev { left: 15px; } .banner-arrow.next { right: 15px; }
+    .banner-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 6px; }
+    .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.2s; }
+    .banner-dot.active { background: white; width: 22px; border-radius: 4px; }
+
+    .slide-manage-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+    .slide-manage-item img { width: 70px; height: 44px; object-fit: cover; border-radius: 6px; }
 
     .view-section { display: none; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -138,8 +143,6 @@
 </head>
 <body>
 
-  <button class="floating-menu-btn" onclick="toggleSidebar()" title="เปิด/ปิดเมนู">☰</button>
-
   <aside class="sidebar" id="appSidebar">
     <div class="sidebar-brand">
       <div class="brand-left">
@@ -194,18 +197,26 @@
       <button class="btn btn-outline" onclick="toggleSidebar()" style="background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 1.05rem; padding: 8px 16px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">☰ เมนู</button>
     </div>
 
-    <!-- Banner ประกาศ พร้อมปุ่มจัดการ -->
+    <div id="authBanner" style="background:#eff6ff; color:#1e40af; padding:12px 20px; border-radius:12px; font-size:0.85rem; font-weight:600; border:1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <span>☁️ การเชื่อมต่อ Google Drive: <span id="driveStatus" style="color: #ef4444;">ยังไม่ได้ล็อกอิน</span></span>
+      <button class="btn btn-primary" id="btnGoogleAuth" style="padding: 6px 12px; font-size: 0.8rem;" onclick="requestDriveAccess()">ล็อกอินเชื่อมต่อ Drive</button>
+    </div>
+
     <div class="banner-container" id="mainBanner">
-      <img id="bannerImg" class="banner-img" style="width: 100%; height: auto; max-height: 400px; object-fit: contain; display: none; border-radius: 12px; margin-bottom: 10px;">
+      <img id="bannerImg" class="banner-img">
       <div class="banner-controls">
         <button class="btn-edit-banner" id="btnUploadBanner" onclick="document.getElementById('bannerFileInput').click()">📷 เพิ่มรูปประกาศ</button>
         <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
       </div>
       <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileChange(event)">
-      <div class="banner-content" id="bannerTextContent">
-        <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
-        <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครองอย่างมืออาชีพ</p>
+      <button class="banner-arrow prev" onclick="prevSlide()" style="display:none;" id="bannerPrevBtn">‹</button>
+      <button class="banner-arrow next" onclick="nextSlide()" style="display:none;" id="bannerNextBtn">›</button>
+      <div class="banner-overlay" id="bannerOverlay"></div>
+      <div class="banner-content">
+        <h2 id="bannerTitle">ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
+        <p id="bannerDesc" class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครอง</p>
       </div>
+      <div class="banner-dots" id="bannerDots"></div>
     </div>
 
     <div id="dashboardView" class="view-section active">
@@ -276,7 +287,7 @@
       </div>
 
       <div class="card">
-        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--primary);" id="chatTitleLabel">💬 ช่องทางติดต่อผู้ปกครอง</h3>
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--primary);">💬 ช่องทางติดต่อผู้ปกครอง</h3>
         <div id="tutorChatBox" class="chat-box"></div>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="tutorMsgInput" class="select-st" placeholder="พิมพ์ข้อความ..." onkeypress="if(event.key==='Enter') sendTutorComment()">
@@ -287,7 +298,6 @@
 
   </main>
 
-  <!-- Modals -->
   <div id="promoDetailModal" class="modal-backdrop">
     <div class="modal-content wide">
       <div style="display:flex; justify-content: space-between; align-items:flex-start; margin-bottom: 12px;">
@@ -336,10 +346,9 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <script>
     const firebaseConfig = {
@@ -352,7 +361,35 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
+
+    const GOOGLE_CLIENT_ID = '426629568710-ljt1a1ac70lgdm846ieer4hpieg3kj50.apps.googleusercontent.com';
+    const GOOGLE_API_KEY = 'AIzaSyBMeOJFJ5xgRnb_LKd2deOTWLGlARcFg7M';
+    
+    let tokenClient;
+    let driveAccessToken = null;
+
+    window.onload = function () {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'https://www.googleapis.com/auth/drive.file',
+        callback: (tokenResponse) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            driveAccessToken = tokenResponse.access_token;
+            document.getElementById('driveStatus').innerText = "✅ เชื่อมต่อแล้ว (พร้อมอัปโหลด)";
+            document.getElementById('driveStatus').style.color = "#16a34a";
+            document.getElementById('btnGoogleAuth').style.display = "none";
+          }
+        },
+      });
+      initBannerListener();
+      initStudentsListener();
+      initPromoListener();
+    };
+
+    function requestDriveAccess() {
+      if (!tokenClient) return alert('ระบบกำลังโหลด กรุณารอสักครู่');
+      tokenClient.requestAccessToken({prompt: 'consent'});
+    }
 
     function toggleSidebar() {
       const sidebar = document.getElementById('appSidebar');
@@ -372,11 +409,42 @@
       arrow.style.transform = content.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
     }
 
-    async function uploadFileToFirebase(file) {
-      const storageRef = storage.ref().child('uploads/' + Date.now() + '_' + file.name);
-      const snapshot = await storageRef.put(file);
-      const downloadURL = await snapshot.ref.getDownloadURL();
-      return downloadURL;
+    async function uploadFileToDrive(file) {
+      if (!driveAccessToken) {
+        throw new Error('กรุณากดปุ่ม "ล็อกอินเชื่อมต่อ Drive" ที่ด้านบนก่อนอัปโหลดไฟล์ครับ');
+      }
+      const boundary = '-------314159265358979323846';
+      const delimiter = "\r\n--" + boundary + "\r\n";
+      const close_delim = "\r\n--" + boundary + "--";
+      const reader = new FileReader();
+
+      return new Promise((resolve, reject) => {
+        reader.readAsDataURL(file);
+        reader.onload = async function() {
+          const base64Data = reader.result.split(',')[1];
+          const metadata = { 'name': file.name, 'mimeType': file.type };
+          const multipartRequestBody =
+            delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) +
+            delimiter + 'Content-Type: ' + file.type + '\r\nContent-Transfer-Encoding: base64\r\n\r\n' + base64Data + close_delim;
+
+          try {
+            const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
+              method: 'POST',
+              headers: { 'Authorization': 'Bearer ' + driveAccessToken, 'Content-Type': 'multipart/related; boundary=' + boundary },
+              body: multipartRequestBody
+            });
+            const data = await res.json();
+            if(data.error) throw new Error(data.error.message);
+
+            await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}/permissions?key=${GOOGLE_API_KEY}`, {
+              method: 'POST',
+              headers: { 'Authorization': 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ role: 'reader', type: 'anyone' })
+            });
+            resolve(data.webViewLink);
+          } catch(e) { reject(e); }
+        };
+      });
     }
 
     let currentStudentId = null;
@@ -384,9 +452,76 @@
     let currentFilterGrade = 'ทั้งหมด';
     let unsubTopics = null;
     let unsubComments = null;
-    let studentNotifications = {};
 
     function generateAccessCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
+
+    let bannerSlides = [];
+    let currentSlideIndex = 0;
+    let bannerAutoTimer = null;
+
+    function initBannerListener() {
+      db.collection('bannerSlides').onSnapshot(snapshot => {
+        bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        bannerSlides.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+        if (currentSlideIndex >= bannerSlides.length) currentSlideIndex = 0;
+        renderBannerSlide(); renderBannerDots(); renderSlideManageList(); setupBannerAutoplay();
+      });
+    }
+
+    function renderBannerSlide() {
+      const bannerImg = document.getElementById('bannerImg');
+      const overlay = document.getElementById('bannerOverlay');
+      const prevBtn = document.getElementById('bannerPrevBtn');
+      const nextBtn = document.getElementById('bannerNextBtn');
+      if (bannerSlides.length > 0) {
+        bannerImg.src = bannerSlides[currentSlideIndex].imageUrl;
+        bannerImg.style.display = 'block'; overlay.style.display = 'block';
+      } else {
+        bannerImg.style.display = 'none'; bannerImg.removeAttribute('src'); overlay.style.display = 'none';
+      }
+      const showArrows = bannerSlides.length > 1;
+      prevBtn.style.display = showArrows ? 'flex' : 'none';
+      nextBtn.style.display = showArrows ? 'flex' : 'none';
+    }
+
+    function renderBannerDots() {
+      const dotsBox = document.getElementById('bannerDots');
+      if (bannerSlides.length <= 1) { dotsBox.innerHTML = ''; return; }
+      dotsBox.innerHTML = bannerSlides.map((s, i) => `<div class="banner-dot ${i === currentSlideIndex ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('');
+    }
+
+    function goToSlide(i) { currentSlideIndex = i; renderBannerSlide(); renderBannerDots(); setupBannerAutoplay(); }
+    function nextSlide() { if (bannerSlides.length === 0) return; currentSlideIndex = (currentSlideIndex + 1) % bannerSlides.length; renderBannerSlide(); renderBannerDots(); }
+    function prevSlide() { if (bannerSlides.length === 0) return; currentSlideIndex = (currentSlideIndex - 1 + bannerSlides.length) % bannerSlides.length; renderBannerSlide(); renderBannerDots(); }
+    function setupBannerAutoplay() { if (bannerAutoTimer) clearInterval(bannerAutoTimer); if (bannerSlides.length > 1) { bannerAutoTimer = setInterval(nextSlide, 5000); } }
+
+    async function handleBannerFileChange(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const btn = document.getElementById('btnUploadBanner');
+      const originalText = btn.innerText;
+      btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
+      try {
+        const url = await uploadFileToDrive(file);
+        await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
+      btn.disabled = false; btn.innerText = originalText; event.target.value = '';
+    }
+
+    function openManageSlidesModal() { renderSlideManageList(); document.getElementById('manageSlidesModal').style.display = 'flex'; }
+    function closeManageSlidesModal() { document.getElementById('manageSlidesModal').style.display = 'none'; }
+    function renderSlideManageList() {
+      const list = document.getElementById('slideManageList');
+      if (!list) return;
+      if (bannerSlides.length === 0) { list.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 16px 0;">ยังไม่มีรูปประกาศ</div>'; return; }
+      list.innerHTML = bannerSlides.map((s, i) => `
+        <div class="slide-manage-item">
+          <img src="${s.imageUrl}" alt="slide">
+          <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
+          <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
+        </div>`).join('');
+    }
+    async function deleteBannerSlide(id) { if (!confirm('ยืนยันลบรูปประกาศนี้?')) return; await db.collection('bannerSlides').doc(id).delete(); }
 
     function switchView(viewId, menuElement = null) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -394,6 +529,8 @@
         document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
         menuElement.classList.add('active');
       }
+      const banner = document.getElementById('mainBanner');
+      if (banner) { banner.style.display = (viewId === 'detailView') ? 'none' : 'flex'; }
       document.getElementById(viewId).classList.add('active');
     }
 
@@ -402,15 +539,6 @@
       const submenu = document.getElementById('gradeSubmenu');
       submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
     }
-
-    db.collection('comments').where('sender_role', '==', 'parent').where('readByTutor', '==', false).onSnapshot(snapshot => {
-      studentNotifications = {};
-      snapshot.docs.forEach(doc => {
-        const data = doc.data();
-        studentNotifications[data.student_id] = true;
-      });
-      renderCourseCards(currentFilterGrade);
-    });
 
     function initStudentsListener() {
       db.collection('students').onSnapshot(snapshot => {
@@ -448,19 +576,16 @@
         grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px;">ยังไม่มีข้อมูลคอร์สเรียน</div>';
         return;
       }
-      const studentHtml = filteredStudents.map(st => {
-        const hasNotif = studentNotifications[st.id] ? '<span class="notif-dot" title="มีข้อความใหม่"></span>' : '';
-        return `
+      const studentHtml = filteredStudents.map(st => `
         <div class="course-card" style="position:relative;" onclick="openDetailView('${st.id}')">
           <button class="quick-edit-btn" onclick="event.stopPropagation(); quickEditStudent('${st.id}')" title="แก้ไขด่วน">✏️</button>
-          <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}${hasNotif}</div>
+          <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}</div>
           <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">👤 น้อง${st.nickname} (${st.full_name})</div>
           <div style="font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #f1f5f9;">
             <span style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px;">ชั้น: ${st.grade_level || '-'}</span>
             <span style="color: var(--primary); font-weight: 600;">ดูรายละเอียด ➜</span>
           </div>
-        </div>`;
-      }).join('');
+        </div>`).join('');
       grid.innerHTML = promoHtml + studentHtml;
     }
 
@@ -506,8 +631,6 @@
       document.getElementById('stCourse').innerText = st.course_title || 'ทั่วไป';
       document.getElementById('stCode').innerText = st.parent_access_code;
       switchView('detailView');
-      document.getElementById('chatTitleLabel').innerHTML = '💬 ช่องทางติดต่อผู้ปกครอง';
-
       if (unsubTopics) unsubTopics();
       if (unsubSessions) unsubSessions();
       if (unsubComments) unsubComments();
@@ -570,14 +693,13 @@
           const status = s.status || 'pending';
           let filesHtml = (s.attachments && s.attachments.length > 0) ? '<div style="margin-top: 8px;">' + s.attachments.map(a => `<a href="${a.file_url}" target="_blank" style="font-size: 0.75rem; padding: 4px 10px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #475569; margin-right: 4px;">${a.file_type === 'pdf' ? '📄' : '📎'} ${a.file_name}</a>`).join('') + '</div>' : '';
           
-          let dateHtml = s.updatedAt ? `<span class="note-date">${s.updatedAt}</span>` : '';
-          let noteHtml = s.tutor_notes || dateHtml ? `
+          let noteHtml = s.tutor_notes ? `
             <div class="note-box-container">
               <div class="note-box-header" onclick="toggleNoteBox(this)">
                 <span>📝 บันทึกจากคุณครู (คลิกเพื่อพับ/ขยาย)</span>
                 <span class="note-arrow" style="transition: transform 0.2s;">▶</span>
               </div>
-              <div class="note-box-content">${dateHtml}${s.tutor_notes}</div>
+              <div class="note-box-content">${s.tutor_notes}</div>
             </div>` : '';
 
           return `
@@ -641,7 +763,7 @@
       const title = prompt('ชื่อบทเรียนย่อย (เช่น เนื้อหาที่เรียนวันนี้):');
       if (!title) return;
       const count = currentSessions.filter(s => s.topic_id === topicId).length;
-      await db.collection('topicSessions').add({ student_id: currentStudentId, topic_id: topicId, title, status: 'pending', sequence_order: count + 1, tutor_notes: '', attachments: [], createdAt: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: '' });
+      await db.collection('topicSessions').add({ student_id: currentStudentId, topic_id: topicId, title, status: 'pending', sequence_order: count + 1, tutor_notes: '', attachments: [], createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       expandedTopics.add(topicId);
     }
     async function editSessionName(sessionId, oldTitle) { const title = prompt('แก้ไขชื่อบทเรียนย่อย:', oldTitle); if (!title || title === oldTitle) return; await db.collection('topicSessions').doc(sessionId).update({ title }); }
@@ -664,19 +786,15 @@
       const btn = document.getElementById('saveModalBtn');
       const s = currentSessions.find(x => x.session_id === sessionId);
 
-      btn.disabled = true; btn.innerText = 'กำลังอัปโหลดเข้า Storage...';
+      btn.disabled = true; btn.innerText = 'กำลังอัปโหลดเข้า Drive...';
       try {
         const newAttachments = [];
         for (let i = 0; i < filesInput.files.length; i++) {
           const file = filesInput.files[i];
-          const url = await uploadFileToFirebase(file);
+          const url = await uploadFileToDrive(file);
           newAttachments.push({ file_name: file.name, file_url: url, file_type: file.type === 'application/pdf' ? 'pdf' : 'image' });
         }
-        
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
-        
-        const updateData = { status: s ? (s.status || 'pending') : 'pending', tutor_notes: notes, updatedAt: dateStr };
+        const updateData = { status: s ? (s.status || 'pending') : 'pending', tutor_notes: notes };
         if (newAttachments.length > 0) { updateData.attachments = firebase.firestore.FieldValue.arrayUnion(...newAttachments); }
         await db.collection('topicSessions').doc(sessionId).update(updateData);
       } catch (err) { alert('บันทึกไม่สำเร็จ: ' + err.message); }
@@ -689,38 +807,22 @@
     function loadTutorChat() {
       if (!currentStudentId) return;
       unsubComments = db.collection('comments').where('student_id', '==', currentStudentId).onSnapshot(snapshot => {
-        const comments = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        const comments = snapshot.docs.map(d => d.data());
         comments.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
         renderChat(comments);
-        
-        comments.forEach(c => {
-          if (c.sender_role === 'parent' && c.readByTutor === false) {
-            db.collection('comments').doc(c.id).update({ readByTutor: true });
-          }
-        });
       });
     }
-    
     function renderChat(comments) {
       const box = document.getElementById('tutorChatBox');
       if (comments.length === 0) { box.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 10px 0;">ยังไม่มีข้อความ</div>'; return; }
       box.innerHTML = comments.map(c => `<div class="chat-msg ${c.sender_role}"><div style="font-size:0.75rem; font-weight:600; margin-bottom:2px;">${c.sender_name}</div><div>${c.message}</div></div>`).join('');
       box.scrollTop = box.scrollHeight;
     }
-
     async function sendTutorComment() {
       const input = document.getElementById('tutorMsgInput');
       const msg = input.value.trim();
       if (!msg || !currentStudentId) return;
-      await db.collection('comments').add({ 
-        student_id: currentStudentId, 
-        sender_role: 'tutor', 
-        sender_name: 'คุณครู', 
-        message: msg, 
-        readByParent: false,
-        readByTutor: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp() 
-      });
+      await db.collection('comments').add({ student_id: currentStudentId, sender_role: 'tutor', sender_name: 'คุณครู', message: msg, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       input.value = '';
     }
 
@@ -732,8 +834,6 @@
         promoCourses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         promoCourses.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
         renderCourseCards(currentFilterGrade);
-      }, error => {
-        console.log("Promo listener error (ignored):", error);
       });
     }
 
@@ -756,6 +856,13 @@
       isAddingPromo = false;
     }
 
+    function getYoutubeEmbedUrl(url) {
+      if (!url) return null;
+      const patterns = [ /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/ ];
+      for (const p of patterns) { const m = url.match(p); if (m) return `https://www.youtube.com/embed/${m[1]}`; }
+      return null;
+    }
+
     function openPromoDetail(id) {
       currentPromoId = id;
       const p = promoCourses.find(x => x.id === id);
@@ -767,7 +874,7 @@
       const coverImg = document.getElementById('promoDetailCover');
       if (p.coverImageUrl) { coverImg.src = p.coverImageUrl; coverImg.style.display = 'block'; } else { coverImg.style.display = 'none'; }
       const videoBox = document.getElementById('promoDetailVideoBox');
-      const embedUrl = p.videoUrl ? p.videoUrl.replace('watch?v=', 'embed/') : null;
+      const embedUrl = getYoutubeEmbedUrl(p.videoUrl);
       if (embedUrl) { videoBox.innerHTML = `<iframe class="promo-video-frame" src="${embedUrl}" allowfullscreen></iframe>`; } else if (p.videoUrl) { videoBox.innerHTML = `<a href="${p.videoUrl}" target="_blank" class="btn btn-outline" style="display:inline-block; margin-bottom:16px;">🔗 เปิดลิงก์ที่เกี่ยวข้อง</a>`; } else { videoBox.innerHTML = ''; }
       document.getElementById('promoDetailModal').style.display = 'flex';
     }
@@ -780,7 +887,7 @@
       const originalText = btn.innerText;
       btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
       try {
-        const url = await uploadFileToFirebase(file);
+        const url = await uploadFileToDrive(file);
         await db.collection('promoCourses').doc(currentPromoId).update({ coverImageUrl: url });
         document.getElementById('promoDetailCover').src = url;
         document.getElementById('promoDetailCover').style.display = 'block';
@@ -806,72 +913,6 @@
       await db.collection('promoCourses').doc(currentPromoId).delete();
       closePromoDetailModal();
     }
-
-    let bannerSlides = [];
-    function initBannerListener() {
-      db.collection('bannerSlides').onSnapshot(snapshot => {
-        bannerSlides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        bannerSlides.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-        renderMainBanner();
-        renderSlideManageList();
-      }, error => {
-        console.log("Banner listener error (ignored):", error);
-      });
-    }
-
-    function renderMainBanner() {
-      const bannerImg = document.getElementById('bannerImg');
-      const textContent = document.getElementById('bannerTextContent');
-      if (bannerSlides.length > 0) {
-        const latestSlide = bannerSlides[bannerSlides.length - 1];
-        bannerImg.src = latestSlide.imageUrl;
-        bannerImg.style.display = 'block';
-        textContent.style.display = 'none';
-      } else {
-        bannerImg.style.display = 'none';
-        bannerImg.removeAttribute('src');
-        textContent.style.display = 'block';
-      }
-    }
-
-    function openManageSlidesModal() { renderSlideManageList(); document.getElementById('manageSlidesModal').style.display = 'flex'; }
-    function closeManageSlidesModal() { document.getElementById('manageSlidesModal').style.display = 'none'; }
-    
-    function renderSlideManageList() {
-      const list = document.getElementById('slideManageList');
-      if (!list) return;
-      if (bannerSlides.length === 0) { list.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 16px 0;">ยังไม่มีรูปประกาศ</div>'; return; }
-      list.innerHTML = bannerSlides.map((s, i) => `
-        <div class="slide-manage-item">
-          <img src="${s.imageUrl}" alt="slide" style="width:70px; height:44px; object-fit:cover; border-radius:6px;">
-          <div style="flex:1; font-size: 0.85rem; color: var(--text-muted);">รูปที่ ${i + 1}</div>
-          <button class="btn btn-danger" style="font-size:0.75rem; padding: 4px 10px;" onclick="deleteBannerSlide('${s.id}')">🗑️ ลบ</button>
-        </div>`).join('');
-    }
-
-    async function deleteBannerSlide(id) { 
-      if (!confirm('ยืนยันลบรูปประกาศนี้?')) return; 
-      await db.collection('bannerSlides').doc(id).delete(); 
-    }
-
-    async function handleBannerFileChange(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const btn = document.getElementById('btnUploadBanner');
-      const originalText = btn.innerText;
-      btn.disabled = true; btn.innerText = '⏳ กำลังอัปโหลด...';
-      try {
-        const url = await uploadFileToFirebase(file);
-        await db.collection('bannerSlides').add({ imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        alert('อัปโหลดรูปประกาศสำเร็จ!');
-      } catch (err) { alert('อัปโหลดรูปไม่สำเร็จ: ' + err.message); }
-      btn.disabled = false; btn.innerText = originalText; event.target.value = '';
-    }
-
-    // 🚀 สั่งเรียกใช้งานฟังก์ชันทั้งหมดทันทีเมื่อหน้าเว็บโหลดเสร็จ
-    initBannerListener();
-    initStudentsListener();
-    initPromoListener();
   </script>
 </body>
 </html>
