@@ -40,9 +40,10 @@ function generateAccessCode() { return Math.floor(100000 + Math.random() * 90000
 // แปลงลิงก์ Google Drive ให้อัตโนมัติ หรือใช้ลิงก์ตรงได้ทันที
 function formatImageUrl(url) {
   if (!url) return '';
-  const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   if (match && match[1]) {
-    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+    // ใช้ลิงก์ thumbnail แทน uc?export=view เพราะฝังเป็น <img> ได้เสถียรกว่ามาก
+    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1920`;
   }
   return url;
 }
