@@ -75,7 +75,9 @@
     <div class="banner-container" id="mainBanner">
       <img id="bannerImg" class="banner-img">
       <div class="banner-controls">
-        <button class="btn-edit-banner" onclick="promptBannerUrl()">🔗 ใส่ลิงก์รูปประกาศ</button>
+        <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerFileUpload(event)">
+        <button class="btn-edit-banner" onclick="document.getElementById('bannerFileInput').click()">📤 อัปโหลดรูปประกาศ</button>
+        <button class="btn-edit-banner" onclick="promptBannerUrl()">🔗 ใส่ลิงก์รูป</button>
         <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
       </div>
       <div class="banner-content" id="bannerTextContent">
