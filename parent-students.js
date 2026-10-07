@@ -5,14 +5,17 @@ let currentFilterGrade = 'ทั้งหมด';
 let parentNotifications = {};
 
 // แจ้งเตือนจุดแดงเมื่อติวเตอร์ส่งข้อความใหม่ที่ผู้ปกครองยังไม่ได้อ่าน
-db.collection('comments').where('sender_role', '==', 'tutor').where('readByParent', '==', false).onSnapshot(snapshot => {
-  parentNotifications = {};
-  snapshot.docs.forEach(doc => {
-    const data = doc.data();
-    parentNotifications[data.student_id] = true;
+// (เรียกจาก parent-firebase-init.js หลังจาก Firebase พร้อมใช้งานแล้วเท่านั้น - แก้บั๊กเดิมที่เรียกก่อน db พร้อม)
+function initNotificationListener() {
+  db.collection('comments').where('sender_role', '==', 'tutor').where('readByParent', '==', false).onSnapshot(snapshot => {
+    parentNotifications = {};
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      parentNotifications[data.student_id] = true;
+    });
+    renderCourseCards(currentFilterGrade);
   });
-  renderCourseCards(currentFilterGrade);
-});
+}
 
 function initStudentsListener() {
   db.collection('students').onSnapshot(snapshot => {

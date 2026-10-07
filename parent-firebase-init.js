@@ -14,3 +14,4 @@ const db = firebase.firestore();
 initBannerListener();
 initStudentsListener();
 initPromoListener();
+initNotificationListener();
