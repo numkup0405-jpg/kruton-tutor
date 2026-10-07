@@ -9,6 +9,9 @@ body { background: var(--bg-color); color: var(--text); display: flex; min-heigh
 .floating-menu-btn { position: fixed; top: 18px; left: 20px; z-index: 1000; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 1.2rem; padding: 8px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.2s; }
 .floating-menu-btn:hover { background: var(--primary-light); }
 
+.notif-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--danger); border-radius: 50%; margin-left: 8px; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
 .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 999; transition: transform 0.3s ease; }
 .sidebar.collapsed { transform: translateX(-260px); }
 .sidebar-brand { padding: 20px 16px 20px 75px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); min-height: 85px; }

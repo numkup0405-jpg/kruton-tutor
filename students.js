@@ -2,6 +2,20 @@
 let currentStudentId = null;
 let allStudents = [];
 let currentFilterGrade = 'ทั้งหมด';
+let tutorNotifications = {};
+
+// แจ้งเตือนจุดแดงเมื่อผู้ปกครองส่งข้อความใหม่ที่ติวเตอร์ยังไม่ได้อ่าน
+// (เรียกจาก firebase-init.js หลังจาก Firebase พร้อมใช้งานแล้วเท่านั้น)
+function initNotificationListener() {
+  db.collection('comments').where('sender_role', '==', 'parent').where('readByTutor', '==', false).onSnapshot(snapshot => {
+    tutorNotifications = {};
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      tutorNotifications[data.student_id] = true;
+    });
+    renderCourseCards(currentFilterGrade);
+  });
+}
 
 function initStudentsListener() {
   db.collection('students').onSnapshot(snapshot => {
@@ -39,16 +53,19 @@ function renderCourseCards(grade = 'ทั้งหมด') {
     grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px;">ยังไม่มีข้อมูลคอร์สเรียน</div>';
     return;
   }
-  const studentHtml = filteredStudents.map(st => `
+  const studentHtml = filteredStudents.map(st => {
+    const hasNotif = tutorNotifications[st.id] ? '<span class="notif-dot" title="มีข้อความใหม่จากผู้ปกครอง"></span>' : '';
+    return `
     <div class="course-card" style="position:relative;" onclick="openDetailView('${st.id}')">
       <button class="quick-edit-btn" onclick="event.stopPropagation(); quickEditStudent('${st.id}')" title="แก้ไขด่วน">✏️</button>
-      <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}</div>
+      <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}${hasNotif}</div>
       <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">👤 น้อง${st.nickname} (${st.full_name})</div>
       <div style="font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #f1f5f9;">
         <span style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px;">ชั้น: ${st.grade_level || '-'}</span>
         <span style="color: var(--primary); font-weight: 600;">ดูรายละเอียด ➜</span>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   grid.innerHTML = promoHtml + studentHtml;
 }
 

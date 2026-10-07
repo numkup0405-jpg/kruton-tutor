@@ -32,6 +32,7 @@ window.onload = function () {
   initBannerListener();
   initStudentsListener();
   initPromoListener();
+  initNotificationListener();
 };
 
 function requestDriveAccess() {
