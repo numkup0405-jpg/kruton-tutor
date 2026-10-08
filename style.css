@@ -58,6 +58,14 @@ body { background: var(--bg-color); color: var(--text); display: flex; min-heigh
 .slide-manage-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
 .slide-manage-item img { width: 70px; height: 44px; object-fit: cover; border-radius: 6px; }
 
+.banner-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.35); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.4rem; line-height: 1; cursor: pointer; z-index: 5; display: none; align-items: center; justify-content: center; transition: 0.2s; }
+.banner-nav-btn:hover { background: rgba(0,0,0,0.55); }
+.banner-nav-prev { left: 12px; }
+.banner-nav-next { right: 12px; }
+.banner-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); display: none; gap: 8px; z-index: 5; }
+.banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.2s; }
+.banner-dot.active { background: white; width: 20px; border-radius: 4px; }
+
 .view-section { display: none; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .view-section.active { display: block; }

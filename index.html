@@ -79,6 +79,9 @@
         <button class="btn-edit-banner" onclick="document.getElementById('bannerFileInput').click()">📤 อัปโหลดรูปประกาศ</button>
         <button class="btn-remove-banner" onclick="openManageSlidesModal()">🖼️ จัดการรูปทั้งหมด</button>
       </div>
+      <button class="banner-nav-btn banner-nav-prev" id="bannerPrevBtn" onclick="prevBannerSlide()" title="รูปก่อนหน้า">‹</button>
+      <button class="banner-nav-btn banner-nav-next" id="bannerNextBtn" onclick="nextBannerSlide()" title="รูปถัดไป">›</button>
+      <div class="banner-dots" id="bannerDots"></div>
       <div class="banner-content" id="bannerTextContent">
         <h2>ยินดีต้อนรับสู่ระบบ Kruton Tutor</h2>
         <p class="banner-desc">จัดการคอร์สเรียน ติดตามความคืบหน้า และสื่อสารกับผู้ปกครอง</p>
