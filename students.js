@@ -5,6 +5,78 @@ let currentFilterGrade = 'ทั้งหมด';
 let tutorNotifications = {};
 let searchQuery = '';
 let sortMode = 'newest';
+let unreadByStudent = {};   // student_id -> { count, message, seconds }  (ใช้กับกระดิ่งแจ้งเตือน)
+let viewMode = 'grid';      // 'grid' = การ์ด, 'list' = รายการ
+try { viewMode = localStorage.getItem('courseViewMode') === 'list' ? 'list' : 'grid'; } catch (e) {}
+
+// กันข้อความที่ผู้ใช้พิมพ์ (เช่น แชทจากผู้ปกครอง) ไม่ให้ถูกตีความเป็นโค้ด HTML
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ===== สลับมุมมอง การ์ด / รายการ =====
+function setViewMode(mode) {
+  viewMode = mode === 'list' ? 'list' : 'grid';
+  try { localStorage.setItem('courseViewMode', viewMode); } catch (e) {}
+  updateViewToggleButtons();
+  renderCourseCards(currentFilterGrade);
+}
+function updateViewToggleButtons() {
+  const g = document.getElementById('viewGridBtn');
+  const l = document.getElementById('viewListBtn');
+  if (g) g.classList.toggle('active', viewMode === 'grid');
+  if (l) l.classList.toggle('active', viewMode === 'list');
+}
+updateViewToggleButtons();
+
+// ===== กระดิ่งแจ้งเตือน =====
+function toggleBellPanel() {
+  const p = document.getElementById('bellPanel');
+  if (p) p.classList.toggle('open');
+}
+function closeBell() {
+  const p = document.getElementById('bellPanel');
+  if (p) p.classList.remove('open');
+}
+function openBellItem(studentId) {
+  closeBell();
+  openDetailView(studentId);
+}
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.bell-wrap');
+  if (wrap && !wrap.contains(e.target)) closeBell();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBell(); });
+
+function renderBell() {
+  const panel = document.getElementById('bellPanel');
+  const badge = document.getElementById('bellBadge');
+  if (!panel || !badge) return;
+  const entries = Object.entries(unreadByStudent)
+    .map(([sid, u]) => ({ sid, u, st: allStudents.find(x => x.id === sid) }))
+    .filter(e => e.st)                       // ข้ามข้อความของนักเรียนที่ถูกลบไปแล้ว
+    .sort((a, b) => b.u.seconds - a.u.seconds);
+  const n = entries.length;
+  badge.style.display = n ? 'flex' : 'none';
+  badge.textContent = n > 9 ? '9+' : String(n);
+  document.title = (n ? `(${n}) ` : '') + 'Kruton Tutor - Dashboard';
+
+  const items = entries.map(({ sid, u, st }) => {
+    const when = u.seconds ? new Date(u.seconds * 1000).toLocaleString('th-TH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+    const msg = u.message.length > 70 ? u.message.slice(0, 70) + '…' : u.message;
+    return `
+      <div class="bell-item" onclick="openBellItem('${sid}')">
+        <div class="bell-item-top">
+          <span>👤 น้อง${escapeHtml(st.nickname)} · ${escapeHtml(st.course_title || 'ทั่วไป')}</span>
+          ${u.count > 1 ? `<span class="bell-count">${u.count}</span>` : ''}
+        </div>
+        <div class="bell-item-msg">${escapeHtml(msg)}</div>
+        <div class="bell-item-time">${when}</div>
+      </div>`;
+  }).join('');
+  panel.innerHTML = '<div class="bell-head">🔔 ข้อความใหม่จากผู้ปกครอง</div>' +
+    (n ? items : '<div class="bell-empty">ไม่มีข้อความใหม่ 🎉</div>');
+}
 
 // เรียกทุกครั้งที่พิมพ์ในช่องค้นหา หรือเปลี่ยนตัวเลือกเรียงลำดับ
 function onCourseFilterChange() {
@@ -18,11 +90,18 @@ function onCourseFilterChange() {
 function initNotificationListener() {
   db.collection('comments').where('sender_role', '==', 'parent').where('readByTutor', '==', false).onSnapshot(snapshot => {
     tutorNotifications = {};
+    unreadByStudent = {};
     snapshot.docs.forEach(doc => {
       const data = doc.data();
-      tutorNotifications[data.student_id] = true;
+      const sid = data.student_id;
+      tutorNotifications[sid] = true;
+      const secs = data.createdAt?.seconds || 0;
+      const u = unreadByStudent[sid] || (unreadByStudent[sid] = { count: 0, message: '', seconds: -1 });
+      u.count++;
+      if (secs >= u.seconds) { u.seconds = secs; u.message = data.message || ''; }   // เก็บข้อความล่าสุดไว้โชว์
     });
     renderCourseCards(currentFilterGrade);
+    renderBell();
   });
 }
 
@@ -30,7 +109,7 @@ function initStudentsListener() {
   db.collection('students').onSnapshot(snapshot => {
     allStudents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     allStudents.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-    renderCourseCards(currentFilterGrade); renderHistoryTable();
+    renderCourseCards(currentFilterGrade); renderHistoryTable(); renderBell();
   });
 }
 
@@ -41,8 +120,35 @@ function filterByGrade(grade) {
   renderCourseCards(grade);
 }
 
+function promoRowHtml(p) {
+  const isOnline = (p.format || '').toLowerCase().includes('online');
+  const tag = p.format ? `<span class="promo-type-tag ${isOnline ? 'online' : 'onsite'}" style="margin-top:0;">${isOnline ? '💻' : '📍'} ${escapeHtml(p.format)}${p.location ? ' · ' + escapeHtml(p.location) : ''}</span>` : '';
+  return `
+    <div class="course-row promo-row" onclick="openPromoDetail('${p.id}')">
+      <span class="row-badge">✨ โปรโมท</span>
+      <div class="row-main">
+        <div class="row-title">${escapeHtml(p.title || 'คอร์สโปรโมท')}</div>
+        <div class="row-sub">${escapeHtml(p.description || '')}</div>
+      </div>
+      ${tag}
+    </div>`;
+}
+
+function studentRowHtml(st, hasNotif) {
+  return `
+    <div class="course-row" onclick="openDetailView('${st.id}')">
+      <div class="row-main">
+        <div class="row-title">${escapeHtml(st.course_title || 'คอร์สเรียนทั่วไป')}${hasNotif}</div>
+        <div class="row-sub">👤 น้อง${escapeHtml(st.nickname)} (${escapeHtml(st.full_name)})</div>
+      </div>
+      <span class="row-grade">ชั้น: ${escapeHtml(st.grade_level || '-')}</span>
+      <button class="row-edit" onclick="event.stopPropagation(); quickEditStudent('${st.id}')" title="แก้ไขด่วน">✏️</button>
+    </div>`;
+}
+
 function renderCourseCards(grade = 'ทั้งหมด') {
   const grid = document.getElementById('courseGrid');
+  grid.className = viewMode === 'list' ? 'course-list' : 'course-grid';
   let filteredStudents = allStudents;
   if (grade !== 'ทั้งหมด') filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
 
@@ -60,7 +166,7 @@ function renderCourseCards(grade = 'ทั้งหมด') {
 
   const visiblePromos = searchQuery ? promoCourses.filter(p => matches(p.title, p.description)) : promoCourses;
   const showPromo = grade === 'ทั้งหมด' && visiblePromos.length > 0;
-  let promoHtml = showPromo ? visiblePromos.map(p => `
+  let promoHtml = showPromo ? visiblePromos.map(p => viewMode === 'list' ? promoRowHtml(p) : `
     <div class="course-card promo-card" style="position:relative;" onclick="openPromoDetail('${p.id}')">
       <span class="promo-badge-inline">✨ โปรโมท</span>
       ${p.coverImageUrl ? `<img class="promo-cover" src="${formatImageUrl(p.coverImageUrl)}">` : `<div class="promo-cover-placeholder">📣</div>`}
@@ -77,6 +183,7 @@ function renderCourseCards(grade = 'ทั้งหมด') {
   }
   const studentHtml = filteredStudents.map(st => {
     const hasNotif = tutorNotifications[st.id] ? '<span class="notif-dot" title="มีข้อความใหม่จากผู้ปกครอง"></span>' : '';
+    if (viewMode === 'list') return studentRowHtml(st, hasNotif);
     return `
     <div class="course-card" style="position:relative;" onclick="openDetailView('${st.id}')">
       <button class="quick-edit-btn" onclick="event.stopPropagation(); quickEditStudent('${st.id}')" title="แก้ไขด่วน">✏️</button>
