@@ -102,6 +102,17 @@
           </div>
         </div>
       </div>
+      <div class="course-toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="courseSearchInput" placeholder="ค้นหาชื่อนักเรียน / คอร์ส / ระดับชั้น..." oninput="onCourseFilterChange()">
+        </div>
+        <select id="courseSortSelect" class="sort-select" onchange="onCourseFilterChange()">
+          <option value="newest">เรียงตาม: เพิ่มล่าสุด</option>
+          <option value="unread">เรียงตาม: มีข้อความใหม่ก่อน</option>
+          <option value="name">เรียงตาม: ชื่อเล่น ก-ฮ</option>
+        </select>
+      </div>
       <div id="courseGrid" class="course-grid"></div>
     </div>
 

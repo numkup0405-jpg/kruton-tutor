@@ -3,6 +3,15 @@ let currentStudentId = null;
 let allStudents = [];
 let currentFilterGrade = 'ทั้งหมด';
 let tutorNotifications = {};
+let searchQuery = '';
+let sortMode = 'newest';
+
+// เรียกทุกครั้งที่พิมพ์ในช่องค้นหา หรือเปลี่ยนตัวเลือกเรียงลำดับ
+function onCourseFilterChange() {
+  searchQuery = document.getElementById('courseSearchInput').value.trim().toLowerCase();
+  sortMode = document.getElementById('courseSortSelect').value;
+  renderCourseCards(currentFilterGrade);
+}
 
 // แจ้งเตือนจุดแดงเมื่อผู้ปกครองส่งข้อความใหม่ที่ติวเตอร์ยังไม่ได้อ่าน
 // (เรียกจาก firebase-init.js หลังจาก Firebase พร้อมใช้งานแล้วเท่านั้น)
@@ -37,8 +46,21 @@ function renderCourseCards(grade = 'ทั้งหมด') {
   let filteredStudents = allStudents;
   if (grade !== 'ทั้งหมด') filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
 
-  const showPromo = grade === 'ทั้งหมด' && promoCourses.length > 0;
-  let promoHtml = showPromo ? promoCourses.map(p => `
+  // ค้นหา: ชื่อเล่น / ชื่อ-นามสกุล / ชื่อคอร์ส / ระดับชั้น
+  const matches = (...vals) => vals.some(v => v && String(v).toLowerCase().includes(searchQuery));
+  if (searchQuery) filteredStudents = filteredStudents.filter(st => matches(st.nickname, st.full_name, st.course_title, st.grade_level));
+
+  // เรียงลำดับ (ค่าเริ่มต้น 'newest' คือเรียงตามที่ดึงมาแล้ว = เพิ่มล่าสุดก่อน)
+  filteredStudents = [...filteredStudents];
+  if (sortMode === 'unread') {
+    filteredStudents.sort((a, b) => (tutorNotifications[b.id] ? 1 : 0) - (tutorNotifications[a.id] ? 1 : 0));
+  } else if (sortMode === 'name') {
+    filteredStudents.sort((a, b) => (a.nickname || '').localeCompare(b.nickname || '', 'th'));
+  }
+
+  const visiblePromos = searchQuery ? promoCourses.filter(p => matches(p.title, p.description)) : promoCourses;
+  const showPromo = grade === 'ทั้งหมด' && visiblePromos.length > 0;
+  let promoHtml = showPromo ? visiblePromos.map(p => `
     <div class="course-card promo-card" style="position:relative;" onclick="openPromoDetail('${p.id}')">
       <span class="promo-badge-inline">✨ โปรโมท</span>
       ${p.coverImageUrl ? `<img class="promo-cover" src="${formatImageUrl(p.coverImageUrl)}">` : `<div class="promo-cover-placeholder">📣</div>`}
@@ -50,7 +72,7 @@ function renderCourseCards(grade = 'ทั้งหมด') {
     </div>`).join('') : '';
 
   if (filteredStudents.length === 0 && !showPromo) {
-    grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px;">ยังไม่มีข้อมูลคอร์สเรียน</div>';
+    grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px;">' + (searchQuery ? 'ไม่พบนักเรียนหรือคอร์สที่ค้นหา' : 'ยังไม่มีข้อมูลคอร์สเรียน') + '</div>';
     return;
   }
   const studentHtml = filteredStudents.map(st => {
