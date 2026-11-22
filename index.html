@@ -93,6 +93,20 @@
     </div>
 
     <div id="dashboardView" class="view-section active">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">👤</div>
+          <div><div class="stat-num" id="statStudents">0</div><div class="stat-label">นักเรียนทั้งหมด</div></div>
+        </div>
+        <div class="stat-card stat-clickable" id="statUnreadCard" onclick="showUnreadFirst()" title="กดเพื่อดูคนที่มีข้อความใหม่ก่อน">
+          <div class="stat-icon">💬</div>
+          <div><div class="stat-num" id="statUnread">0</div><div class="stat-label">ข้อความใหม่จากผู้ปกครอง</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-icon-promo">✨</div>
+          <div><div class="stat-num" id="statPromo">0</div><div class="stat-label">คอร์สโปรโมท</div></div>
+        </div>
+      </div>
       <div class="section-header">
         <h3 class="section-title" id="courseListTitle">คอร์สที่ปรากฏ (ทั้งหมด)</h3>
         <div style="display:flex; align-items:center; gap: 24px;">

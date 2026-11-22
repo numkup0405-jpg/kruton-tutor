@@ -51,8 +51,12 @@
   </aside>
 
   <main class="main-wrapper" id="mainContent">
-    <div style="margin-bottom: 5px;">
+    <div class="top-bar">
       <button class="btn btn-outline" onclick="toggleSidebar()" style="background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 1.05rem; padding: 8px 16px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">☰ เมนู</button>
+      <div class="bell-wrap">
+        <button class="bell-btn" onclick="toggleBellPanel()" title="ข้อความใหม่จากคุณครู">🔔<span class="bell-badge" id="bellBadge" style="display:none;">0</span></button>
+        <div class="bell-panel" id="bellPanel"><div class="bell-head">🔔 ข้อความใหม่จากคุณครู</div><div class="bell-empty">ไม่มีข้อความใหม่ 🎉</div></div>
+      </div>
     </div>
 
     <div class="banner-container" id="mainBanner">
@@ -67,8 +71,37 @@
     </div>
 
     <div id="dashboardView" class="view-section active">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">📚</div>
+          <div><div class="stat-num" id="statStudents">0</div><div class="stat-label">คอร์สเรียนทั้งหมด</div></div>
+        </div>
+        <div class="stat-card stat-clickable" id="statUnreadCard" onclick="showUnreadFirst()" title="กดเพื่อดูคอร์สที่มีข้อความใหม่ก่อน">
+          <div class="stat-icon">💬</div>
+          <div><div class="stat-num" id="statUnread">0</div><div class="stat-label">ข้อความใหม่จากคุณครู</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-icon-promo">✨</div>
+          <div><div class="stat-num" id="statPromo">0</div><div class="stat-label">คอร์สโปรโมท</div></div>
+        </div>
+      </div>
       <div class="section-header">
         <h3 class="section-title" id="courseListTitle">คอร์สที่ปรากฏ (ทั้งหมด)</h3>
+      </div>
+      <div class="course-toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="courseSearchInput" placeholder="ค้นหาชื่อนักเรียน / คอร์ส / ระดับชั้น..." oninput="onCourseFilterChange()">
+        </div>
+        <select id="courseSortSelect" class="sort-select" onchange="onCourseFilterChange()">
+          <option value="newest">เรียงตาม: เพิ่มล่าสุด</option>
+          <option value="unread">เรียงตาม: มีข้อความใหม่ก่อน</option>
+          <option value="name">เรียงตาม: ชื่อเล่น ก-ฮ</option>
+        </select>
+        <div class="view-toggle">
+          <button id="viewGridBtn" class="active" onclick="setViewMode('grid')" title="มุมมองการ์ด">▦</button>
+          <button id="viewListBtn" onclick="setViewMode('list')" title="มุมมองรายการ">☰</button>
+        </div>
       </div>
       <div id="courseGrid" class="course-grid"></div>
     </div>

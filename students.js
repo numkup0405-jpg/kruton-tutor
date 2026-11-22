@@ -45,14 +45,39 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBell(); });
 
+// รายการนักเรียนที่มีข้อความใหม่ (ใหม่สุดก่อน) ใช้ร่วมกันทั้งกระดิ่งและ Quick Stats
+function getUnreadEntries() {
+  return Object.entries(unreadByStudent)
+    .map(([sid, u]) => ({ sid, u, st: allStudents.find(x => x.id === sid) }))
+    .filter(e => e.st)                       // ข้ามข้อความของนักเรียนที่ถูกลบไปแล้ว
+    .sort((a, b) => b.u.seconds - a.u.seconds);
+}
+
+// ===== Quick Stats (แถบตัวเลขสรุปบนหน้าแดชบอร์ด) =====
+function renderQuickStats() {
+  const unread = getUnreadEntries().length;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('statStudents', allStudents.length);
+  set('statUnread', unread);
+  set('statPromo', promoCourses.length);
+  const card = document.getElementById('statUnreadCard');
+  if (card) card.classList.toggle('stat-alert', unread > 0);
+}
+
+// กดการ์ด "ข้อความใหม่" → เรียงคนที่มีข้อความใหม่ไว้บนสุด แล้วเลื่อนลงไปดูรายการ
+function showUnreadFirst() {
+  const sel = document.getElementById('courseSortSelect');
+  if (sel) sel.value = 'unread';
+  onCourseFilterChange();
+  const grid = document.getElementById('courseGrid');
+  if (grid && grid.scrollIntoView) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function renderBell() {
   const panel = document.getElementById('bellPanel');
   const badge = document.getElementById('bellBadge');
   if (!panel || !badge) return;
-  const entries = Object.entries(unreadByStudent)
-    .map(([sid, u]) => ({ sid, u, st: allStudents.find(x => x.id === sid) }))
-    .filter(e => e.st)                       // ข้ามข้อความของนักเรียนที่ถูกลบไปแล้ว
-    .sort((a, b) => b.u.seconds - a.u.seconds);
+  const entries = getUnreadEntries();
   const n = entries.length;
   badge.style.display = n ? 'flex' : 'none';
   badge.textContent = n > 9 ? '9+' : String(n);
@@ -146,6 +171,7 @@ function studentRowHtml(st, hasNotif) {
 function renderCourseCards(grade = 'ทั้งหมด') {
   const grid = document.getElementById('courseGrid');
   grid.className = viewMode === 'list' ? 'course-list' : 'course-grid';
+  renderQuickStats();
   let filteredStudents = allStudents;
   if (grade !== 'ทั้งหมด') filteredStudents = allStudents.filter(st => st.grade_level && st.grade_level.includes(grade));
 
@@ -166,11 +192,11 @@ function renderCourseCards(grade = 'ทั้งหมด') {
   let promoHtml = showPromo ? visiblePromos.map(p => viewMode === 'list' ? promoRowHtml(p) : `
     <div class="course-card promo-card" style="position:relative;" onclick="openPromoDetail('${p.id}')">
       <span class="promo-badge-inline">✨ โปรโมท</span>
-      ${p.coverImageUrl ? `<img class="promo-cover" src="${formatImageUrl(p.coverImageUrl)}">` : `<div class="promo-cover-placeholder">📣</div>`}
+      ${p.coverImageUrl ? `<img class="promo-cover" src="${escapeHtml(formatImageUrl(p.coverImageUrl))}">` : `<div class="promo-cover-placeholder">📣</div>`}
       <div class="promo-body">
-        <div class="course-title">${p.title || 'คอร์สโปรโมท'}</div>
-        <div style="font-size: 0.85rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.description || ''}</div>
-        ${p.format ? `<span class="promo-type-tag ${p.format.toLowerCase().includes('online') ? 'online' : 'onsite'}">${p.format.toLowerCase().includes('online') ? '💻' : '📍'} ${p.format}${p.location ? ' · ' + p.location : ''}</span>` : ''}
+        <div class="course-title">${escapeHtml(p.title || 'คอร์สโปรโมท')}</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${escapeHtml(p.description || '')}</div>
+        ${p.format ? `<span class="promo-type-tag ${p.format.toLowerCase().includes('online') ? 'online' : 'onsite'}">${p.format.toLowerCase().includes('online') ? '💻' : '📍'} ${escapeHtml(p.format)}${p.location ? ' · ' + escapeHtml(p.location) : ''}</span>` : ''}
       </div>
     </div>`).join('') : '';
 
@@ -184,10 +210,10 @@ function renderCourseCards(grade = 'ทั้งหมด') {
     return `
     <div class="course-card" style="position:relative;" onclick="openDetailView('${st.id}')">
       <button class="quick-edit-btn" onclick="event.stopPropagation(); quickEditStudent('${st.id}')" title="แก้ไขด่วน">✏️</button>
-      <div class="course-title">${st.course_title || 'คอร์สเรียนทั่วไป'}${hasNotif}</div>
-      <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">👤 น้อง${st.nickname} (${st.full_name})</div>
+      <div class="course-title">${escapeHtml(st.course_title || 'คอร์สเรียนทั่วไป')}${hasNotif}</div>
+      <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">👤 น้อง${escapeHtml(st.nickname)} (${escapeHtml(st.full_name)})</div>
       <div style="font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #f1f5f9;">
-        <span style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px;">ชั้น: ${st.grade_level || '-'}</span>
+        <span style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px;">ชั้น: ${escapeHtml(st.grade_level || '-')}</span>
         <span style="color: var(--primary); font-weight: 600;">ดูรายละเอียด ➜</span>
       </div>
     </div>`;
