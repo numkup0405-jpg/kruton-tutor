@@ -19,7 +19,8 @@ function loadTutorChat() {
 function renderChat(comments) {
   const box = document.getElementById('tutorChatBox');
   if (comments.length === 0) { box.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 10px 0;">ยังไม่มีข้อความ</div>'; return; }
-  box.innerHTML = comments.map(c => `<div class="chat-msg ${c.sender_role}"><div style="font-size:0.75rem; font-weight:600; margin-bottom:2px;">${c.sender_name}</div><div>${c.message}</div></div>`).join('');
+  // escape ทั้งชื่อผู้ส่งและข้อความ + จำกัด class ให้เป็น tutor/parent เท่านั้น (กันโค้ดแฝงจากข้อความ)
+  box.innerHTML = comments.map(c => `<div class="chat-msg ${c.sender_role === 'tutor' ? 'tutor' : 'parent'}"><div style="font-size:0.75rem; font-weight:600; margin-bottom:2px;">${escapeHtml(c.sender_name)}</div><div>${escapeHtml(c.message)}</div></div>`).join('');
   box.scrollTop = box.scrollHeight;
 }
 async function sendTutorComment() {

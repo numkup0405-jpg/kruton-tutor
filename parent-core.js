@@ -38,3 +38,8 @@ function statusLabel(s) {
   if (s === 'in_progress') return 'กำลังเรียน';
   return 'รอดำเนินการ';
 }
+
+// กันข้อความที่ผู้ใช้พิมพ์ (เช่น แชท) ไม่ให้ถูกตีความเป็นโค้ด HTML/JavaScript เมื่อนำไปแสดงบนหน้าเว็บ
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}

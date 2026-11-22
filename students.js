@@ -9,10 +9,7 @@ let unreadByStudent = {};   // student_id -> { count, message, seconds }  (ใ�
 let viewMode = 'grid';      // 'grid' = การ์ด, 'list' = รายการ
 try { viewMode = localStorage.getItem('courseViewMode') === 'list' ? 'list' : 'grid'; } catch (e) {}
 
-// กันข้อความที่ผู้ใช้พิมพ์ (เช่น แชทจากผู้ปกครอง) ไม่ให้ถูกตีความเป็นโค้ด HTML
-function escapeHtml(str) {
-  return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
+// (ฟังก์ชัน escapeHtml อยู่ใน app-core.js)
 
 // ===== สลับมุมมอง การ์ด / รายการ =====
 function setViewMode(mode) {

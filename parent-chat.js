@@ -19,8 +19,8 @@ function renderChat(comments) {
   if (comments.length === 0) { box.innerHTML = '<div class="empty-state" style="padding:12px 0;">ยังไม่มีข้อความ</div>'; return; }
   box.innerHTML = comments.map(c => `
     <div class="chat-msg ${c.sender_role === 'tutor' ? 'tutor' : 'parent'}">
-      <div style="font-size:0.72rem; font-weight:600; margin-bottom:2px; opacity:0.8;">${c.sender_name}</div>
-      <div>${c.message}</div>
+      <div style="font-size:0.72rem; font-weight:600; margin-bottom:2px; opacity:0.8;">${escapeHtml(c.sender_name)}</div>
+      <div>${escapeHtml(c.message)}</div>
     </div>`).join('');
   box.scrollTop = box.scrollHeight;
 }

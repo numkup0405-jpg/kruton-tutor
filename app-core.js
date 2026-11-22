@@ -49,3 +49,8 @@ function formatImageUrl(url) {
 }
 
 function copyParentLink() { const link = new URL('parent.html', window.location.href).href; navigator.clipboard.writeText(link); alert(`คัดลอกลิงก์สำหรับผู้ปกครองสำเร็จ:\n${link}`); }
+
+// กันข้อความที่ผู้ใช้พิมพ์ (เช่น แชท) ไม่ให้ถูกตีความเป็นโค้ด HTML/JavaScript เมื่อนำไปแสดงบนหน้าเว็บ
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
